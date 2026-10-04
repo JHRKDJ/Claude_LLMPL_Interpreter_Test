@@ -32,7 +32,7 @@ Minimal reproduction: tests/regressions/test_bug_0001_provider_frames.py
 Regression test failed before fix: yes (both cases)
 Fix: eval_Yield hides the suspended provider frames (restores call depth) while the
   scope body runs and restores them for normal release (lang/runtime/interp/res.py).
-Commit: (this commit)
+Commit: 3dcea3c
 Status: fixed
 
 BUG-0002
@@ -47,5 +47,22 @@ Regression test failed before fix: yes (2 of 3 cases; the third pins the
   "unaffected group returns, cancellation stays pending" behaviour)
 Fix: group_outcome re-raises cancellation after quiescence when cancellation is
   pending for the owner and any child ended cancelled (lang/runtime/interp/conc.py).
-Commit: (this commit)
+Commit: 3dcea3c
+Status: fixed
+
+BUG-0003
+Origin: checker integration review (conformance test
+  `test_on_abandon_restricted_to_builtin_primitives` asserted the wrong code)
+Subsystems: resources × diagnostics
+Symptom: the runtime's defence-in-depth check for `onAbandon` (only built-in
+  abandonment-safe release primitives, V3 5.5.10-12) abandoned with the unrelated
+  code A.RESOURCE.PROVIDER_OUTSIDE_USE, so tools and readers could not distinguish
+  "provider used outside `use`" from "unsafe abandonment action".
+Minimal reproduction: tests/regressions/test_bug_0003_on_abandon_code.py (runs the
+  interpreter without the static checker, which now rejects this statically)
+Regression test failed before fix: yes
+Fix: exec_OnAbandonStmt reports A.RESOURCE.ON_ABANDON_RESTRICTED (new code in
+  lang/diagnostics/codes.py); the conformance test asserts the static code
+  S.RESOURCE.ON_ABANDON_RESTRICTED.
+Commit: a67c865
 Status: fixed
