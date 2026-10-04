@@ -1,0 +1,1439 @@
+{
+ "note": "Dynamic queue; see tools/workitems.py. States: TODO IN_PROGRESS BLOCKED IMPLEMENTED VERIFYING DONE",
+ "items": [
+  {
+   "id": "SRC-001",
+   "title": "Source files, spans, line/column mapping",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-001",
+   "title": "Structured diagnostic model (code, severity, labels, notes, provenance fields)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-002",
+   "title": "Text renderer with multi-span source snippets",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-003",
+   "title": "JSON renderer exposing outcome/domain/reason/stable_code",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-004",
+   "title": "Hierarchical stable code registry",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-005",
+   "title": "Bounded, cycle-safe, redacting local value capture (V3 7.13.4)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-006",
+   "title": "Abandonment reports with frames and bounded locals",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-007",
+   "title": "Concurrent failure tree (stack cactus) + flattened leaves (V3 7.13.6)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-008",
+   "title": "Resource provenance in diagnostics (acquisition/owning scope)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-009",
+   "title": "Channel/select provenance (ids, sequence, ready sets, cursor)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-010",
+   "title": "Output modes default/quiet/deep/JSON",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-011",
+   "title": "Render budget and explicit truncation markers",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-012",
+   "title": "Parser/checker cascade marking (root cause prominent)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DIAG-013",
+   "title": "State-horizon advisories (provisional V3 7.3.5)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-LEX-001",
+   "title": "Lexer: tokens, keywords, numbers, operators",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-LEX-002",
+   "title": "String literals: escapes, interpolation, triple-quoted",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-LEX-003",
+   "title": "Comment/blank-line trivia retention for formatter",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-001",
+   "title": "Declarations: fn/record/enum/error/category/protocol/predicate/const/import/test",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-002",
+   "title": "Statements: let/const/assign/return/break/continue/throw/defer/assert/while/for",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-003",
+   "title": "Expressions: precedence, postfix, literals, lambdas, with-update",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-004",
+   "title": "Newline continuation rules and leading-operator diagnostic (V3 7.1.2)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-005",
+   "title": "Patterns: literal, binding, variant, record, tuple, type, or, guards",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-006",
+   "title": "Types: generics, T?, fn types with throws, tuples, borrow",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-007",
+   "title": "Concurrency syntax: parallel modes, spawn, within, select forms",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-008",
+   "title": "Resource syntax: resource fn, yields, use, yield, onAbandon, defer",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FRONTEND-PARSE-009",
+   "title": "Error recovery: multiple errors, synchronisation, cascade suppression",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FORMAT-001",
+   "title": "Canonical formatter printing for all constructs",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FORMAT-002",
+   "title": "Comment and blank-line preservation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FORMAT-003",
+   "title": "Formatter idempotence + parse/format/parse property tests",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FORMAT-004",
+   "title": "format --check/--diff patches",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "NAME-RESOLVE-001",
+   "title": "Lexical scopes, bindings, duplicate/shadowing rules",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "NAME-RESOLVE-002",
+   "title": "Use-before-initialisation / definite assignment",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "NAME-RESOLVE-003",
+   "title": "Closure captures and nonlocal reassignment marker",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "NAME-RESOLVE-004",
+   "title": "Unresolved-name diagnostics with import candidates",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-001",
+   "title": "Manifest (lang.toml), lockfile, project root",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-002",
+   "title": "Module loading, absolute paths, directory modules",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-003",
+   "title": "Exports (pub) and module-private visibility",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-004",
+   "title": "Module constant init-cycle detection with full trace",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-005",
+   "title": "Mutable module globals prohibited; constants frozen",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-006",
+   "title": "Auto-import as visible source patch from known modules only",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "MODULE-007",
+   "title": "Runtime module loading and explicit reload (REPL)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-001",
+   "title": "Primitives Int/Float/Bool/Str/Unit, arithmetic, no coercion",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-002",
+   "title": "NaN policy implementation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-003",
+   "title": "String API and interpolation runtime (safe display only)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-004",
+   "title": "Frozen records: construction, defaults, equality, with-update",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-005",
+   "title": "Mutable records: identity, field assignment",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-006",
+   "title": "Frozen collections List/Map/Set API",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-007",
+   "title": "Mutable collections API + modification-during-iteration check",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-008",
+   "title": "freeze()/mutableCopy() snapshot isolation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-009",
+   "title": "Tuples and ranges",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VALUE-010",
+   "title": "Equality, typed hashing, ordering, display without Python leakage",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VARIANT-001",
+   "title": "Enums: declaration, qualified construction, methods",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VARIANT-002",
+   "title": "Pattern matching: all pattern kinds, guards, is-expressions with bindings",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "VARIANT-003",
+   "title": "Runtime non-exhaustive match abandonment",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "OPTION-001",
+   "title": "Option/T?/null and API",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FN-001",
+   "title": "Functions: params, defaults, named args, return",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FN-002",
+   "title": "Methods with explicit self, associated functions",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FN-003",
+   "title": "Lambdas and closures",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FN-004",
+   "title": "Control flow and expression-valued blocks",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FN-005",
+   "title": "Left-to-right evaluation order",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "BIND-001",
+   "title": "let/const/assignment runtime semantics, uninitialised bindings",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-001",
+   "title": "Type terms and annotation conversion",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-002",
+   "title": "Runtime boundary checks: params, returns, let, fields, collections",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-003",
+   "title": "Transient nested checks inserted at typed uses",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-004",
+   "title": "Dynamic mismatch diagnostics: boundary, annotation, origin",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-005",
+   "title": "Generics for functions/records/enums with static instantiation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-006",
+   "title": "Static expression type checking (verified errors, draft warnings)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-007",
+   "title": "as-narrowing and type patterns",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-008",
+   "title": "Dynamic callable narrowing before verified invocation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TYPE-009",
+   "title": "Exported-interface annotation requirements (verified)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "PROTOCOL-001",
+   "title": "Protocol declarations",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "PROTOCOL-002",
+   "title": "Structural conformance table (arity, effects, no added preconditions)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "PROTOCOL-003",
+   "title": "Protocol-annotated boundary shallow shape/effect check",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "PROTOCOL-004",
+   "title": "satisfies declaration static check",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "PROTOCOL-005",
+   "title": "Inherited protocol contracts on every invocation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "PROTOCOL-006",
+   "title": "Implementation postconditions supplement inherited ones",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-001",
+   "title": "error / category / error enum declarations",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-002",
+   "title": "throw and try propagation with propagation chain",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-003",
+   "title": "catch by type/category; no catch-all",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-004",
+   "title": "else fallback legality (one known concrete type)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-005",
+   "title": "Runtime enforcement of written throws clauses (AMB-005)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-006",
+   "title": "Top-level unhandled recoverable exception behaviour and exit status",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-007",
+   "title": "AggregateException with provenance",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-008",
+   "title": "Static effect checking: missing try, undeclared throws",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-009",
+   "title": "Effect variables, unions, forwarding through callbacks",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-010",
+   "title": "Abandonment non-catchable; diagnostics with stack",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ERR-011",
+   "title": "Hard termination escalation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESULT-001",
+   "title": "Result type and API",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESULT-002",
+   "title": "capture / orThrow / propagate conversions",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESULT-003",
+   "title": "Reject functions both throwing and returning Result",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESULT-004",
+   "title": "Err provenance: creation span, chain, task lineage, context",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-001",
+   "title": "requires/ensures runtime checking",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-002",
+   "title": "result binding and old() snapshot legality",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-003",
+   "title": "Restricted contract language static validation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-004",
+   "title": "predicate declarations (non-recursive, predicates-only calls)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-005",
+   "title": "Invariants on frozen and mutable records; field control",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-006",
+   "title": "Invariant checks at exits with outermost-call rule",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-007",
+   "title": "Exit ordering: cleanup before postconditions; invariant failure supersedes",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CONTRACT-008",
+   "title": "Violation diagnostics with sub-expression values and blame",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-001",
+   "title": "resource fn providers, exactly one yield (static + runtime)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-002",
+   "title": "use scopes, expression-valued, ScopeExit to provider",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-003",
+   "title": "borrow parameters",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-004",
+   "title": "Runtime no-escape enforcement",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-005",
+   "title": "Static no-escape checking",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-006",
+   "title": "Normal release on return/exception/cancellation without suppression",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-007",
+   "title": "onAbandon restricted abandonment-safe release",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-008",
+   "title": "Cleanup/release failure combination table (all rows)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-009",
+   "title": "defer: block-scoped LIFO, not on abandonment, async under masking",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-010",
+   "title": "Scope-width advisories (provisional)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "RESOURCE-011",
+   "title": "Built-in fs providers (read/write/atomic write/temp dir)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SCHED-001",
+   "title": "Baton-passing coroutine primitive",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SCHED-002",
+   "title": "Deterministic FIFO scheduler",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SCHED-003",
+   "title": "Seeded random scheduling mode",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SCHED-004",
+   "title": "Clock (real/virtual), sleep, Instant/Duration",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SCHED-005",
+   "title": "Deadlock detection diagnostic",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ASYNC-001",
+   "title": "async fn / await runtime semantics",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ASYNC-002",
+   "title": "Static async rules: await only in async, missing await, sync->async calls",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-001",
+   "title": "parallel fail-fast",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-002",
+   "title": "parallel collect -> TaskGroupReport",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-003",
+   "title": "parallel race",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-004",
+   "title": "parallel firstSuccess",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-005",
+   "title": "spawn forms, handles, await, observation (AMB-002)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-006",
+   "title": "Child abandonment dominance, TaskGroupFailure",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-007",
+   "title": "Stable task paths and task-tree reports",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-008",
+   "title": "External cancellation coinciding with group failure",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TASK-009",
+   "title": "Quiescence before structured exit",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CANCEL-001",
+   "title": "Cancellation requests, delivery points, cancel.check()",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CANCEL-002",
+   "title": "Cancellation not catchable/capturable",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CANCEL-003",
+   "title": "Cleanup masking and redelivery",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CANCEL-004",
+   "title": "within deadline -> DeadlineExceeded",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CANCEL-005",
+   "title": "Stuck-cleanup diagnostic, SIGINT and double-SIGINT escalation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CANCEL-006",
+   "title": "Verified warning for async loops lacking cancellation points",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ISOLATION-001",
+   "title": "Static sendability classification",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ISOLATION-002",
+   "title": "Runtime graph inspection for dynamic values",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ISOLATION-003",
+   "title": "Graph copy preserving cycles/aliases",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ISOLATION-004",
+   "title": "Closure capture sendability (mutable captures rejected)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ISOLATION-005",
+   "title": "Reject resources/borrows/controllers/unsafe capabilities",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "ISOLATION-006",
+   "title": "Large-copy advisories",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-001",
+   "title": "Controller/ports and capacity construction",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-002",
+   "title": "Blocking send/receive and rendezvous matching",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-003",
+   "title": "Buffered and unbounded channels",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-004",
+   "title": "Closure, holder tracking, NoReceivers/NoSenders/ControllerClosed",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-005",
+   "title": "Nonblocking trySend/tryReceive outcomes",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-006",
+   "title": "Cancellation commit atomicity for channel ops",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-007",
+   "title": "Ordering and commit sequence numbers",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-008",
+   "title": "Mutable messages copied after reservation, before commit",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-009",
+   "title": "FIFO waiter queues; cancellation removes waiter",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-010",
+   "title": "Closure diagnostics and bounded event history",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-011",
+   "title": "Broadcast (frozen-only)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-012",
+   "title": "for await receive loop",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CHANNEL-013",
+   "title": "Unbounded growth advisory",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-001",
+   "title": "Static select syntax and branch kinds",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-002",
+   "title": "Atomic one-winner commit; losers have no effect",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-003",
+   "title": "Rotating fairness cursor per site/activation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-004",
+   "title": "select priority + starvation warning",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-005",
+   "title": "select now with none ready",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-006",
+   "title": "Deadlines: at / after",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-007",
+   "title": "Guards (precomputed frozen booleans)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-008",
+   "title": "Closed-channel outcomes",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-009",
+   "title": "Task completion branch",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-010",
+   "title": "Pure branch setup static check",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-011",
+   "title": "Select cancellation semantics",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-012",
+   "title": "Random tie-breaking in stress mode",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-013",
+   "title": "Selection event ring buffer diagnostics",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-014",
+   "title": "selectReceive / selectTask dynamic homogeneous helpers",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "SELECT-015",
+   "title": "Loop diagnostics: deadline reset, closed loop, busy poll",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DRAFT-VERIFY-001",
+   "title": "Mode plumbing: manifest default + CLI override",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DRAFT-VERIFY-002",
+   "title": "Severity policy for obligations by mode",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DRAFT-VERIFY-003",
+   "title": "Draft runtime meaning identical to verified",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "DRAFT-VERIFY-004",
+   "title": "Release requires verified acceptance",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CLI-001",
+   "title": "lang run",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CLI-002",
+   "title": "lang check",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CLI-003",
+   "title": "lang format",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CLI-004",
+   "title": "lang test runner",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CLI-005",
+   "title": "lang repl",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "CLI-006",
+   "title": "Exit status conventions",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-001",
+   "title": "Core builtins (print, min, max, abs, ...)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-002",
+   "title": "math module",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-003",
+   "title": "json module",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-004",
+   "title": "fs module helpers",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-005",
+   "title": "time module",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-006",
+   "title": "Standard concrete errors and categories",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-007",
+   "title": "String utilities and regex",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-008",
+   "title": "Channel helpers in language stdlib (fan-in, receive-until-closed)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "STD-009",
+   "title": "Ordinary protocols Comparable/Hashable/Iterable",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INFRA-001",
+   "title": "Conformance harness (expected stdout/exit/diagnostic codes)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INFRA-002",
+   "title": "Architecture dependency test",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-FUZZ-001",
+   "title": "Parser malformed-input robustness fuzz",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-FUZZ-002",
+   "title": "Formatter idempotence fuzz",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-FUZZ-003",
+   "title": "Scheduling interleaving fuzz (seeded)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-FUZZ-004",
+   "title": "Graph copy property tests",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-FUZZ-005",
+   "title": "Exhaustiveness combinatorics",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-FUZZ-006",
+   "title": "Diagnostic span consistency",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-001",
+   "title": "Interaction: typing x recoverable errors",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-002",
+   "title": "Interaction: typing x Result",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-003",
+   "title": "Interaction: draft/verified x type checking",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-004",
+   "title": "Interaction: draft/verified x effect obligations",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-005",
+   "title": "Interaction: variants x exhaustiveness",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-006",
+   "title": "Interaction: dynamic x protocols x contracts (8.1)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-007",
+   "title": "Interaction: protocols x structural conformance",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-008",
+   "title": "Interaction: mutable values x contracts",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-009",
+   "title": "Interaction: mutation x invariants x cancellation (8.8)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-010",
+   "title": "Interaction: resources x success/error/abandonment/cancellation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-011",
+   "title": "Interaction: cleanup x cleanup failure",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-012",
+   "title": "Interaction: tasks x errors/abandonment/cancellation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-013",
+   "title": "Interaction: isolation x frozen/mutable/resources (8.2)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-014",
+   "title": "Interaction: channels x task lifetime/cancellation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-015",
+   "title": "Interaction: select x channels/cancellation/simultaneous readiness/failure",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-016",
+   "title": "Interaction: concurrent failures x aggregation x diagnostics (8.10, 8.11)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-017",
+   "title": "Interaction: error effects x higher-order functions (8.3)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-018",
+   "title": "Interaction: exceptions x Results x channels (8.4)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-019",
+   "title": "Interaction: resources x async suspension (8.5)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-020",
+   "title": "Interaction: resources x expression blocks x contracts (8.7)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-021",
+   "title": "Interaction: channels x graph copy x backpressure (8.12)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-022",
+   "title": "Interaction: closure x select loops x fairness diagnostics (8.13, 8.14)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-023",
+   "title": "Interaction: selection x task lifetimes (8.15)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-024",
+   "title": "Interaction: relative timeout x loops (8.16)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-025",
+   "title": "Interaction: guards x mutable state (8.17)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-026",
+   "title": "Interaction: modules x mutable state x tasks (8.18)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-027",
+   "title": "Interaction: auto-import x reproducibility (8.19)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-028",
+   "title": "Interaction: diagnostics x privacy (8.20)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-029",
+   "title": "Interaction: protocol contracts x mutable implementations (8.9)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "TEST-INT-030",
+   "title": "Interaction: resources x abandonment transaction example (8.6)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-SPEC-001",
+   "title": "LocalFlow PROGRAM_SPEC.md",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-SPEC-002",
+   "title": "LocalFlow TEST_PLAN.md",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-FIX-001",
+   "title": "LocalFlow fixtures incl. generated large DAGs",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-ORACLE-001",
+   "title": "Python reference model (oracle)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-BB-001",
+   "title": "Black-box acceptance harness comparing oracle vs LocalFlow",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-IMPL-001",
+   "title": "LocalFlow: workflow parsing and validation",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-IMPL-002",
+   "title": "LocalFlow: DAG analysis (duplicates, missing deps, cycles)",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-IMPL-003",
+   "title": "LocalFlow: scheduler with bounded concurrency",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-IMPL-004",
+   "title": "LocalFlow: job kinds",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-IMPL-005",
+   "title": "LocalFlow: retry/timeout/failure policies",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-IMPL-006",
+   "title": "LocalFlow: reporting",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "APP-ADV-001",
+   "title": "LocalFlow adversarial acceptance cases",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "AUDIT-001",
+   "title": "First full V3 coverage reread after apparent completion",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "AUDIT-002",
+   "title": "Second independent coverage/correctness audit",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "AUDIT-003",
+   "title": "LocalFlow final adversarial acceptance review",
+   "state": "TODO",
+   "deps": []
+  },
+  {
+   "id": "FINAL-001",
+   "title": "FINAL_REPORT.md",
+   "state": "TODO",
+   "deps": []
+  }
+ ]
+}
