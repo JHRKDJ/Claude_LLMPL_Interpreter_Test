@@ -12,7 +12,7 @@ from .decls import FnSig
 from .expr import BuiltinRef, BuiltinTypeRef, CaseRef, ModRef, SigRef, TypeRef, opt
 from .types import (DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type,
                     task_error_names, task_error_type, unify)
-from .walk import AGG, CHCLOSED, DEADLINE, short
+from .walk import AGG, CHCLOSED, DEADLINE, contains_task, short
 
 
 class CallInfo:
@@ -223,6 +223,8 @@ class CallMixin:
         if info.params is None or info.kind == "dyn":
             return info.ret, info.effect_names, info.effect_unknown
         params = info.params
+        # a named function passed as a value is checked by its full function type
+        arg_types = [(a, self.callable_type(t)) for a, t in arg_types]
         positional = [(a, t) for a, t in arg_types if a.name is None]
         named = {a.name: (a, t) for a, t in arg_types if a.name is not None}
         subst: dict = {}
@@ -374,8 +376,9 @@ class CallMixin:
                 names.pop(concrete[0], None)
             ft = self.expr(e.fallback, sc)
             result = join(result, ft)
-        if not e.catches and e.fallback is None and not names and not coll.unknown and self.report:
-            pass
+        if not e.catches and e.fallback is None and coll.empty and self.report:
+            self.advise("W.EFFECT.USELESS_TRY", "`try` marks a failure point, but this expression cannot throw a "
+                        "recoverable error", e.span, help="remove `try`; it should mark only real failure points")
         for n, s in names.items():
             self.raise_eff([n], False, s)
         if coll.unknown:
@@ -552,6 +555,7 @@ class CallMixin:
         if not hasattr(self, "_parallel_stack"):
             self._parallel_stack = []
         e.ann.pop("_child_types", None)
+        e.ann["_fn_depth"] = len(self.fn_stack)
         self._parallel_stack.append(e)
         try:
             bt, coll = self.with_collector(lambda: self.block(e.body, sc))
@@ -561,6 +565,8 @@ class CallMixin:
         if fs is not None:
             fs.has_cancel_point = True
         child_types = e.ann.get("_child_types", [])
+        if e.mode == "failfast" and contains_task(bt):
+            e.ann["_value_has_task"] = True  # reported where the value is bound/assigned/returned
         # collect mode reports child failures as data; only the body's own failure is thrown
         may_fail = not coll.empty or (e.mode != "collect" and e.ann.get("_child_may_fail", False))
         if may_fail:

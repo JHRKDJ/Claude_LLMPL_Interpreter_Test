@@ -160,6 +160,8 @@ class Checker(WalkMixin, CallMixin, SelectCheckMixin, ExprMixin):
             if ms.file is not None and ms.file.path in self.blocked_files:
                 continue
             self.check_module_bodies(name, ms.ast)
+        from .advisories import run_advisories
+        run_advisories(self, [(n, m) for n, m in mods if m.file is None or m.file.path not in self.blocked_files])
         return self.diags
 
     def declare_types(self, mname: str, mod: A.Module) -> None:
@@ -260,7 +262,12 @@ class Checker(WalkMixin, CallMixin, SelectCheckMixin, ExprMixin):
         try:
             return T.from_expr(texpr, self.resolver_for(mname or self.cur_module),
                                frozenset(tparams) | texpr.ann.get("tparams", frozenset()))
-        except T.TypeConversionError:
+        except T.TypeConversionError as err:
+            if err.stable == "S.TYPE.GENERIC_ARITY":
+                saved = self.report
+                self.report = True  # annotation errors are reported once, whatever pass converts them
+                self.legal(err.stable, err.message, err.node.span, help=err.help or None)
+                self.report = saved
             return DYN
 
     # ------------------------------------------------------------------ declarations

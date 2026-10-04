@@ -455,8 +455,9 @@ class Parser:
                     self.parse_member(rec, owner)
                     t2 = self.toks[self.i]
                     if t2.kind == ",":
-                        self.i += 1
-                    self.end_stmt()
+                        self.i += 1  # `,` separates items like a newline (BUG-0004)
+                    else:
+                        self.end_stmt()
                 except ParseError:
                     self.sync_stmt()
 
@@ -1275,8 +1276,9 @@ class Parser:
                     body = self.parse_arm_body()
                     arms.append(A.MatchArm(span=pat.span.to(body.span), pattern=pat, guard=guard, body=body))
                     if self.toks[self.i].kind == ",":
-                        self.i += 1
-                    self.end_stmt()
+                        self.i += 1  # `,` separates items like a newline (BUG-0004)
+                    else:
+                        self.end_stmt()
                 except ParseError:
                     self.sync_stmt()
         return A.Match(span=kw.span.to(self.toks[self.i - 1].span), scrutinee=scrut, arms=arms)
@@ -1313,8 +1315,9 @@ class Parser:
                 try:
                     branches.append(self.parse_select_branch())
                     if self.toks[self.i].kind == ",":
-                        self.i += 1
-                    self.end_stmt()
+                        self.i += 1  # `,` separates items like a newline (BUG-0004)
+                    else:
+                        self.end_stmt()
                 except ParseError:
                     self.sync_stmt()
         return A.Select(span=kw.span.to(self.toks[self.i - 1].span), mode=mode, branches=branches)

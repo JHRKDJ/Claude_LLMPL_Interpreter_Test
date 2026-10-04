@@ -43,7 +43,10 @@ class ConcMixin:
             raise Fault("A.ASYNC.SYNC_CONTEXT", f"cannot suspend ({wait.detail}) inside a non-async function",
                         help="only async functions may suspend; mark the function `async fn`")
         task.wait = wait
+        stuck = self._arm_stuck_cleanup(task, wait) if task.mask and task.pending_scope() is not None else None
         self.sched.block_current()
+        if stuck is not None:
+            stuck.cancelled = True
         kind, val = task.wake if task.wake is not None else ("value", None)
         task.wake = None
         task.wait = None
@@ -52,6 +55,29 @@ class ConcMixin:
         if kind == "abandon":
             raise Abandoned(val)
         return val
+
+    def _arm_stuck_cleanup(self, task, wait):
+        """V3 7.10.11: cleanup that keeps waiting while cancellation is pending gets a
+        stuck-cleanup diagnostic (there is no language-level cleanup timeout)."""
+        ms = self.options.stuck_cleanup_after_ms
+
+        def fire():
+            if task.wait is wait and not task.done:
+                self.report_stuck_cleanup(task, f"has been waiting {ms} ms")
+        return self.sched.add_timer(self.sched.now() + ms * 1_000_000, fire)
+
+    def report_stuck_cleanup(self, task, how: str) -> None:
+        w = task.wait
+        if any(getattr(d, "_stuck_task", None) is task for d in self.runtime_warnings):
+            return
+        d = Diagnostic(code("W.CLEANUP.STUCK"),
+                       f"cleanup in task {task.path} {how} while cancellation is pending ({w.detail if w else 'blocked'})",
+                       severity="warning", primary=Label(w.span, "cleanup blocked here") if w is not None and w.span
+                       else None)
+        d.notes.append(Note("cancellation is masked during cleanup; there is no language-level cleanup timeout "
+                            "(V3 7.10.11): the user or host may escalate to hard termination"))
+        d._stuck_task = task
+        self.runtime_warnings.append(d)
 
     # ------------------------------------------------------------------ await
     def eval_Await(self, node: A.Await, env: Env):
@@ -473,6 +499,9 @@ class ConcMixin:
                                "all tasks are waiting for each other to quiesce (interpreter inconsistency)")
                 self.hard_termination = d
             return False
+        for t in stuck_cleanup:
+            if t.pending_scope() is not None:
+                self.report_stuck_cleanup(t, "can never be woken")
         summary = "; ".join(f"{t.path}: {t.wait.detail}" for t in blocked[:12])
         for t in leaves:
             d = Diagnostic(code("A.CONCURRENCY.DEADLOCK"),

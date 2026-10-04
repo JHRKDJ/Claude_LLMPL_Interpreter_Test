@@ -198,13 +198,13 @@ class WalkMixin:
 
     def check_cancel_points(self, d: A.FnDecl) -> None:
         for n in A.walk(d.body):
-            if isinstance(n, A.WhileStmt):
-                body_nodes = list(A.walk(n.body)) + list(A.walk(n.cond))
+            if isinstance(n, A.WhileStmt) or (isinstance(n, A.ForStmt) and not n.is_await):
+                body_nodes = list(A.walk(n.body)) + list(A.walk(n.cond if isinstance(n, A.WhileStmt) else n.iterable))
                 has_point = any(isinstance(x, (A.Await, A.Select, A.Parallel, A.Within)) or
                                 (isinstance(x, A.Call) and isinstance(x.callee, A.Field) and x.callee.name == "check"
                                  and isinstance(x.callee.obj, A.Name) and x.callee.obj.name == "cancel")
                                 for x in body_nodes)
-                is_forever = isinstance(n.cond, A.Literal) and n.cond.value is True
+                is_forever = isinstance(n, A.WhileStmt) and isinstance(n.cond, A.Literal) and n.cond.value is True
                 if not has_point and (is_forever or self.verified):
                     self.advise("W.CANCEL.NO_CANCELLATION_POINT",
                                 "async loop has no reachable cancellation point (await, cancel.check(), channel "
@@ -249,6 +249,7 @@ class WalkMixin:
         fs = self.fn_stack[-1] if self.fn_stack else None
         if c is A.LetStmt:
             t = self.expr(st.value, sc) if st.value is not None else None
+            self.check_parallel_value(st.value)
             ann = self.ty(st.type, self.cur_module, self.tparams()) if st.type is not None else None
             if t is not None and ann is not None and not consistent(t, ann, self.satisfies):
                 self.mismatch(st.value.span, ann, t, "binding annotation", st.type.span)
@@ -268,10 +269,18 @@ class WalkMixin:
             return
         if c is A.AssignStmt:
             vt = self.expr(st.value, sc)
+            self.check_parallel_value(st.value)
             tgt = st.target
             if isinstance(tgt, A.Name):
                 ent = sc.get(tgt.name)
                 if ent is not None:
+                    par = self.enclosing_parallel()
+                    if par is not None and contains_task(vt) and ent[2] is not None and \
+                            ent[2].file is par.span.file and ent[2].start < par.span.start:
+                        self.legal("S.TASK.HANDLE_ESCAPE",
+                                   f"task handle assigned to `{tgt.name}`, which outlives the `parallel` block that "
+                                   f"owns the task", st.span, secondary=[Label(par.span, "owning task group")],
+                                   help="await the handle (or select on it) inside the block and assign the result")
                     if isinstance(vt, T.TBorrow):
                         self.oblig("S.RESOURCE.ESCAPE", "a resource cannot be assigned to an ordinary binding",
                                    st.span)
@@ -294,6 +303,12 @@ class WalkMixin:
         if c is A.ReturnStmt:
             if st.value is not None:
                 t = self.expr(st.value, sc)
+                self.check_parallel_value(st.value)
+                par = self.enclosing_parallel()
+                if par is not None and contains_task(t):
+                    self.legal("S.TASK.HANDLE_ESCAPE", "a task handle cannot be returned out of the `parallel` block "
+                               "that owns the task", st.value.span, secondary=[Label(par.span, "owning task group")],
+                               help="return the awaited result instead")
                 if isinstance(t, T.TBorrow):
                     self.oblig("S.RESOURCE.ESCAPE", "a resource borrow cannot be returned", st.value.span)
                 if isinstance(st.value, A.Lambda):
@@ -457,9 +472,26 @@ class WalkMixin:
             return "convert explicitly with `toFloat()` / `toInt()`"
         return None
 
-    def unknown_member(self, node, tname: str, members) -> None:
+    def check_parallel_value(self, v) -> None:
+        if isinstance(v, A.Parallel) and v.ann.get("_value_has_task"):
+            last = v.body.stmts[-1] if v.body.stmts else v.body
+            self.legal("S.TASK.HANDLE_ESCAPE", "the `parallel` block's value contains a task handle, which cannot "
+                       "outlive the block that owns the task", last.span, secondary=[Label(v.span, "owning task group")],
+                       help="await the handle inside the block and produce its result")
+
+    def enclosing_parallel(self):
+        """The innermost `parallel` node lexically enclosing the current point *in the
+        current function* (a lambda body inside a group is a different function)."""
+        stack = getattr(self, "_parallel_stack", None)
+        if not stack:
+            return None
+        top = stack[-1]
+        return top if top.ann.get("_fn_depth") == len(self.fn_stack) else None
+
+    def unknown_member(self, node, tname: str, members, for_call: bool = False) -> None:
         close = difflib.get_close_matches(node.name, members, n=3, cutoff=0.5)
-        self.oblig("S.TYPE.UNKNOWN_FIELD", f"{tname} has no field or method `{node.name}`",
+        self.oblig("S.TYPE.UNKNOWN_METHOD" if for_call else "S.TYPE.UNKNOWN_FIELD",
+                   f"{tname} has no {'method' if for_call else 'field or method'} `{node.name}`",
                    node.name_span or node.span,
                    help=("did you mean " + ", ".join(f"`{c}`" for c in close) + "?") if close else None)
 
@@ -481,3 +513,11 @@ def _ends_abruptly(b) -> bool:
         return False
     last = b.stmts[-1]
     return isinstance(last, (A.ReturnStmt, A.ThrowStmt))
+
+
+def contains_task(t) -> bool:
+    if isinstance(t, T.TCon):
+        return t.name == "Task" or any(contains_task(a) for a in t.args)
+    if isinstance(t, T.TTuple):
+        return any(contains_task(a) for a in t.items)
+    return False

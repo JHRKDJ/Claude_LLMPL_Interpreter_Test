@@ -31,8 +31,9 @@ decision with semantic consequences.
 ### SPEC-002 Bindings and constants (V3 5.1.5, 6.3, 9.3#1)
 - `let x = e` declares a **reassignable** binding (JavaScript `let` prior; V3
   examples use `let`). `let x: T` without initializer declares an *uninitialised*
-  binding (V3 5.4.3-4); reading it before definite assignment is a static error and
-  a runtime abandonment `A.BINDING.UNINITIALISED`.
+  binding (V3 5.4.3-4); reading it before definite assignment is reported statically
+  (`S.NAME.UNINITIALISED`: a warning in draft, an error in verified, because the
+  analysis is conservative — V3 5.3.3) and abandons at runtime (`A.BINDING.UNINITIALISED`).
 - `const x = e` declares a non-reassignable binding (JS prior). At module level only
   `const` is permitted and the value must be transitively frozen (V3 5.2.1-2).
 - `x = e` rebinds; `obj.f = e` / `xs[i] = e` mutate (V3 5.1.5 keeps these distinct).
@@ -81,7 +82,8 @@ decision with semantic consequences.
   only legal on frozen records (mutable records use field assignment).
 
 ### SPEC-007 Variants (V3 6.2, 3.3)
-- `enum Shape { Circle(radius: Float)  Rect(w: Float, h: Float)  Empty }`.
+- `enum Shape { Circle(radius: Float), Rect(w: Float, h: Float), Empty }` — cases (like record
+  members, match arms and select branches) are separated by newlines or commas.
 - User cases are always qualified: `Shape.Circle(radius: 1.0)`, pattern
   `Shape.Circle(r)`. Only the core cases `Some`, `None`, `Ok`, `Err` are unqualified.
 

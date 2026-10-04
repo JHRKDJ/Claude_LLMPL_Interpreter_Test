@@ -46,9 +46,9 @@ params     = [ param {"," param} [","] ]
 param      = "self" | name [":" ["borrow"] type] ["=" expr]
 throws_list= type { ("," | "|") type }
 record_decl= ["mutable"] "record" name [type_params] ["satisfies" type {"," type}]
-             "{" { field | "invariant" expr | ["pub"] fn_decl | NL } "}"
+             "{" { (field | "invariant" expr | ["pub"] fn_decl) (NL | ",") | NL } "}"
 field      = ["sensitive"] name ":" type ["=" expr]
-enum_decl  = "enum" name [type_params] ["satisfies" ...] "{" { case | fn_decl | NL } "}"
+enum_decl  = "enum" name [type_params] ["satisfies" ...] "{" { (case | fn_decl) (NL | ",") | NL } "}"
 case       = name [ "(" field_sig {"," field_sig} ")" ]       field_sig = name ":" type
 error_decl = "error" name ["category" name] [ "{" { field | fn_decl | NL } "}" ]
            | "error" "enum" name ["category" name] "{" { case | NL } "}"
@@ -98,7 +98,7 @@ use_expr   = "use" name "=" expr block
 parallel_expr = "parallel" ["collect" | "race" | "firstSuccess"] block
 spawn_expr = "spawn" (block | postfix-call)
 within_expr= "within" expr block
-select_expr= "select" ["now" | "priority"] "{" { branch NL } "}"
+select_expr= "select" ["now" | "priority"] "{" { branch (NL | ",") } "}"
 branch     = ["when" name ":"] ( "receive" (name|"_") "from" expr
            | "closed" expr | "send" expr "to" expr
            | "task" expr "completed" "as" name | "at" expr | "after" expr )

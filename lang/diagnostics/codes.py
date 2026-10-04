@@ -71,7 +71,6 @@ CODES: dict[str, str] = {
     "S.EFFECT.BROAD_FALLBACK": "unqualified `else` fallback over an open or multi-type error set",
     "S.EFFECT.THROWS_AND_RESULT": "function both declares throws and returns Result",
     "S.EFFECT.NOT_AN_ERROR": "thrown/caught type is not a declared error type",
-    "S.EFFECT.USELESS_TRY": "`try` applied to an expression that cannot throw",
     "S.EFFECT.CATCH_UNREACHABLE": "catch clause names an error that cannot be thrown here",
     "S.EFFECT.PROPAGATE_CONTEXT": "`propagate` used outside a Result-returning function",
     # ---- contracts ----
@@ -100,12 +99,11 @@ CODES: dict[str, str] = {
     "S.SELECT.IMPURE_SETUP": "select branch setup must be pure/precomputed",
     "S.SELECT.INVALID_GUARD": "select guard must be a frozen local Bool",
     "S.SELECT.NONE_READY_PLACEMENT": "`none ready` only allowed in `select now` (and required there)",
-    "S.SELECT.DUPLICATE_DEADLINE": "select has more than one deadline branch",
     # ---- mode policy ----
     "S.MODE.RELEASE_REQUIRES_VERIFIED": "release builds require verified acceptance",
     # ---- warnings / advisories ----
-    "W.EFFECT.MISSING_TRY": "draft: throwing call lacks a `try` marker",
     "W.CANCEL.NO_CANCELLATION_POINT": "async loop without a reachable cancellation point",
+    "W.EFFECT.USELESS_TRY": "`try` applied to an expression that cannot throw",
     "W.SELECT.DEADLINE_RESET": "relative `after` deadline inside a loop is recomputed each iteration",
     "W.SELECT.CLOSED_LOOP": "closed branch in a loop does not exit or change eligibility",
     "W.SELECT.STARVATION": "priority select in a loop may starve later branches",
@@ -119,7 +117,6 @@ CODES: dict[str, str] = {
     "W.INVARIANT.ACROSS_AWAIT": "invariant field mutated before a cancellation point",
     "W.CLEANUP.FAILED_DURING_CANCELLATION": "cleanup/release failed while cancellation was pending",
     "W.CLEANUP.STUCK": "cleanup appears stuck while cancellation is pending",
-    "W.NAME.UNUSED": "binding is never used",
     "W.TEST.SEED": "schedule stress seed",
     # ---- runtime abandonment ----
     "A.TYPE.DYNAMIC_MISMATCH": "value crossing a typed boundary does not have the annotated type",

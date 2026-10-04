@@ -41,6 +41,7 @@ class RunOptions:
     stderr: object = None
     argv: list = field(default_factory=list)
     large_copy_threshold: int = 10000
+    stuck_cleanup_after_ms: int = 10000
     deep: bool = False
 
 

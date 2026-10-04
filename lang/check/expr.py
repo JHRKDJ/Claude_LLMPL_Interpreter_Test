@@ -375,7 +375,7 @@ class ExprMixin:
                                    e.name_span or e.span, help="match on the case to read its payload")
                         return DYN
             if ti.kind != "protocol" or name not in ti.methods:
-                self.unknown_member(e, ti.name, list(ti.fields) + list(ti.methods))
+                self.unknown_member(e, ti.name, list(ti.fields) + list(ti.methods), for_call)
             return DYN
         if isinstance(ot, T.TTuple):
             if name.isdigit():
@@ -393,7 +393,7 @@ class ExprMixin:
             if b is not None:
                 return BuiltinRef(b, ot)
             members = list(PROPS.get(k, {})) + list(METHODS.get(k, {}))
-            self.unknown_member(e, str(ot), members)
+            self.unknown_member(e, str(ot), members, for_call)
         return DYN
 
     def subst_owner(self, ti, ot, t):

@@ -66,3 +66,18 @@ Fix: exec_OnAbandonStmt reports A.RESOURCE.ON_ABANDON_RESTRICTED (new code in
   S.RESOURCE.ON_ABANDON_RESTRICTED.
 Commit: a67c865
 Status: fixed
+
+BUG-0004
+Origin: writing checker conformance tests (one-line enum/match forms)
+Subsystems: parser (match arms × record/enum members × select branches)
+Symptom: after consuming a `,` separator the parser still required a newline, so
+  `match x { 1 => 10, _ => 0 }`, `enum Color { Red, Green, Blue }` and
+  `record P { x: Int, y: Int }` were rejected with S.SYNTAX.MISSING_SEPARATOR,
+  contradicting the syntax contract.
+Minimal reproduction: tests/regressions/test_bug_0004_comma_separators.py
+Regression test failed before fix: yes (4 of 5 cases; the fifth pins that a missing
+  separator without a comma is still reported)
+Fix: a consumed `,` now ends the item exactly like a newline at all three sites in
+  lang/syntax/parser.py; syntax.md grammar and SPEC-007 updated to state it.
+Commit: (next commit)
+Status: fixed

@@ -43,7 +43,10 @@ verified are acceptance standards, not different languages (5.15, 7.6.4).
 | unsendable spawn argument / capture | warning | error |
 | provider not yielding exactly once on every path | warning | error |
 | definite assignment | warning | error |
-| advisories (cancellation points, select loops, scope width, state horizon, identity equality) | warning | warning |
+| advisories (select loops, scope width, state horizon, identity equality, useless `try`, unreachable catch/arm, invariant mutation before a cancellation point) | warning | warning |
+| async loop without a cancellation point (`W.CANCEL.NO_CANCELLATION_POINT`): unconditional `while true` | warning | warning |
+| … the same for any other `while`/`for` loop ("verified analysis reports", V3 7.10.2) | — | warning |
+| task handle escaping its `parallel` block (`S.TASK.HANDLE_ESCAPE`), wrong generic arity | error | error |
 
 Warnings never block execution; errors block `run` (exit status 2).
 
