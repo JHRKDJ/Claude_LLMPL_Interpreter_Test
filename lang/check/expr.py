@@ -275,8 +275,10 @@ class ExprMixin:
                            "coercion)", e.span, help="convert explicitly with toFloat()/toInt()")
             elif a is not DYN and b is not DYN and not consistent(a, b) and not consistent(b, a) \
                     and not (isinstance(a, T.TVar) or isinstance(b, T.TVar)):
-                self.advise("S.TYPE.ALWAYS_FALSE_EQUALITY" if False else "W.TYPE.IDENTITY_EQUALITY",
-                            f"comparison between {a} and {b} is always {'false' if op == '==' else 'true'}", e.span)
+                self.oblig("S.TYPE.ALWAYS_FALSE_EQUALITY",
+                           f"comparison between {a} and {b} is always {'false' if op == '==' else 'true'}", e.span,
+                           help="values of different types are never equal (no implicit conversion); convert "
+                                "explicitly or compare like with like")
             elif is_mutable_type(a):
                 self.advise("W.TYPE.IDENTITY_EQUALITY", f"`{op}` on {a} compares identity, not contents", e.span,
                             help="compare frozen snapshots (`a.freeze() == b.freeze()`) to compare contents")

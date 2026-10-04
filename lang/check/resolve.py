@@ -101,9 +101,15 @@ class ProjectIndex:
 
     def __init__(self, program):
         self.by_name: dict[str, list[str]] = {}
+        self.modules: set[str] = set()
         self._build(program)
 
+    def module_candidates(self, name: str) -> list[str]:
+        """Known modules whose last path segment is `name` (e.g. `fs` -> `std.fs`)."""
+        return sorted(m for m in self.modules if m.rsplit(".", 1)[-1] == name)
+
     def _add(self, module: str, name: str) -> None:
+        self.modules.add(module)
         self.by_name.setdefault(name, [])
         if module not in self.by_name[name]:
             self.by_name[name].append(module)
@@ -436,7 +442,17 @@ class Resolver:
         fixes = []
         help_ = None
         notes = []
-        if len(cands) == 1:
+        mod_cands = [] if as_type else self.index.module_candidates(name)
+        if len(mod_cands) == 1 and not cands:
+            mod = mod_cands[0]
+            f = self.cur_file
+            imports = self.cur_ast.imports
+            pos = imports[-1].span.end if imports else 0
+            text = f"\nimport {mod}" if imports else f"import {mod}\n\n"
+            fixes.append(Fix(f"add `import {mod}`", [TextEdit(Span(f, pos, pos), text)]))
+            help_ = f"`{name}` is the module `{mod}`; add `import {mod}` (applied automatically by `lang check --fix`)"
+            notes.append("known missing module import")
+        elif len(cands) == 1:
             mod = cands[0]
             fixes.append(Fix(f"add `import {mod}.{{{name}}}`", [self.import_edit(mod, name)]))
             help_ = f"`{name}` is exported by `{mod}`; add the import (applied automatically by `lang check --fix`)"

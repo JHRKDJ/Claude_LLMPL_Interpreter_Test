@@ -60,6 +60,11 @@ class WalkMixin:
                 ent = self.modules[mname].get(d.name)
                 if ent is not None and ent[1] is None:
                     self.modules[mname][d.name] = ("const", t)
+                if is_mutable_type(t):
+                    self.legal("S.MODULE.MUTABLE_GLOBAL", f"module constant `{d.name}` would hold a mutable {t}",
+                               d.value.span, label="this value is mutable",
+                               help="module-level state must be frozen (V3 5.2); create mutable state in `main` "
+                                    "and pass it explicitly to the code that needs it")
                 if d.type is not None:
                     want = self.ty(d.type, mname)
                     if not consistent(t, want, self.satisfies):

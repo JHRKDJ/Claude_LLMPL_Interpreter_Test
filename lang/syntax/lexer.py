@@ -57,6 +57,21 @@ class Lexer:
                 if ch == ":" and depth == 0:
                     tokens.append(Token("EOF", None, self._span(self.pos, self.pos)))
                     return tokens
+                if ch == '"' and depth == 0:
+                    eol = self.text.find("\n", self.pos, self.end)
+                    eol = self.end if eol < 0 else eol
+                    rest = self.text[self.pos + 1:eol]
+                    q1 = rest.find('"')
+                    br = rest.find("}", q1 + 1) if q1 >= 0 else -1
+                    if q1 < 0 or br < 0 or rest.find('"', br + 1) < 0:
+                        # a nested string could never be followed by the interpolation's `}`:
+                        # this quote ends the enclosing string, so the interpolation is unclosed
+                        self._error("S.SYNTAX.INTERPOLATION",
+                                    "string interpolation is missing its closing `}` before the end of the string",
+                                    start, start + 1, label="string ends here",
+                                    help="close the interpolation with `}` or write a literal brace as `\\{`")
+                        tokens.append(Token("EOF", None, self._span(self.pos, self.pos)))
+                        return tokens
                 if ch == "\n":
                     self._error("S.SYNTAX.INTERPOLATION", "string interpolation is not closed on this line",
                                 start, start + 1, help="close the interpolation with `}` or escape the brace as `\\{`")

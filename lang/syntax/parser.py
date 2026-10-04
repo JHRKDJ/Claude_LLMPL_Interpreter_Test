@@ -26,6 +26,9 @@ LEADING_OP_TOKENS = {"||", "&&", "==", "!=", "<", "<=", ">", ">=", "+", "*", "/"
 CORE_CASES = {"Some", "None", "Ok", "Err"}
 
 
+CLOSERS = (")", "]", "}")
+
+
 class Parser:
     def __init__(self, file: SourceFile, tokens: list[Token], comments: list[Comment] | None = None,
                  allow_toplevel_statements: bool = False):
@@ -136,6 +139,10 @@ class Parser:
             return self.advance()
         what = what or f"`{kind}`"
         found = describe(t)
+        if kind in CLOSERS and t.kind in CLOSERS:
+            raise self.error("S.SYNTAX.MISMATCHED_DELIMITER", f"expected {what}, found `{t.kind}`", t.span,
+                             f"expected `{kind}` here",
+                             help=f"close the innermost open delimiter with `{kind}` before `{t.kind}`")
         raise self.error("S.SYNTAX.UNEXPECTED_TOKEN", f"expected {what}, found {found}", t.span,
                          f"expected {what}")
 
@@ -964,6 +971,14 @@ class Parser:
         left = self.parse_mul()
         while self.peek().kind in ("+", "-"):
             op = self.advance()
+            nxt = self.peek()
+            if nxt.kind == op.kind and nxt.span.start == op.span.end:
+                after = self.toks[self.i + 1] if self.i + 1 < len(self.toks) else nxt
+                if after.kind in ("NEWLINE", ";", "}", ")", "EOF"):
+                    target = left.span.text
+                    raise self.error("S.SYNTAX.UNSUPPORTED_SYNTAX",
+                                     f"`{op.kind}{op.kind}` is not an operator in this language", op.span.to(nxt.span),
+                                     help=f"write `{target} {op.kind}= 1`")
             self._binary_rhs_skip()
             right = self.parse_mul()
             left = A.Binary(span=left.span.to(right.span), op=op.kind, left=left, right=right)
