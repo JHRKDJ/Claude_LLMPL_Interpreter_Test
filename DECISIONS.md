@@ -243,6 +243,31 @@ select [priority | now] {
   an omitted `try` marker. Verified mode makes it an error. Calling an async function
   from a non-async function is always an error (`S.ASYNC.SYNC_CALLS_ASYNC`).
 
+### SPEC-024 REPL session model (V3 7.14.4)
+- A session = a workspace module (accumulated imports + declarations) + persistent
+  top-level bindings. Declarations are statically checked in the session mode before
+  they replace the workspace; rejected entries change nothing. Statements are checked
+  as the body of a synthetic async function over the session bindings (Dyn) and run
+  in an async root task; non-Unit expression values are printed.
+- `:load path` imports a module by its module name (module identity = name).
+  Changes on disk take effect only after an explicit `:reload`.
+- Reload is explicit: redefining a declaration, `:reload` and `:reset` discard all
+  session bindings and list the discarded names, so no value of an old, possibly
+  incompatible definition survives invisibly. Pure additions keep bindings.
+
+### SPEC-025 Formatter and test runner (V3 4.8, 7.14.2-7.14.5)
+- Canonical layout: 4-space indentation, `{` on the opening line, one statement per
+  line, members in source order (fields/invariants grouped, a blank line around
+  methods), at most one preserved blank line, contracts on their own lines with the
+  body brace on its own line, `throws A, B` in declarations and `A | B` in function
+  types, wrapping of argument/collection lists over 100 columns with trailing commas.
+  Comments are preserved (own-line before the next item, trailing on the same
+  line). The formatter re-parses its output and refuses if the program or comment
+  count would change. `lang format --check/--diff` support review-first workflows.
+- `lang test` runs `test "name" { }` blocks, each in a fresh interpreter on the
+  virtual clock; `--schedule=random [--seed=N] [--repeat=K]` is the seeded stress
+  mode; failures carry `W.TEST.SEED` with the reproduce command.
+
 ---
 
 ## B. Semantic resolutions (ambiguities and gaps)

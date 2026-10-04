@@ -11,6 +11,7 @@ import json
 import signal
 import sys
 from pathlib import Path
+from typing import Optional
 
 from ..diagnostics.render_json import render_json, to_dict
 from ..diagnostics.render_text import render, render_all, summary_line
@@ -25,8 +26,9 @@ def _add_common(p: argparse.ArgumentParser) -> None:
     p.add_argument("--deep", action="store_true", help="deep diagnostics (all frames, event histories)")
 
 
-def _add_runtime(p: argparse.ArgumentParser) -> None:
-    p.add_argument("--clock", choices=["real", "virtual"], default="real")
+def _add_runtime(p: argparse.ArgumentParser, clock_default: Optional[str] = "real") -> None:
+    p.add_argument("--clock", choices=["real", "virtual"], default=clock_default,
+                   help="time source (default: real for run/repl, virtual for test)")
     p.add_argument("--schedule", choices=["fifo", "random"], default="fifo")
     p.add_argument("--seed", type=int, default=None)
 
@@ -191,8 +193,9 @@ def main(argv=None) -> int:
     p = sub.add_parser("test", help="run `test \"...\" { }` blocks")
     p.add_argument("paths", nargs="+")
     _add_common(p)
-    _add_runtime(p)
-    p.add_argument("--filter", default=None)
+    _add_runtime(p, clock_default=None)
+    p.add_argument("--filter", default=None, help="run only tests whose name contains this text")
+    p.add_argument("--repeat", type=int, default=1, help="with --schedule=random: runs per test (seeds seed..)")
     p.set_defaults(fn=cmd_test)
     p = sub.add_parser("repl", help="interactive session with runtime module loading")
     _add_common(p)
