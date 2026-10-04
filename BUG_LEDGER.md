@@ -126,3 +126,18 @@ Fix: sync_stmt consumes a stray closing `)`/`]` when it has not advanced, so eve
   recovery step makes progress (lang/syntax/parser.py).
 Commit: f347523
 Status: fixed
+
+BUG-0008
+Origin: interaction test TEST-INT-022 (select closure loops, V3 8.13)
+Subsystems: static checker advisories × select × loops
+Symptom: W.SELECT.CLOSED_LOOP was reported for loops whose closed branch ends the
+  loop through the select's value (`let done = select { … closed rx => true }`,
+  `if done { break }`) or by changing loop state (`closed rx => { open = false }`),
+  i.e. a false positive on the correct shapes V3 8.13 asks programs to use.
+Minimal reproduction: tests/regressions/test_bug_0008_closed_loop_advisory.py
+Regression test failed before fix: yes (2 of 3; the third pins the genuine spin case)
+Fix: the advisory fires only when the select's value is discarded (statement
+  position in a loop/function body) and the closed branch neither exits nor assigns
+  (lang/check/selectcheck.py, walk.py).
+Commit: (next commit)
+Status: fixed

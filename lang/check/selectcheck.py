@@ -63,7 +63,8 @@ class SelectCheckMixin:
                         throws_closed = True
                     if b.binding:
                         bsc.vars[b.binding] = (elem, "pattern", b.span)
-                if k == "closed" and in_loop and not _exits(b.body):
+                if k == "closed" and in_loop and e.ann.get("_value_unused") and not _exits(b.body) \
+                        and not _assigns(b.body):
                     self.advise("W.SELECT.CLOSED_LOOP",
                                 "closed branch inside a loop neither exits nor changes eligibility; a closed channel "
                                 "stays ready and will win repeatedly", b.span,
@@ -128,3 +129,8 @@ def _exits(body) -> bool:
         if isinstance(n, (A.BreakStmt, A.ReturnStmt, A.ThrowStmt)):
             return True
     return False
+
+
+def _assigns(body) -> bool:
+    """The branch changes state the loop can observe (BUG-0008)."""
+    return any(isinstance(n, A.AssignStmt) for n in A.walk(body))

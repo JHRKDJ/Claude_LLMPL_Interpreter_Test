@@ -1162,182 +1162,212 @@
   {
    "id": "TEST-INT-001",
    "title": "Interaction: typing x recoverable errors",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int001_*"
   },
   {
    "id": "TEST-INT-002",
    "title": "Interaction: typing x Result",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int002_*"
   },
   {
    "id": "TEST-INT-003",
    "title": "Interaction: draft/verified x type checking",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int003_*"
   },
   {
    "id": "TEST-INT-004",
    "title": "Interaction: draft/verified x effect obligations",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int004_*"
   },
   {
    "id": "TEST-INT-005",
    "title": "Interaction: variants x exhaustiveness",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int005_*"
   },
   {
    "id": "TEST-INT-006",
    "title": "Interaction: dynamic x protocols x contracts (8.1)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int006_*"
   },
   {
    "id": "TEST-INT-007",
    "title": "Interaction: protocols x structural conformance",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int007_*"
   },
   {
    "id": "TEST-INT-008",
    "title": "Interaction: mutable values x contracts",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int008_*"
   },
   {
    "id": "TEST-INT-009",
    "title": "Interaction: mutation x invariants x cancellation (8.8)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int009_*"
   },
   {
    "id": "TEST-INT-010",
    "title": "Interaction: resources x success/error/abandonment/cancellation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_a.py::test_int010_*"
   },
   {
    "id": "TEST-INT-011",
    "title": "Interaction: cleanup x cleanup failure",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int011_*"
   },
   {
    "id": "TEST-INT-012",
    "title": "Interaction: tasks x errors/abandonment/cancellation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int012_*"
   },
   {
    "id": "TEST-INT-013",
    "title": "Interaction: isolation x frozen/mutable/resources (8.2)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int013_*"
   },
   {
    "id": "TEST-INT-014",
    "title": "Interaction: channels x task lifetime/cancellation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int014_*"
   },
   {
    "id": "TEST-INT-015",
    "title": "Interaction: select x channels/cancellation/simultaneous readiness/failure",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int015_*"
   },
   {
    "id": "TEST-INT-016",
    "title": "Interaction: concurrent failures x aggregation x diagnostics (8.10, 8.11)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int016_*"
   },
   {
    "id": "TEST-INT-017",
    "title": "Interaction: error effects x higher-order functions (8.3)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int017_*"
   },
   {
    "id": "TEST-INT-018",
    "title": "Interaction: exceptions x Results x channels (8.4)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int018_*"
   },
   {
    "id": "TEST-INT-019",
    "title": "Interaction: resources x async suspension (8.5)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int019_*"
   },
   {
    "id": "TEST-INT-020",
    "title": "Interaction: resources x expression blocks x contracts (8.7)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_b.py::test_int020_*"
   },
   {
    "id": "TEST-INT-021",
    "title": "Interaction: channels x graph copy x backpressure (8.12)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int021_*"
   },
   {
    "id": "TEST-INT-022",
    "title": "Interaction: closure x select loops x fairness diagnostics (8.13, 8.14)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int022_*"
   },
   {
    "id": "TEST-INT-023",
    "title": "Interaction: selection x task lifetimes (8.15)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int023_*"
   },
   {
    "id": "TEST-INT-024",
    "title": "Interaction: relative timeout x loops (8.16)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int024_*"
   },
   {
    "id": "TEST-INT-025",
    "title": "Interaction: guards x mutable state (8.17)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int025_*"
   },
   {
    "id": "TEST-INT-026",
    "title": "Interaction: modules x mutable state x tasks (8.18)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int026_*"
   },
   {
    "id": "TEST-INT-027",
    "title": "Interaction: auto-import x reproducibility (8.19)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int027_*"
   },
   {
    "id": "TEST-INT-028",
    "title": "Interaction: diagnostics x privacy (8.20)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int028_*"
   },
   {
    "id": "TEST-INT-029",
    "title": "Interaction: protocol contracts x mutable implementations (8.9)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int029_*"
   },
   {
    "id": "TEST-INT-030",
    "title": "Interaction: resources x abandonment transaction example (8.6)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/interactions/test_interactions_c.py::test_int030_*"
   },
   {
    "id": "APP-SPEC-001",

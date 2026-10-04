@@ -123,6 +123,7 @@ class WalkMixin:
                             self.oblig("S.TYPE.STATIC_MISMATCH", f"{kind} clause must be a Bool, found {t}", c.span)
             if d.body is None:
                 return
+            d.body.ann["value_discarded"] = True  # function bodies return only via `return`
             _, coll = self.with_collector(lambda: self.block(d.body, sc))
         finally:
             self.fn_stack.pop()
@@ -237,6 +238,8 @@ class WalkMixin:
                     result = T.UNIT
                     continue
                 if isinstance(st, A.ExprStmt):
+                    if isinstance(st.expr, A.Select) and (st is not b.stmts[-1] or b.ann.get("value_discarded")):
+                        st.expr.ann["_value_unused"] = True
                     result = self.expr(st.expr, sc)
                 else:
                     self.stmt(st, sc)
@@ -362,6 +365,7 @@ class WalkMixin:
             self.cond(st.cond, sc, body_sc)
             fs.loop_depth += 1 if fs else 0
             try:
+                st.body.ann["value_discarded"] = True
                 self.block(st.body, body_sc, new_scope=False)
             finally:
                 if fs:
@@ -399,6 +403,8 @@ class WalkMixin:
             if fs:
                 fs.loop_depth += 1
             try:
+                st.body.ann["value_discarded"] = True
+                st.body.ann["value_discarded"] = True
                 self.block(st.body, body_sc, new_scope=False)
             finally:
                 if fs:

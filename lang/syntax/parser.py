@@ -1048,6 +1048,10 @@ class Parser:
             self.advance()
             e = self.parse_unary()
             return A.Propagate(span=t.span.to(self.sp(e)), expr=e)
+        if t.kind in ("capture", "yield"):
+            raise self.error("S.SYNTAX.MISPLACED_CONSTRUCT",
+                             f"`{t.kind}` covers its whole operand and cannot appear inside an operator expression",
+                             t.span, help=f"parenthesise it: `({t.kind} ...)`, e.g. `propagate (capture f(x))`")
         if t.kind == "try":
             raise self.error("S.SYNTAX.MISPLACED_CONSTRUCT", "`try` must begin the expression it marks",
                              t.span, help="move `try` to the start of the whole expression, e.g. `try a + f()`")
