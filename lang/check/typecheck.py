@@ -52,17 +52,27 @@ class Collector:
 
 
 class Scope:
-    __slots__ = ("vars", "parent")
+    __slots__ = ("vars", "parent", "origins")
 
     def __init__(self, parent=None):
         self.vars: dict[str, tuple] = {}  # name -> (Ty, kind, span)
         self.parent = parent
+        self.origins: dict[str, object] = {}  # name -> span of the written annotation it relies on
 
     def get(self, name):
         s = self
         while s is not None:
             if name in s.vars:
                 return s.vars[name]
+            s = s.parent
+        return None
+
+    def origin(self, name):
+        """Span of the annotation that gave `name` its static type (None if inferred)."""
+        s = self
+        while s is not None:
+            if name in s.vars:
+                return s.origins.get(name)
             s = s.parent
         return None
 

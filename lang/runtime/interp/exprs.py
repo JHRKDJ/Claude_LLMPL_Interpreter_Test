@@ -179,7 +179,11 @@ class ExprMixin:
         if len(node.indices) != 1:
             raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", "exactly one index is supported", node.span, env)
         idx = self.eval(node.indices[0], env)
-        return self.index_get(obj, idx, node, env)
+        v = self.index_get(obj, idx, node, env)
+        rc = node.ann.get("rt_check")
+        if rc is not None:
+            self.transient_check(rc, v, node.span, env, "this element")
+        return v
 
     def index_get(self, obj, idx, node, env):
         if type(obj) is Borrow:
@@ -490,8 +494,10 @@ class ExprMixin:
                         return self.exec_block(h, henv)
                     return self.eval(h, henv)
             if node.fallback is not None:
-                ftype = node.ann.get("fallback_type")
-                if ftype is None or self.error_is_type(t.error, ftype):
+                # V3 7.7.3: an unqualified fallback handles exactly the one concrete error
+                # type the checker proved (`fallback_qual`); anything else propagates
+                fq = node.ann.get("fallback_qual")
+                if fq is None or self.error_qualname(t.error) == fq:
                     if t.origin is not None:
                         t.origin.observed = True
                     return self.eval(node.fallback, env)
@@ -524,6 +530,14 @@ class ExprMixin:
         if t is EnumType:
             return type(error) is VariantValue and error.case.etype is target
         return False
+
+    @staticmethod
+    def error_qualname(error):
+        if type(error) is FrozenRecord:
+            return error.rtype.qualname
+        if type(error) is VariantValue:
+            return error.case.etype.qualname
+        return None
 
     def error_categories(self, error) -> tuple:
         if type(error) is FrozenRecord:

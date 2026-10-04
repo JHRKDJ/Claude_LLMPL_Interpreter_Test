@@ -384,6 +384,7 @@ class StmtMixin:
         pat = st.pattern
         simple = pat.__class__ is A.BindPat and pat.type is None
         n = len(seq) if version_src is not None else None
+        rc = st.ann.get("rt_check")
         i = 0
         while True:
             if version_src is not None:
@@ -400,6 +401,8 @@ class StmtMixin:
                     break
                 item = seq[i]
             i += 1
+            if rc is not None:
+                self.transient_check(rc, item, st.iterable.span, env, "a loop element")
             benv = Env(env)
             if simple:
                 benv.vars[pat.name] = item

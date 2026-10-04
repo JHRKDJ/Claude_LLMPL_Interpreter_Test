@@ -370,3 +370,16 @@ provider without running post-yield code (V3 5.5.10).
 The checker computes static types and records, per AST node, the runtime check a
 typed use relies on (V3 7.6.3); the runtime executes those checks in both modes, and
 always enforces written boundary annotations independently of the checker.
+Checks are inserted only where the static type derives from a *written* annotation
+(parameter, `let`, record field or declared return type) — never from inference — so
+an inference imprecision can never make a correct program abandon. Sites: `for`
+elements, list/map index reads, and case-payload bindings in `match`/`for` patterns.
+The failure names the use site (primary) and the relied-upon annotation (secondary).
+A typed `else` fallback handles only the error type the checker proved
+(`fallback_qual`); any other error propagates.
+
+### IMPL-005 Inferred effects are static-only
+The checker infers effect sets for functions without a `throws` clause and uses them
+for diagnostics. The runtime enforces only *written* `throws` clauses (AMB-005) and
+written function-type effects; it does not consult inferred sets. Rationale: as in
+IMPL-004, static inference must not change the outcome of a program at run time.

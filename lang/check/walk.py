@@ -101,6 +101,8 @@ class WalkMixin:
             sc.vars["self"] = (owner.ty, "param", d.params[0].span)
         for (name, t, _, borrow), p in zip(sig.params, [p for p in d.params if not p.is_self]):
             sc.vars[name] = (t, "borrowparam" if borrow else "param", p.span)
+            if p.type is not None:
+                sc.origins[name] = p.type.span
         st = FnState(sig, d, d.is_async, "fn", owner)
         self.fn_stack.append(st)
         try:
@@ -271,6 +273,12 @@ class WalkMixin:
             else:
                 name, span = st.names[0]
                 sc.vars[name] = (ann if ann is not None else (t if t is not None else DYN), "let", span)
+                if st.type is not None:
+                    sc.origins[name] = st.type.span
+                else:
+                    o = self.origin_of(st.value, sc) if st.value is not None else None
+                    if o is not None:
+                        sc.origins[name] = o
             return
         if c is A.AssignStmt:
             vt = self.expr(st.value, sc)
@@ -383,10 +391,11 @@ class WalkMixin:
                 self.raise_eff([], False, st.span)
                 if fs:
                     fs.has_cancel_point = True
-            if elem is not DYN and not isinstance(elem, T.TVar):
-                st.ann["rt_check"] = elem
+            origin = self.origin_of(st.iterable, sc)
+            if origin is not None and needs_rt_check(elem):
+                st.ann["rt_check"] = (elem, origin)
             body_sc = Scope(sc)
-            self.bind_pattern(st.pattern, elem, body_sc)
+            self.with_pattern_origin(origin, lambda: self.bind_pattern(st.pattern, elem, body_sc))
             if fs:
                 fs.loop_depth += 1
             try:
@@ -526,3 +535,13 @@ def contains_task(t) -> bool:
     if isinstance(t, T.TTuple):
         return any(contains_task(a) for a in t.items)
     return False
+
+
+def needs_rt_check(t) -> bool:
+    """A transient check is only useful for a known, non-generic static type."""
+    from .types import ErrSet
+    if t is DYN or isinstance(t, (T.TVar, ErrSet)) or t is T.NEVER:
+        return False
+    if isinstance(t, T.TCon):
+        return True
+    return isinstance(t, (T.TPrim, T.TNominal, T.TTuple, T.TFn))

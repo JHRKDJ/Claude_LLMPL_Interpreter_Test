@@ -353,6 +353,19 @@ class CallMixin:
                                            f"{type_name(v)}", span, env, label=f"expected {ty}",
                                            expected=str(ty), found=type_name(v), secondary=secondary))
 
+    def transient_check(self, rc, v, span, env, what: str) -> None:
+        """IMPL-004 / V3 5.3.7: typed code consumed a nested value whose static type
+        relies on a written annotation that the boundary checked only shallowly."""
+        ty, origin = rc
+        if type(v) is Borrow:
+            v = v.target
+        if not self.registry.check(ty, v):
+            raise Abandoned(self.make_diag(
+                "A.TYPE.DYNAMIC_MISMATCH", f"{what} is {type_name(v)}, but the annotation relied on here says {ty}",
+                span, env, label=f"expected {ty}", expected=str(ty), found=type_name(v),
+                secondary=[Label(origin, "relied-upon annotation")] if origin is not None else [],
+                help="the value entered typed code through a dynamic boundary; validate or convert it there"))
+
     def check_return(self, clo, value, ret_span, env) -> None:
         decl = clo.decl
         rt = getattr(decl, "ret", None)

@@ -27,6 +27,9 @@ class PatternMixin:
                     pat.ann["ty"] = ty
                 if not self.registry.check(ty, v):
                     return False
+            rc = pat.ann.get("rt_check")
+            if rc is not None:
+                self.transient_check(rc, v, pat.span, env, f"`{pat.name}`")
             b[pat.name] = v
             return True
         if c is A.WildcardPat:

@@ -12,7 +12,7 @@ from ..syntax import ast as A
 from .decls import FnSig, TypeInfo
 from .exhaustive import check_match
 from .types import DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type, unify
-from .walk import AGG, CHCLOSED, DEADLINE, CORE_CASES, short
+from .walk import AGG, CHCLOSED, DEADLINE, CORE_CASES, needs_rt_check, short
 
 
 class TypeRef(T.Ty):
@@ -112,6 +112,38 @@ def opt(t):
 
 
 class ExprMixin:
+    def origin_of(self, e, sc):
+        """Span of the written annotation the static type of `e` relies on, if any
+        (V3 5.3.7/5.3.12: transient checks name the relied-upon annotation)."""
+        c = e.__class__
+        if c is A.Name:
+            return sc.origin(e.name)
+        if c is A.Index:
+            return self.origin_of(e.obj, sc)
+        if c is A.Field:
+            ot = e.obj.ann.get("_sty")
+            if isinstance(ot, T.TBorrow):
+                ot = ot.inner
+            if isinstance(ot, T.TNominal):
+                ti = self.types.get(ot.qualname)
+                if ti is not None and e.name in ti.fields and ti.fields[e.name] is not DYN:
+                    return ti.field_spans.get(e.name)
+            return None
+        if c is A.Call:
+            info = e.ann.get("_sig")
+            if info is not None and info.ret_written and info.decl is not None and \
+                    getattr(info.decl, "ret", None) is not None:
+                return info.decl.ret.span
+        return None
+
+    def with_pattern_origin(self, origin, fn):
+        saved = getattr(self, "_pattern_origin", None)
+        self._pattern_origin = origin
+        try:
+            return fn()
+        finally:
+            self._pattern_origin = saved
+
     def callable_type(self, t):
         if isinstance(t, SigRef):
             return t.sig.as_fn_type()
@@ -190,7 +222,9 @@ class ExprMixin:
         if m is None:
             return DYN
         t = m(e, sc)
-        return t if t is not None else DYN
+        t = t if t is not None else DYN
+        e.ann["_sty"] = t
+        return t
 
     def x_Literal(self, e, sc):
         return {"int": T.INT, "float": T.FLOAT, "bool": T.BOOL, "null": opt(DYN), "unit": T.UNIT,
@@ -439,16 +473,18 @@ class ExprMixin:
                 if not consistent(it, T.INT):
                     self.oblig("S.TYPE.STATIC_MISMATCH", f"list index must be Int, found {it}", e.indices[0].span)
                 elem = ot.args[0]
-                if elem is not DYN and not isinstance(elem, T.TVar):
-                    e.ann["rt_check"] = elem
+                origin = self.origin_of(e.obj, sc)
+                if origin is not None and needs_rt_check(elem):
+                    e.ann["rt_check"] = (elem, origin)
                 return elem
             if ot.name in ("Map", "MutableMap"):
                 if not consistent(it, ot.args[0]):
                     self.oblig("S.TYPE.STATIC_MISMATCH", f"map key must be {ot.args[0]}, found {it}",
                                e.indices[0].span)
                 v = ot.args[1]
-                if v is not DYN and not isinstance(v, T.TVar):
-                    e.ann["rt_check"] = v
+                origin = self.origin_of(e.obj, sc)
+                if origin is not None and needs_rt_check(v):
+                    e.ann["rt_check"] = (v, origin)
                 return v
             if ot.name in ("Set", "MutableSet"):
                 self.oblig("S.TYPE.INVALID_OPERATOR", "sets cannot be indexed; use `.contains(x)`", e.span)
@@ -507,6 +543,8 @@ class ExprMixin:
                 t = T.TBorrow(t)
             ptys.append(t)
             lsc.vars[p.name] = (t, "param", p.span)
+            if p.type is not None:
+                lsc.origins[p.name] = p.type.span
         ret_ann = self.ty(e.ret, self.cur_module, self.tparams()) if e.ret is not None else None
         sig = FnSig("<lambda>", [(p.name, t, False, p.borrow) for p, t in zip(e.params, ptys)],
                     ret_ann if ret_ann is not None else DYN, None, e.is_async, decl=e, ret_written=ret_ann is not None)
@@ -586,10 +624,11 @@ class ExprMixin:
     def x_Match(self, e: A.Match, sc):
         from .typecheck import Scope
         st = self.expr(e.scrutinee, sc)
+        origin = self.origin_of(e.scrutinee, sc)
         result = T.NEVER
         for arm in e.arms:
             asc = Scope(sc)
-            self.bind_pattern(arm.pattern, st, asc)
+            self.with_pattern_origin(origin, lambda: self.bind_pattern(arm.pattern, st, asc))
             if arm.guard is not None:
                 gt = self.expr(arm.guard, asc)
                 if not consistent(gt, T.BOOL):
@@ -647,8 +686,9 @@ class ExprMixin:
                     if not match:
                         self.oblig("S.MATCH.INVALID_PATTERN", f"`{p.name}` has no field `{fname}`", sp.span)
                     ft = match[0] if match else DYN
-                if isinstance(sp, A.BindPat) and sp.type is None and ft is not DYN and not isinstance(ft, T.TVar):
-                    sp.ann["rt_check"] = ft
+                origin = getattr(self, "_pattern_origin", None)
+                if isinstance(sp, A.BindPat) and sp.type is None and origin is not None and needs_rt_check(ft):
+                    sp.ann["rt_check"] = (ft, origin)
                 self.bind_pattern(sp, ft, sc)
 
     def case_fields(self, p: A.CasePat, t):

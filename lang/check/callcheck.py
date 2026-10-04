@@ -182,6 +182,8 @@ class CallMixin:
                 return t
             return DYN
         info, recv_ty = self.call_target(e, sc)
+        if info.sig is not None and info.kind in ("fn", "method"):
+            e.ann["_sig"] = info.sig
         arg_types = []
         for a in e.args:
             at = self.expr(a.value, sc)

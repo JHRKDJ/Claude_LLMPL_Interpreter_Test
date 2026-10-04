@@ -5,11 +5,14 @@ Errors are reported as structured diagnostics; the lexer always makes progress.
 """
 from __future__ import annotations
 
-from ..diagnostics import Diagnostic, Label, code, Fix, TextEdit
+from ..diagnostics import Diagnostic, Fix, Label, Note, TextEdit, code
 from ..source import SourceFile, Span
 from .tokens import HARD_KEYWORDS, OPERATORS, Comment, StringPart, Token
 
 _ESCAPES = {"n": "\n", "t": "\t", "r": "\r", "0": "\0", "\\": "\\", '"': '"', "{": "{", "}": "}", "'": "'"}
+
+
+_NOT_AN_EXPRESSION = {"S.SYNTAX.INVALID_CHARACTER", "S.SYNTAX.UNTERMINATED_STRING", "S.SYNTAX.INVALID_ESCAPE"}
 
 
 class Lexer:
@@ -26,13 +29,14 @@ class Lexer:
         return Span(self.file, start, self.pos if end is None else end)
 
     def _error(self, stable: str, msg: str, start: int, end: int | None = None, label: str = "",
-               help: str | None = None, fix: Fix | None = None) -> None:
+               help: str | None = None, fix: Fix | None = None) -> Diagnostic:
         d = Diagnostic(code(stable), msg, primary=Label(self._span(start, end), label))
         if help:
             d.help.append(help)
         if fix:
             d.fixes.append(fix)
         self.diagnostics.append(d)
+        return d
 
     def _peek(self, k: int = 0) -> str:
         i = self.pos + k
@@ -208,6 +212,7 @@ class Lexer:
         buf: list[str] = []
         buf_start = self.pos
         closed = False
+        literal_braces = False  # set after an unparseable `{`: later braces are reported once
         while self.pos < self.end:
             ch = self.text[self.pos]
             if triple and self.text.startswith('"""', self.pos):
@@ -250,6 +255,20 @@ class Lexer:
                 self.pos += 1
                 sub = Lexer(self.file, self.pos, self.end)
                 toks = sub.tokenize(interpolation=True)
+                if any(d.stable_code in _NOT_AN_EXPRESSION for d in sub.diagnostics):
+                    # the brace does not start an expression (typically JSON or other
+                    # brace-heavy text): report once, keep the brace literal, keep lexing
+                    first = sub.diagnostics[0]
+                    d = self._error("S.SYNTAX.INTERPOLATION", "`{` in a string starts an interpolation, but what "
+                                    "follows is not an expression", interp_start, interp_start + 1,
+                                    label="interpolation starts here",
+                                    help="write a literal brace as `\\{` (and `\\}`), e.g. \"\\{\\\"port\\\": 80\\}\"")
+                    if d is not None:
+                        d.notes.append(Note(f"inside the interpolation: {first.message}"))
+                    literal_braces = True
+                    buf_start = interp_start if not buf else buf_start
+                    buf.append("{")
+                    continue
                 self.diagnostics.extend(sub.diagnostics)
                 self.comments.extend(sub.comments)
                 self.pos = sub.pos
@@ -273,8 +292,9 @@ class Lexer:
                 buf_start = self.pos
                 continue
             if ch == "}" and quote == '"':
-                self._error("S.SYNTAX.INTERPOLATION", "unmatched `}` in string literal", self.pos, self.pos + 1,
-                            help="write a literal closing brace as `\\}`")
+                if not literal_braces:
+                    self._error("S.SYNTAX.INTERPOLATION", "unmatched `}` in string literal", self.pos, self.pos + 1,
+                                help="write a literal closing brace as `\\}`")
                 buf.append("}")
                 self.pos += 1
                 continue

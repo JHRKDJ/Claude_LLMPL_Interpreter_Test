@@ -42,6 +42,12 @@ def test_syntax_diagnostics(name, src, code, text):
         assert d.primary.span.text == text
 
 
+def test_unescaped_json_in_string_is_one_diagnostic():
+    r = parse_text('fn f() { let s = "{\\"port\\": 80}" }')
+    assert [d.stable_code for d in r.diagnostics] == ["S.SYNTAX.INTERPOLATION"]
+    assert "\\{" in " ".join(r.diagnostics[0].help)
+
+
 def test_syntax_errors_are_recovered_and_reported_per_statement():
     r = parse_text("fn f() {\n let = 1\n let y = 2\n let = 3\n}\nfn g() { return }")
     codes = [d.stable_code for d in r.diagnostics]
