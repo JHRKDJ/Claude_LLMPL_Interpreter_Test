@@ -17,9 +17,13 @@ from .core import Env, Frame
 
 
 class TaskHandle:
+    """Stable handle to a child task. Immutable (so it may sit in frozen local
+    collections) but not sendable: it stays within its structured scope (V3 5.11)."""
+
     lang_kind = "Task"
     lang_sendable = "reject"
     lang_reject_reason = "task handle"
+    lang_frozen = True
 
     __slots__ = ("task", "group")
 
@@ -204,6 +208,7 @@ class ConcMixin:
                 raise self.aggregate_thrown(self._order(failures, children), group.site, cancel_pending=outer_cancel)
             if isinstance(body_exc, Cancelled):
                 raise body_exc
+            self._propagate_external_cancel(task, children, group)
             return value
         if mode == "collect":
             if isinstance(body_exc, Thrown):
@@ -211,6 +216,7 @@ class ConcMixin:
                                             cancel_pending=outer_cancel)
             if isinstance(body_exc, Cancelled):
                 raise body_exc
+            self._propagate_external_cancel(task, children, group)
             return self.build_report(group, env)
         # race / firstSuccess
         if isinstance(body_exc, Thrown):
@@ -241,6 +247,13 @@ class ConcMixin:
         if outer_cancel or any(c.outcome.kind == "cancelled" for c in children) and not threw:
             raise Cancelled("all firstSuccess children cancelled", group.site)
         raise self.aggregate_thrown(threw, group.site, cancel_pending=outer_cancel)
+
+    def _propagate_external_cancel(self, task, children, group) -> None:
+        """External cancellation that reached the group (some child ended cancelled)
+        propagates after quiescence (V3 7.10.4/7.10.5). If nothing in the group was
+        affected, the group's result stands and the cancellation stays pending."""
+        if task.cancel_pending() and any(c.outcome.kind == "cancelled" for c in children):
+            raise Cancelled("external cancellation of task group", group.site)
 
     def _order(self, failures, children):
         order = {c.path: i for i, c in enumerate(children)}

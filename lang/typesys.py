@@ -76,7 +76,7 @@ class TCon(Ty):
 CON_ARITY = {
     "List": 1, "Set": 1, "Map": 2, "MutableList": 1, "MutableSet": 1, "MutableMap": 2,
     "Option": 1, "Result": 2, "Task": 2, "Channel": 1, "SendPort": 1, "ReceivePort": 1,
-    "Broadcast": 1, "TaskGroupReport": 2, "TaskOutcome": 2,
+    "Broadcast": 1, "TaskGroupReport": 2, "TaskOutcome": 2, "File": 0, "Dir": 0, "PublishPort": 1,
 }
 FROZEN_CONS = {"List", "Set", "Map", "Option", "Result", "SendPort", "ReceivePort"}
 MUTABLE_CONS = {"MutableList", "MutableSet", "MutableMap"}

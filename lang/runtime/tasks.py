@@ -187,8 +187,17 @@ class TaskGroup:
         cancel_scope(self.scope, reason)
 
     def owner_awaiting(self, child: Task) -> bool:
+        """Is the group body blocked waiting on exactly this child (an `await` of its
+        handle, or a select with a `task` branch on it)? Then a failure is delivered
+        there for observation instead of triggering fail-fast (AMB-002)."""
         w = self.owner.wait
-        return w is not None and w.kind == "await" and w.target is child
+        if w is None:
+            return False
+        if w.kind == "await":
+            return w.target is child
+        if w.kind == "select" and w.target:
+            return child in w.target
+        return False
 
     def on_child_done(self, child: Task) -> None:
         self.live -= 1

@@ -139,10 +139,12 @@ decision with semantic consequences.
 ### SPEC-012 Exception/Result conversion (V3 5.7.4, 7.7.4, 9.3#6, 9.3#24)
 - `capture e` evaluates `e` and yields `Ok(v)` or `Err(error)` for recoverable
   exceptions only (never cancellation/abandonment). Marks awaited child errors
-  observed (V3 5.12.4).
+  observed (V3 5.12.4). `capture` covers its whole operand (like `try`).
 - `r.orThrow()` throws the `Err` payload (so `try r.orThrow()`).
-- `propagate r` inside a function returning `Result` returns the `Err` early
-  (appending a propagation-chain entry) or yields the `Ok` value.
+- `propagate r` (a prefix operator binding like `await`, usable inside larger
+  expressions: `total + propagate parse(x)`) inside a function returning `Result`
+  returns the `Err` early (appending a propagation-chain entry) or yields the `Ok`
+  value.
 - Context attachment: `Err(e).context("path", path)` (V3 7.7.8 illustrative).
 
 ### SPEC-013 Effect variables and unions (V3 5.8, 7.7.5, 9.3#7)
@@ -249,8 +251,9 @@ postconditions to existing types' methods.
 ### AMB-002 Fail-fast groups and observing a child failure at `await`
 V3 5.12.3-5, 7.10.4, 8.10. **Resolution:** when a child terminates with an
 unobserved recoverable failure: if the group body is at that moment blocked in
-`await` on exactly that handle, the failure is delivered to the body (it may be
-caught → observed). Otherwise the failure triggers group cancellation of the body and
+`await` on exactly that handle — or in a `select` with a `task` branch on that
+handle — the failure is delivered to the body (it may be caught, or converted to a
+Result by the task branch → observed). Otherwise the failure triggers group cancellation of the body and
 all other children. `await` is always a cancellation point (V3 7.10.2), so a body
 cannot catch a failure that already triggered group cancellation. Outward: every
 unobserved failure, in task-path order, inside `AggregateException` (V3 6.8 "even
@@ -290,6 +293,12 @@ received through task arguments, captures, or messages. A task's holdings are
 released at task termination or by `port.release()`. "No receivers remain" = no
 task holds any receive port of the channel; similarly for senders.
 
+### AMB-006b Endpoint loss requires a prior endpoint
+"No receivers remain" / "no senders remain" (V3 5.13.11) are only reported after at
+least one port of that side has existed; a fresh channel whose receive port has not
+been created yet buffers or waits instead of failing (otherwise correctness would
+depend on creation order).
+
 ### AMB-007 Equality of identity-bearing values
 V3 5.1.1-2 gives frozen values structural equality and mutable records identity.
 **Resolution:** `==` on mutable records and mutable collections is identity; a static
@@ -306,6 +315,17 @@ V3 5.10.3 lists "frozen field reads"; invariants of mutable records (5.10.6-7) m
 read mutable fields. **Resolution:** contracts may *read* fields of any record; they
 may not mutate, call general functions, or allocate unboundedly. `old()` legality is
 judged on the captured *result* (V3 7.8.3).
+
+### AMB-011 TaskGroupReport holds frozen results
+`parallel collect` returns a `TaskGroupReport` (a core frozen record). A child's
+successful value stored in it must therefore be frozen; a mutable result abandons
+with `A.TASK.NOT_SENDABLE` and advice to freeze it. V3 does not specify the
+report's mutability; this keeps the transitive-freezing invariant (V3 5.1.3).
+
+### AMB-012 Task handles are immutable but unsendable
+Handles may be stored in local (frozen or mutable) collections inside their group
+body (e.g. for `selectTask`), but cannot cross task/channel boundaries, and awaiting
+after the group ended abandons (`A.TASK.HANDLE_OUTSIDE_SCOPE`).
 
 ### AMB-010 Unresolved names in draft mode
 V3 2.4 and 5.15.2. **Resolution:** an unresolved name is a blocking static error in

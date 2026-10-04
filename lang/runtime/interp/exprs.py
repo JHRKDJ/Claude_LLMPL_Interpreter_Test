@@ -160,6 +160,10 @@ class ExprMixin:
             return b
         a = self.eval(node.left, env)
         b = self.eval(node.right, env)
+        if type(a) is Borrow:
+            a = self.borrow_target(a, node.left.span, env)
+        if type(b) is Borrow:
+            b = self.borrow_target(b, node.right.span, env)
         try:
             return binop(op, a, b)
         except Fault as f:

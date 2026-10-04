@@ -50,7 +50,7 @@ CANCEL_REASON = _enum("CancellationReason", [("External", None), ("GroupFailure"
 # ---- categories and standard errors
 CATEGORIES = {
     "IO": CategoryType("IO", "core.IO"),
-    "Channel": CategoryType("Channel", "core.Channel"),
+    "Channels": CategoryType("Channels", "core.Channels"),
     "Time": CategoryType("Time", "core.Time"),
     "Data": CategoryType("Data", "core.Data"),
 }
@@ -60,7 +60,7 @@ PERMISSION_DENIED = _record("PermissionDenied", [("path", T.STR)], "error", "IO"
 IO_FAILURE = _record("IOFailure", [("path", T.STR), ("detail", T.STR)], "error", "IO")
 JSON_ERROR = _record("JsonError", [("message", T.STR), ("line", T.INT), ("column", T.INT)], "error", "Data")
 CHANNEL_CLOSED = _record("ChannelClosed", [("channelId", T.INT), ("operation", T.STR), ("reason", T.STR),
-                                           ("portId", T.INT)], "error", "Channel")
+                                           ("portId", T.INT)], "error", "Channels")
 DEADLINE_EXCEEDED = _record("DeadlineExceeded", [("deadline", T.INSTANT)], "error", "Time")
 AGGREGATE_ENTRY = _record("AggregateEntry", [("source", T.STR), ("taskPath", T.option(T.STR)), ("error", T.DYN)])
 AGGREGATE_EXCEPTION = _record("AggregateException", [("entries", T.TCon("List", (T.TNominal("core.AggregateEntry", "record"),)))],

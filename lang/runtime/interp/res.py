@@ -24,7 +24,8 @@ from .core import Env
 
 
 class ProviderCtx:
-    __slots__ = ("node", "env", "run_body", "yielded", "outcome", "masked", "abandon_actions", "state", "name")
+    __slots__ = ("node", "env", "run_body", "yielded", "outcome", "masked", "abandon_actions", "state", "name",
+                 "frame_base", "depth_base")
 
     def __init__(self, node, env, name):
         self.node = node
@@ -36,6 +37,8 @@ class ProviderCtx:
         self.state = None
         self.name = name
         self.run_body = None
+        self.frame_base = 0  # logical frame depth of the scope owner
+        self.depth_base = 0
 
 
 class NativeProvider:
@@ -135,6 +138,8 @@ class ResourceMixin:
             ctx.state = state
             return outcome
         ctx.run_body = run_body
+        ctx.frame_base = len(task.frames)
+        ctx.depth_base = task.depth
         release_error = None
         try:
             self.call_closure(f, args, kwargs, node.init.span, awaited=awaited, node=node.init,
@@ -173,7 +178,17 @@ class ResourceMixin:
                                node.span, env, help="a provider establishes exactly one lifetime: yield once")
         v = self.eval(node.value, env)
         ctx.yielded = True
-        outcome = ctx.run_body(v)
+        # The scope body belongs to the scope owner's activation: hide the suspended
+        # provider frames while it runs (BUG-0001), then restore them for release.
+        suspended = task.frames[ctx.frame_base:]
+        del task.frames[ctx.frame_base:]
+        depth = task.depth
+        task.depth = ctx.depth_base
+        try:
+            outcome = ctx.run_body(v)
+        finally:
+            task.frames.extend(suspended)
+            task.depth = depth
         ctx.outcome = outcome
         kind = outcome[0]
         if kind == "cancelled":

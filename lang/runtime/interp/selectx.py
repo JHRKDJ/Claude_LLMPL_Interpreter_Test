@@ -256,8 +256,9 @@ class SelectMixin:
             self.check_cancel(node.span)
             st = SelectState(task)
             self.register_select(st, real, task)
+            watched = frozenset(b.handle.task for b in enabled if b.kind == "task")
             self.block(Wait("select", f"selecting at {node.span.describe()} over {len(enabled)} branch(es)", True,
-                            st.unregister_all, None, node.span))
+                            st.unregister_all, watched, node.span))
             if st.done:
                 b = real[st.chosen]
                 self.record_select(node, invocation, real, [st.chosen], start, b, mode, seq=st.seq)

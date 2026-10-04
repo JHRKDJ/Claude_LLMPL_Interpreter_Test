@@ -698,8 +698,13 @@ class Parser:
             if self.at("{"):
                 b = self.parse_block()
                 return A.DeferStmt(span=t.span.to(b.span), body=b)
-            e = self.parse_expr()
-            return A.DeferStmt(span=t.span.to(e.span), body=e)
+            inner = self.parse_stmt()
+            if isinstance(inner, A.ExprStmt):
+                return A.DeferStmt(span=t.span.to(inner.span), body=inner.expr)
+            if not isinstance(inner, A.AssignStmt):
+                raise self.error("S.SYNTAX.MISPLACED_CONSTRUCT", "`defer` takes an expression, an assignment or a block",
+                                 inner.span, help="wrap it in braces: `defer { ... }`")
+            return A.DeferStmt(span=t.span.to(inner.span), body=A.Block(span=inner.span, stmts=[inner]))
         if k == "IDENT" and t.value == "onAbandon" and self.peek2().kind in ("IDENT", "self"):
             self.advance()
             e = self.parse_expr()

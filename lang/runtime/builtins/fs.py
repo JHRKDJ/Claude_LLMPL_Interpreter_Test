@@ -70,6 +70,12 @@ def _check_open(h: FileHandle):
         raise Fault("A.RESOURCE.USE_AFTER_RELEASE", f"file {h.path} is closed")
 
 
+from ..values import TypeValue
+from .registry import MODULES
+MODULES.setdefault("std.fs", {})["File"] = TypeValue("builtin", "File", (), "File")
+MODULES["std.fs"]["Dir"] = TypeValue("builtin", "Dir", (), "Dir")
+
+
 # ------------------------------------------------------------------ providers
 class _FileProvider:
     def __init__(self, path: str, mode: str, atomic: bool = False):

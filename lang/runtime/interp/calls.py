@@ -190,6 +190,8 @@ class CallMixin:
             try:
                 if decl.__class__ is A.Lambda and not decl.is_block:
                     value = self.eval(decl.body, fenv)
+                elif decl.__class__ is A.PredicateDecl:
+                    value = self.exec_block(decl.body, fenv, scope=False)
                 elif provider_body is not None:
                     value = self.run_provider_body(clo, decl, fenv, provider_body)
                 else:
