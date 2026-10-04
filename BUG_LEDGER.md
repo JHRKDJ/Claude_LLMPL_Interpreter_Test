@@ -94,7 +94,7 @@ Regression test failed before fix: yes (span case; the other two pin folding of
 Fix: parse_unary folds only when the number literal immediately follows the minus
   sign (lang/syntax/parser.py); the formatter treats folded negative literals as
   prefix expressions for parenthesisation.
-Commit: (next commit)
+Commit: 4285cb7
 Status: fixed
 
 BUG-0006
@@ -110,5 +110,5 @@ Regression test failed before fix: yes (4 of 5; the fifth pins the genuine case 
 Fix: the rule now requires a line break immediately before the `-` and a previous
   line ending in an expression-ending token (name, literal, `)` or `]`); the fix
   edit is anchored at that token (lang/syntax/parser.py).
-Commit: (next commit)
+Commit: 4285cb7
 Status: fixed
