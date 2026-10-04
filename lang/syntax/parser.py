@@ -309,7 +309,9 @@ class Parser:
                 self.advance()
                 name_tok = self.advance()
                 body = self.parse_block()
-                return A.TestDecl(span=start.to(body.span), name=name_tok.value or "", body=body)
+                td = A.TestDecl(span=start.to(body.span), name=name_tok.value or "", body=body)
+                td.ann["name_src"] = name_tok.span.text  # literal as written (formatter)
+                return td
         if t.kind == "const":
             self.advance()
             n = self.expect_ident("a constant name")
@@ -760,6 +762,9 @@ class Parser:
         if k == "IDENT" and t.value in ("elif", "elsif"):
             raise self.error("S.SYNTAX.UNSUPPORTED_SYNTAX", f"`{t.value}` is not a keyword", t.span,
                              help="write `else if`")
+        # a `-` that starts a line right after a line ending an expression is suspicious
+        # (it does not continue that expression); a block's first statement is not (BUG-0006)
+        prev_ends_expr = self._prev_line_expr_end() if t.kind == "-" else None
         e = self.parse_expr()
         nt = self.peek()
         if nt.kind in ASSIGN_OPS:
@@ -770,14 +775,30 @@ class Parser:
                                  e.span, help="assign to a binding, a field (`obj.f = v`) or an element (`xs[i] = v`)")
             v = self.parse_expr()
             return A.AssignStmt(span=e.span.to(v.span), target=e, op=op.kind, value=v)
-        if isinstance(e, A.Unary) and e.op == "-" and t.kind == "-":
-            prev = self._prev_line_end()
+        if isinstance(e, A.Unary) and e.op == "-" and t.kind == "-" and prev_ends_expr is not None:
+            prev = prev_ends_expr
             raise self.error("S.SYNTAX.LEADING_OPERATOR",
                              "line starts with `-`; this is a separate statement, not a continuation",
                              t.span, help="put the `-` at the end of the previous line to continue the expression",
                              fix=Fix("move `-` to the end of the previous line",
                                      [TextEdit(Span(self.file, prev, prev), " -"), TextEdit(t.span, "")]) if prev is not None else None)
         return A.ExprStmt(span=e.span, expr=e)
+
+    def _prev_line_expr_end(self) -> Optional[int]:
+        """End offset of the previous line's last token if it could end an expression
+        and a line break separates it from the current token; else None."""
+        j = self.i - 1
+        if j < 0 or self.toks[j].kind != "NEWLINE":
+            return None
+        while j >= 0 and self.toks[j].kind == "NEWLINE":
+            j -= 1
+        if j < 0:
+            return None
+        pt = self.toks[j]
+        if pt.kind in ("IDENT", "INT", "FLOAT", "STRING", ")", "]") or \
+                (pt.kind in ("true", "false", "null")):
+            return pt.span.end
+        return None
 
     def _prev_line_end(self) -> Optional[int]:
         j = self.i - 1
@@ -869,6 +890,12 @@ class Parser:
                                                   binding=binding, handler=handler))
                 node.span = node.span.to(handler.span)
                 continue
+            if nxt.kind == "else" and node.catches:
+                self.skip_newlines()
+                el = self.peek()
+                raise self.error("S.SYNTAX.MISPLACED_CONSTRUCT",
+                                 "an unqualified `else` fallback cannot follow `catch` clauses", el.span,
+                                 help="name the remaining error type with another `catch Type => ...` clause")
             if nxt.kind == "else" and not node.catches and self._else_is_fallback():
                 self.skip_newlines()
                 self.advance()
@@ -887,7 +914,9 @@ class Parser:
 
     def parse_block_expr(self) -> A.Expr:
         b = self.parse_block()
-        return A.If(span=b.span, cond=A.Literal(span=b.span, value=True, kind="bool"), then=b, else_=None)
+        node = A.If(span=b.span, cond=A.Literal(span=b.span, value=True, kind="bool"), then=b, else_=None)
+        node.ann["block_expr"] = True  # a bare `{ ... }` in expression position (formatter prints it as a block)
+        return node
 
     def parse_arm_body(self):
         if self.at("{"):
@@ -905,7 +934,7 @@ class Parser:
             self.advance()
             self._binary_rhs_skip()
             right = self.parse_and()
-            left = A.Binary(span=left.span.to(right.span), op="||", left=left, right=right)
+            left = A.Binary(span=self.sp(left).to(self.sp(right)), op="||", left=left, right=right)
         return left
 
     def parse_and(self) -> A.Expr:
@@ -914,7 +943,7 @@ class Parser:
             self.advance()
             self._binary_rhs_skip()
             right = self.parse_cmp()
-            left = A.Binary(span=left.span.to(right.span), op="&&", left=left, right=right)
+            left = A.Binary(span=self.sp(left).to(self.sp(right)), op="&&", left=left, right=right)
         return left
 
     def parse_cmp(self) -> A.Expr:
@@ -923,7 +952,7 @@ class Parser:
             op = self.advance()
             self._binary_rhs_skip()
             right = self.parse_rel()
-            left = A.Binary(span=left.span.to(right.span), op=op.kind, left=left, right=right)
+            left = A.Binary(span=self.sp(left).to(self.sp(right)), op=op.kind, left=left, right=right)
             if self.at("==") or self.at("!="):
                 t = self.peek()
                 raise self.error("S.SYNTAX.UNEXPECTED_TOKEN", "comparison operators do not chain", t.span,
@@ -936,7 +965,7 @@ class Parser:
             op = self.advance()
             self._binary_rhs_skip()
             right = self.parse_is()
-            left = A.Binary(span=left.span.to(right.span), op=op.kind, left=left, right=right)
+            left = A.Binary(span=self.sp(left).to(self.sp(right)), op=op.kind, left=left, right=right)
             if self.peek().kind in ("<", "<=", ">", ">="):
                 t = self.peek()
                 raise self.error("S.SYNTAX.UNEXPECTED_TOKEN", "comparison operators do not chain", t.span,
@@ -949,12 +978,12 @@ class Parser:
             if self.at("is"):
                 self.advance()
                 pat = self.parse_pattern(allow_or=False)
-                left = A.Is(span=left.span.to(pat.span), expr=left, pattern=pat)
+                left = A.Is(span=self.sp(left).to(pat.span), expr=left, pattern=pat)
                 continue
             if self.at("as"):
                 self.advance()
                 ty = self.parse_type()
-                left = A.As(span=left.span.to(ty.span), expr=left, type=ty)
+                left = A.As(span=self.sp(left).to(ty.span), expr=left, type=ty)
                 continue
             return left
 
@@ -964,7 +993,7 @@ class Parser:
             op = self.advance()
             self._binary_rhs_skip()
             right = self.parse_add()
-            return A.Range(span=left.span.to(right.span), lo=left, hi=right, inclusive=op.kind == "..=")
+            return A.Range(span=self.sp(left).to(self.sp(right)), lo=left, hi=right, inclusive=op.kind == "..=")
         return left
 
     def parse_add(self) -> A.Expr:
@@ -981,7 +1010,7 @@ class Parser:
                                      help=f"write `{target} {op.kind}= 1`")
             self._binary_rhs_skip()
             right = self.parse_mul()
-            left = A.Binary(span=left.span.to(right.span), op=op.kind, left=left, right=right)
+            left = A.Binary(span=self.sp(left).to(self.sp(right)), op=op.kind, left=left, right=right)
         return left
 
     def parse_mul(self) -> A.Expr:
@@ -990,7 +1019,7 @@ class Parser:
             op = self.advance()
             self._binary_rhs_skip()
             right = self.parse_unary()
-            left = A.Binary(span=left.span.to(right.span), op=op.kind, left=left, right=right)
+            left = A.Binary(span=self.sp(left).to(self.sp(right)), op=op.kind, left=left, right=right)
         return left
 
     def parse_unary(self) -> A.Expr:
@@ -998,17 +1027,18 @@ class Parser:
         if t.kind in ("-", "!"):
             self.advance()
             e = self.parse_unary()
-            if t.kind == "-" and isinstance(e, A.Literal) and e.kind in ("int", "float"):
-                return A.Literal(span=t.span.to(e.span), value=-e.value, kind=e.kind)
-            return A.Unary(span=t.span.to(e.span), op=t.kind, operand=e)
+            if t.kind == "-" and isinstance(e, A.Literal) and e.kind in ("int", "float") and \
+                    e.span.start == t.span.end:  # fold only `-<number>`, never `-(<number>)` (BUG-0005)
+                return A.Literal(span=t.span.to(self.sp(e)), value=-e.value, kind=e.kind)
+            return A.Unary(span=t.span.to(self.sp(e)), op=t.kind, operand=e)
         if t.kind == "await":
             self.advance()
             e = self.parse_unary()
-            return A.Await(span=t.span.to(e.span), expr=e)
+            return A.Await(span=t.span.to(self.sp(e)), expr=e)
         if t.kind == "propagate":
             self.advance()
             e = self.parse_unary()
-            return A.Propagate(span=t.span.to(e.span), expr=e)
+            return A.Propagate(span=t.span.to(self.sp(e)), expr=e)
         if t.kind == "try":
             raise self.error("S.SYNTAX.MISPLACED_CONSTRUCT", "`try` must begin the expression it marks",
                              t.span, help="move `try` to the start of the whole expression, e.g. `try a + f()`")
@@ -1031,14 +1061,14 @@ class Parser:
                         if not self.eat(","):
                             break
                     close = self.expect("]", "`]` closing the index")
-                e = A.Index(span=e.span.to(close.span), obj=e, indices=idx)
+                e = A.Index(span=self.sp(e).to(close.span), obj=e, indices=idx)
                 continue
             if t.kind == "." or (t.kind == "NEWLINE" and self.peek_past_newlines().kind == "."):
                 self.skip_newlines()
                 self.advance()
                 n = self.expect_member_name()
                 name = str(n.value)
-                e = A.Field(span=e.span.to(n.span), obj=e, name=name, name_span=n.span)
+                e = A.Field(span=self.sp(e).to(n.span), obj=e, name=name, name_span=n.span)
                 continue
             if t.kind == "IDENT" and t.value == "with" and self.peek2().kind == "{":
                 self.advance()
@@ -1053,7 +1083,7 @@ class Parser:
                         if not self.eat(","):
                             break
                     close = self.expect("}", "`}` closing the update")
-                e = A.WithUpdate(span=e.span.to(close.span), obj=e, fields=fields)
+                e = A.WithUpdate(span=self.sp(e).to(close.span), obj=e, fields=fields)
                 continue
             if t.kind == "?" :
                 raise self.error("S.SYNTAX.UNSUPPORTED_SYNTAX", "postfix `?` is not an operator in this language",
@@ -1070,7 +1100,7 @@ class Parser:
                     self.advance()
                     self.advance()
                     v = self.parse_expr()
-                    args.append(A.Arg(t.value, v, t.span.to(v.span)))
+                    args.append(A.Arg(t.value, v, t.span.to(self.sp(v))))
                 elif t.kind == "IDENT" and self.peek2().kind == "=" :
                     raise self.error("S.SYNTAX.UNSUPPORTED_SYNTAX", "named arguments use `name: value`",
                                      self.peek2().span, help=f"write `{t.value}: ...`")
@@ -1080,7 +1110,7 @@ class Parser:
                 if not self.eat(","):
                     break
             close = self.expect(")", "`)` closing the argument list")
-        return A.Call(span=callee.span.to(close.span), callee=callee, args=args)
+        return A.Call(span=self.sp(callee).to(close.span), callee=callee, args=args)
 
     def parse_primary(self) -> A.Expr:
         t = self.peek()
@@ -1193,7 +1223,13 @@ class Parser:
                 return A.TupleLit(span=open_.span.to(close.span), items=items)
             close = self.expect(")", "`)`")
         first.span = open_.span.to(close.span) if isinstance(first, (A.Binary,)) else first.span
+        first.ann["outer_span"] = open_.span.to(close.span)  # includes the parentheses (BUG-0005)
         return first
+
+    @staticmethod
+    def sp(e) -> Span:
+        """Source extent of an operand including any enclosing parentheses."""
+        return e.ann.get("outer_span", e.span)
 
     def string_literal(self, t: Token) -> A.StringLit:
         parts: list = []

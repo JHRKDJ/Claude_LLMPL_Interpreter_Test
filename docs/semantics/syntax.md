@@ -71,7 +71,7 @@ bind_target= name | "(" name {"," name} ")"
 assign_op  = "=" | "+=" | "-=" | "*=" | "/=" | "%="
 cond       = expr            (an `is` pattern inside may bind names for the block)
 
-expr       = "try" expr { "catch" catch_clause } [ "else" expr ]
+expr       = "try" expr ( "catch" catch_clause { "catch" catch_clause } | [ "else" (expr | block) ] )
            | "capture" expr | "yield" expr | or_expr
 catch_clause = ["category"] qualified ["as" name] "=>" (block | expr)
 or_expr    = and_expr { "||" and_expr }

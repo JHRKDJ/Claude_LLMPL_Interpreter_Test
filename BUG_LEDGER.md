@@ -81,3 +81,34 @@ Fix: a consumed `,` now ends the item exactly like a newline at all three sites 
   lang/syntax/parser.py; syntax.md grammar and SPEC-007 updated to state it.
 Commit: be0d02c
 Status: fixed
+
+BUG-0005
+Origin: formatter safety net (parse/format/parse equivalence over the test corpus)
+Subsystems: parser × source spans (× diagnostics, formatter)
+Symptom: `-` applied to a parenthesised numeric literal was folded into one literal
+  whose span ended before the closing parenthesis (`-(-7` for `-(-7)`), so any
+  diagnostic or tool reading the span saw truncated source text.
+Minimal reproduction: tests/regressions/test_bug_0005_negative_literal_span.py
+Regression test failed before fix: yes (span case; the other two pin folding of
+  adjacent `-7` and unchanged values)
+Fix: parse_unary folds only when the number literal immediately follows the minus
+  sign (lang/syntax/parser.py); the formatter treats folded negative literals as
+  prefix expressions for parenthesisation.
+Commit: (next commit)
+Status: fixed
+
+BUG-0006
+Origin: formatter fuzzing (seeded generated program, seed 4)
+Subsystems: parser (statement start × leading-operator diagnostics)
+Symptom: the rule "a line starting with `-` after a line that ends an expression is a
+  separate statement" fired for every statement beginning with unary minus, so
+  valid block values such as `if c { 1 } else { -v }` were rejected with
+  S.SYNTAX.LEADING_OPERATOR.
+Minimal reproduction: tests/regressions/test_bug_0006_leading_minus.py
+Regression test failed before fix: yes (4 of 5; the fifth pins the genuine case and
+  its fix)
+Fix: the rule now requires a line break immediately before the `-` and a previous
+  line ending in an expression-ending token (name, literal, `)` or `]`); the fix
+  edit is anchored at that token (lang/syntax/parser.py).
+Commit: (next commit)
+Status: fixed
