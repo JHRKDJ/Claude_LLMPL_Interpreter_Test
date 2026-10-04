@@ -1,0 +1,35 @@
+{
+  "workflow": "s02_chain",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "b",
+      "kind": "reduce",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "c",
+      "kind": "external",
+      "deps": [
+        "b"
+      ],
+      "config": {
+        "latencyMs": 7,
+        "value": "done"
+      }
+    }
+  ]
+}

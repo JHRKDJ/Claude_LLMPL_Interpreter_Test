@@ -1,0 +1,45 @@
+{
+  "workflow": "s30g_sub_timeout_retry",
+  "workflows": {
+    "slowsub": {
+      "workflow": "slowsub",
+      "jobs": [
+        {
+          "id": "s1",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 2,
+            "costMs": 10
+          }
+        },
+        {
+          "id": "s2",
+          "kind": "compute",
+          "deps": [
+            "s1"
+          ],
+          "config": {
+            "op": "fib",
+            "n": 3,
+            "costMs": 10
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "n",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "slowsub"
+      },
+      "timeoutMs": 15,
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 5
+      }
+    }
+  ]
+}

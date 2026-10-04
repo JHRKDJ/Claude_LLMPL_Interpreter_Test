@@ -1,0 +1,66 @@
+{
+  "workflow": "s22_fanout",
+  "jobs": [
+    {
+      "id": "m1",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "square",
+        "parallelism": 3,
+        "itemLatencyMs": 5
+      }
+    },
+    {
+      "id": "m2",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "op": "inc",
+        "failOn": [
+          3
+        ],
+        "itemLatencyMs": 2,
+        "allowPartial": true
+      }
+    },
+    {
+      "id": "m3",
+      "kind": "map",
+      "config": {
+        "items": [
+          5,
+          6
+        ],
+        "op": "inc",
+        "failOn": [
+          6
+        ]
+      }
+    },
+    {
+      "id": "m4",
+      "kind": "map",
+      "deps": [
+        "m1"
+      ],
+      "config": {
+        "from": "m1",
+        "op": "inc"
+      }
+    }
+  ]
+}

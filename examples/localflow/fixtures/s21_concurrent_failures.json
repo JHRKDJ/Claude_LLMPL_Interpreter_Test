@@ -1,0 +1,64 @@
+{
+  "workflow": "s21_concurrent_failures",
+  "onFailure": "failFast",
+  "jobs": [
+    {
+      "id": "f1",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "f2",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10,
+        "script": [
+          "retryable"
+        ]
+      }
+    },
+    {
+      "id": "f3",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "ok",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "slow",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 2,
+        "costMs": 40
+      }
+    },
+    {
+      "id": "needs",
+      "kind": "reduce",
+      "deps": [
+        "f1",
+        "f2",
+        "ok"
+      ],
+      "config": {
+        "op": "count"
+      }
+    }
+  ]
+}

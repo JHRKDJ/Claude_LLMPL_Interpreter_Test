@@ -1,0 +1,53 @@
+{
+  "workflow": "s30d_zero_time_chain",
+  "maxConcurrency": 1,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "b",
+      "kind": "check",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "input": "a",
+        "op": "eq",
+        "value": 55
+      }
+    },
+    {
+      "id": "c",
+      "kind": "compute",
+      "deps": [
+        "b"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      },
+      "when": {
+        "job": "b",
+        "equals": true
+      }
+    },
+    {
+      "id": "d",
+      "kind": "reduce",
+      "deps": [
+        "c"
+      ],
+      "config": {
+        "op": "max"
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "workflow": "s30h_cancel_subworkflow",
+  "cancelAfterMs": 12,
+  "workflows": {
+    "slowsub": {
+      "workflow": "slowsub",
+      "jobs": [
+        {
+          "id": "s1",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 2,
+            "costMs": 10
+          }
+        },
+        {
+          "id": "s2",
+          "kind": "compute",
+          "deps": [
+            "s1"
+          ],
+          "config": {
+            "op": "fib",
+            "n": 3,
+            "costMs": 10
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "n",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "slowsub"
+      }
+    }
+  ]
+}

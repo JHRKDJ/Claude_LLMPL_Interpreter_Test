@@ -1,0 +1,188 @@
+{
+  "workflow": "s26_deterministic",
+  "maxConcurrency": 4,
+  "groups": {
+    "g": 2
+  },
+  "jobs": [
+    {
+      "id": "e0",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 0
+      },
+      "group": "g",
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      }
+    },
+    {
+      "id": "e1",
+      "kind": "external",
+      "config": {
+        "latencyMs": 8,
+        "script": [
+          "ok"
+        ],
+        "value": 1
+      }
+    },
+    {
+      "id": "e2",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "script": [
+          "ok"
+        ],
+        "value": 2
+      },
+      "group": "g"
+    },
+    {
+      "id": "e3",
+      "kind": "external",
+      "config": {
+        "latencyMs": 11,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 3
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      }
+    },
+    {
+      "id": "e4",
+      "kind": "external",
+      "config": {
+        "latencyMs": 7,
+        "script": [
+          "ok"
+        ],
+        "value": 4
+      },
+      "group": "g"
+    },
+    {
+      "id": "e5",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "script": [
+          "ok"
+        ],
+        "value": 5
+      }
+    },
+    {
+      "id": "e6",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 6
+      },
+      "group": "g",
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      }
+    },
+    {
+      "id": "e7",
+      "kind": "external",
+      "config": {
+        "latencyMs": 6,
+        "script": [
+          "ok"
+        ],
+        "value": 7
+      }
+    },
+    {
+      "id": "e8",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "ok"
+        ],
+        "value": 8
+      },
+      "group": "g"
+    },
+    {
+      "id": "e9",
+      "kind": "external",
+      "config": {
+        "latencyMs": 9,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 9
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      }
+    },
+    {
+      "id": "e10",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "ok"
+        ],
+        "value": 10
+      },
+      "group": "g"
+    },
+    {
+      "id": "e11",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "ok"
+        ],
+        "value": 11
+      }
+    },
+    {
+      "id": "sum",
+      "kind": "reduce",
+      "deps": [
+        "e0",
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e9",
+        "e10",
+        "e11"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    }
+  ]
+}

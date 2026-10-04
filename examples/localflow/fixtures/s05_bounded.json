@@ -1,0 +1,60 @@
+{
+  "workflow": "s05_bounded",
+  "maxConcurrency": 3,
+  "groups": {
+    "io": 1
+  },
+  "jobs": [
+    {
+      "id": "e0",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "e1",
+      "kind": "external",
+      "config": {
+        "latencyMs": 11
+      },
+      "group": "io"
+    },
+    {
+      "id": "e2",
+      "kind": "external",
+      "config": {
+        "latencyMs": 12
+      },
+      "group": "io"
+    },
+    {
+      "id": "e3",
+      "kind": "external",
+      "config": {
+        "latencyMs": 13
+      }
+    },
+    {
+      "id": "e4",
+      "kind": "external",
+      "config": {
+        "latencyMs": 14
+      }
+    },
+    {
+      "id": "e5",
+      "kind": "external",
+      "config": {
+        "latencyMs": 15
+      }
+    },
+    {
+      "id": "e6",
+      "kind": "external",
+      "config": {
+        "latencyMs": 16
+      }
+    }
+  ]
+}

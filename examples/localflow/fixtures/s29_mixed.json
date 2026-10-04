@@ -1,0 +1,100 @@
+{
+  "workflow": "s29_mixed",
+  "cancelAfterMs": 60,
+  "jobs": [
+    {
+      "id": "retried",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 5
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 2
+      }
+    },
+    {
+      "id": "failed",
+      "kind": "external",
+      "config": {
+        "latencyMs": 6,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "blocked",
+      "kind": "compute",
+      "deps": [
+        "failed"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "skipped",
+      "kind": "compute",
+      "deps": [
+        "gate"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      },
+      "when": {
+        "job": "gate",
+        "equals": true
+      }
+    },
+    {
+      "id": "gate",
+      "kind": "check",
+      "deps": [
+        "retried"
+      ],
+      "config": {
+        "input": "retried",
+        "op": "lt",
+        "value": 0
+      }
+    },
+    {
+      "id": "ok",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 12,
+        "costMs": 8
+      }
+    },
+    {
+      "id": "running",
+      "kind": "external",
+      "config": {
+        "latencyMs": 200
+      }
+    },
+    {
+      "id": "notrun",
+      "kind": "compute",
+      "deps": [
+        "running"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

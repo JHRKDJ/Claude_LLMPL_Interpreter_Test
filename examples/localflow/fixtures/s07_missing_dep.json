@@ -1,0 +1,26 @@
+{
+  "workflow": "s07_missing_dep",
+  "jobs": [
+    {
+      "id": "x",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "y",
+      "kind": "compute",
+      "deps": [
+        "nope"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

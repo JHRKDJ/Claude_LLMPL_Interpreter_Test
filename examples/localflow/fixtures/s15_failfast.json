@@ -1,0 +1,44 @@
+{
+  "workflow": "s15_failfast",
+  "onFailure": "failFast",
+  "jobs": [
+    {
+      "id": "bad",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "slow",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 100
+      }
+    },
+    {
+      "id": "later",
+      "kind": "compute",
+      "deps": [
+        "slow"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "same",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    }
+  ]
+}

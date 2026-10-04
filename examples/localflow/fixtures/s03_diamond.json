@@ -1,0 +1,49 @@
+{
+  "workflow": "s03_diamond",
+  "jobs": [
+    {
+      "id": "top",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 6,
+        "costMs": 5
+      }
+    },
+    {
+      "id": "left",
+      "kind": "compute",
+      "deps": [
+        "top"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 7,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "right",
+      "kind": "compute",
+      "deps": [
+        "top"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 8,
+        "costMs": 20
+      }
+    },
+    {
+      "id": "join",
+      "kind": "reduce",
+      "deps": [
+        "left",
+        "right"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    }
+  ]
+}

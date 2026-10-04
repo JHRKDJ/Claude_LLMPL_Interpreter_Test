@@ -1,0 +1,37 @@
+{
+  "workflow": "s16_cancel_resource",
+  "cancelAfterMs": 20,
+  "jobs": [
+    {
+      "id": "t",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "words.out",
+        "op": "upper",
+        "latencyMs": 50
+      }
+    },
+    {
+      "id": "quick",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 5
+      }
+    },
+    {
+      "id": "next",
+      "kind": "compute",
+      "deps": [
+        "t"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

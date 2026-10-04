@@ -1,0 +1,33 @@
+{
+  "workflow": "s30e_failfast_zero_time",
+  "onFailure": "failFast",
+  "jobs": [
+    {
+      "id": "r",
+      "kind": "reduce",
+      "deps": [
+        "x"
+      ],
+      "config": {
+        "op": "max"
+      }
+    },
+    {
+      "id": "x",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "value": "text"
+      }
+    },
+    {
+      "id": "long",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 50
+      }
+    }
+  ]
+}

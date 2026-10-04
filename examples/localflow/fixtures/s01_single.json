@@ -1,0 +1,14 @@
+{
+  "workflow": "s01_single",
+  "jobs": [
+    {
+      "id": "only",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 20,
+        "costMs": 5
+      }
+    }
+  ]
+}

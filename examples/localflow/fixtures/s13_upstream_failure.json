@@ -1,0 +1,48 @@
+{
+  "workflow": "s13_upstream_failure",
+  "jobs": [
+    {
+      "id": "src",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "mid",
+      "kind": "compute",
+      "deps": [
+        "src"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "leaf",
+      "kind": "compute",
+      "deps": [
+        "mid"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "other",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 3
+      }
+    }
+  ]
+}

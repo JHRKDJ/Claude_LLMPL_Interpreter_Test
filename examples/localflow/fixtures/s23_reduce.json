@@ -1,0 +1,81 @@
+{
+  "workflow": "s23_reduce",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "value": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "config": {
+        "latencyMs": 6,
+        "value": 10
+      }
+    },
+    {
+      "id": "c",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "value": [
+          7
+        ]
+      }
+    },
+    {
+      "id": "sum",
+      "kind": "reduce",
+      "deps": [
+        "a",
+        "b",
+        "c"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "max",
+      "kind": "reduce",
+      "deps": [
+        "a",
+        "b",
+        "c"
+      ],
+      "config": {
+        "op": "max"
+      }
+    },
+    {
+      "id": "cat",
+      "kind": "reduce",
+      "deps": [
+        "a",
+        "c"
+      ],
+      "config": {
+        "op": "concat"
+      }
+    },
+    {
+      "id": "badcat",
+      "kind": "reduce",
+      "deps": [
+        "a",
+        "b"
+      ],
+      "config": {
+        "op": "concat"
+      }
+    }
+  ]
+}

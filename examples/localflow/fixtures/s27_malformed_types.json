@@ -1,0 +1,81 @@
+{
+  "workflow": "",
+  "maxConcurrency": 0,
+  "onFailure": "sometimes",
+  "jobs": [
+    {
+      "id": "ok",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3
+      }
+    },
+    {
+      "id": "bad id!",
+      "kind": "compute"
+    },
+    {
+      "id": "k",
+      "kind": "teleport"
+    },
+    {
+      "id": "c",
+      "kind": "compute",
+      "config": {
+        "op": "fib"
+      }
+    },
+    {
+      "id": "w",
+      "kind": "compute",
+      "deps": [
+        "ok"
+      ],
+      "when": {
+        "job": "ok",
+        "equals": true
+      },
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "g",
+      "kind": "compute",
+      "group": "none",
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "h",
+      "kind": "external",
+      "config": {
+        "script": [
+          "hang"
+        ]
+      }
+    },
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "ghost"
+      }
+    },
+    {
+      "id": "r",
+      "kind": "compute",
+      "retry": {
+        "maxAttempts": 0
+      },
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    }
+  ]
+}

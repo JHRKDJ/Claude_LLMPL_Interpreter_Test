@@ -1,0 +1,6706 @@
+{
+ "workflow": "large",
+ "maxConcurrency": 16,
+ "groups": {
+  "narrow": 2
+ },
+ "onFailure": "continue",
+ "jobs": [
+  {
+   "id": "L00_00",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 12,
+    "script": [
+     "permanent"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_01",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L00_02",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 10,
+    "script": [
+     "ok"
+    ],
+    "value": 3
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_03",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L00_04",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L00_05",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 19,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L00_06",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L00_07",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L00_08",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 18,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L00_09",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 13,
+    "script": [
+     "retryable",
+     "ok"
+    ],
+    "value": 7
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_10",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L00_11",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 7,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L00_12",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L00_13",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 6,
+    "script": [
+     "ok"
+    ],
+    "value": 6
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_14",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L00_15",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 18,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L00_16",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 27,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L00_17",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "retryable",
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_18",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 9,
+    "script": [
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_19",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 11,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L00_20",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 10,
+    "script": [
+     "ok"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_21",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 2,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L00_22",
+   "kind": "external",
+   "deps": [],
+   "config": {
+    "latencyMs": 15,
+    "script": [
+     "ok"
+    ],
+    "value": 1
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L00_23",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 28,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L00_24",
+   "kind": "compute",
+   "deps": [],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L01_00",
+   "kind": "external",
+   "deps": [
+    "L00_10"
+   ],
+   "config": {
+    "latencyMs": 10,
+    "script": [
+     "ok"
+    ],
+    "value": 9
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L01_01",
+   "kind": "compute",
+   "deps": [
+    "L00_02",
+    "L00_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L01_02",
+   "kind": "compute",
+   "deps": [
+    "L00_04",
+    "L00_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L01_03",
+   "kind": "compute",
+   "deps": [
+    "L00_09"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L01_04",
+   "kind": "compute",
+   "deps": [
+    "L00_00",
+    "L00_15",
+    "L00_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L01_05",
+   "kind": "compute",
+   "deps": [
+    "L00_01",
+    "L00_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L01_06",
+   "kind": "reduce",
+   "deps": [
+    "L00_06",
+    "L00_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L01_07",
+   "kind": "compute",
+   "deps": [
+    "L00_18",
+    "L00_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L01_08",
+   "kind": "compute",
+   "deps": [
+    "L00_03"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 19,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L01_09",
+   "kind": "compute",
+   "deps": [
+    "L00_08",
+    "L00_14",
+    "L00_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L01_10",
+   "kind": "compute",
+   "deps": [
+    "L00_07"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 18,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L01_11",
+   "kind": "compute",
+   "deps": [
+    "L00_08"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 11,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L01_12",
+   "kind": "compute",
+   "deps": [
+    "L00_11",
+    "L00_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L01_13",
+   "kind": "compute",
+   "deps": [
+    "L00_07",
+    "L00_10",
+    "L00_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L01_14",
+   "kind": "compute",
+   "deps": [
+    "L00_00",
+    "L00_15",
+    "L00_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 1,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L01_15",
+   "kind": "compute",
+   "deps": [
+    "L00_15"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L01_16",
+   "kind": "reduce",
+   "deps": [
+    "L00_08",
+    "L00_13"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L01_17",
+   "kind": "compute",
+   "deps": [
+    "L00_02"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L01_18",
+   "kind": "compute",
+   "deps": [
+    "L00_07",
+    "L00_14",
+    "L00_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L01_19",
+   "kind": "compute",
+   "deps": [
+    "L00_12",
+    "L00_13",
+    "L00_15"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L01_20",
+   "kind": "external",
+   "deps": [
+    "L00_06",
+    "L00_24"
+   ],
+   "config": {
+    "latencyMs": 3,
+    "script": [
+     "ok"
+    ],
+    "value": 4
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L01_21",
+   "kind": "compute",
+   "deps": [
+    "L00_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L01_22",
+   "kind": "compute",
+   "deps": [
+    "L00_05",
+    "L00_07",
+    "L00_15"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L01_23",
+   "kind": "compute",
+   "deps": [
+    "L00_20",
+    "L00_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L01_24",
+   "kind": "compute",
+   "deps": [
+    "L00_00",
+    "L00_08"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L02_00",
+   "kind": "external",
+   "deps": [
+    "L01_01",
+    "L01_05",
+    "L01_23"
+   ],
+   "config": {
+    "latencyMs": 4,
+    "script": [
+     "ok"
+    ],
+    "value": 0
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L02_01",
+   "kind": "compute",
+   "deps": [
+    "L01_04"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L02_02",
+   "kind": "compute",
+   "deps": [
+    "L01_03"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 26,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L02_03",
+   "kind": "reduce",
+   "deps": [
+    "L01_01",
+    "L01_10",
+    "L01_13"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L02_04",
+   "kind": "compute",
+   "deps": [
+    "L01_08",
+    "L01_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L02_05",
+   "kind": "compute",
+   "deps": [
+    "L01_08",
+    "L01_12",
+    "L01_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L02_06",
+   "kind": "compute",
+   "deps": [
+    "L01_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L02_07",
+   "kind": "compute",
+   "deps": [
+    "L01_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 14,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L02_08",
+   "kind": "compute",
+   "deps": [
+    "L01_11",
+    "L01_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L02_09",
+   "kind": "compute",
+   "deps": [
+    "L01_03",
+    "L01_06",
+    "L01_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L02_10",
+   "kind": "compute",
+   "deps": [
+    "L01_00",
+    "L01_17",
+    "L01_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L02_11",
+   "kind": "compute",
+   "deps": [
+    "L01_05",
+    "L01_17",
+    "L01_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L02_12",
+   "kind": "compute",
+   "deps": [
+    "L01_12",
+    "L01_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L02_13",
+   "kind": "compute",
+   "deps": [
+    "L01_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L02_14",
+   "kind": "compute",
+   "deps": [
+    "L01_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 27,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L02_15",
+   "kind": "compute",
+   "deps": [
+    "L01_03",
+    "L01_09",
+    "L01_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 21,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L02_16",
+   "kind": "compute",
+   "deps": [
+    "L01_18",
+    "L01_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L02_17",
+   "kind": "external",
+   "deps": [
+    "L01_06",
+    "L01_08",
+    "L01_13"
+   ],
+   "config": {
+    "latencyMs": 2,
+    "script": [
+     "retryable",
+     "ok"
+    ],
+    "value": 5
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L02_18",
+   "kind": "compute",
+   "deps": [
+    "L01_09"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 25,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L02_19",
+   "kind": "compute",
+   "deps": [
+    "L01_04",
+    "L01_18",
+    "L01_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 0,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L02_20",
+   "kind": "compute",
+   "deps": [
+    "L01_00",
+    "L01_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L02_21",
+   "kind": "compute",
+   "deps": [
+    "L01_10",
+    "L01_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L02_22",
+   "kind": "reduce",
+   "deps": [
+    "L01_02",
+    "L01_05",
+    "L01_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L02_23",
+   "kind": "reduce",
+   "deps": [
+    "L01_16"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L02_24",
+   "kind": "compute",
+   "deps": [
+    "L01_02"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L03_00",
+   "kind": "reduce",
+   "deps": [
+    "L02_05",
+    "L02_12",
+    "L02_18"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L03_01",
+   "kind": "reduce",
+   "deps": [
+    "L02_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L03_02",
+   "kind": "compute",
+   "deps": [
+    "L02_03"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 19,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L03_03",
+   "kind": "compute",
+   "deps": [
+    "L02_06",
+    "L02_07",
+    "L02_08"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L03_04",
+   "kind": "external",
+   "deps": [
+    "L02_04",
+    "L02_08"
+   ],
+   "config": {
+    "latencyMs": 14,
+    "script": [
+     "ok"
+    ],
+    "value": 4
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L03_05",
+   "kind": "compute",
+   "deps": [
+    "L02_04",
+    "L02_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 28,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L03_06",
+   "kind": "compute",
+   "deps": [
+    "L02_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 8,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L03_07",
+   "kind": "compute",
+   "deps": [
+    "L02_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 15,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L03_08",
+   "kind": "external",
+   "deps": [
+    "L02_00",
+    "L02_09",
+    "L02_11"
+   ],
+   "config": {
+    "latencyMs": 6,
+    "script": [
+     "ok"
+    ],
+    "value": 1
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L03_09",
+   "kind": "compute",
+   "deps": [
+    "L02_02",
+    "L02_04",
+    "L02_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 1,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L03_10",
+   "kind": "compute",
+   "deps": [
+    "L02_02",
+    "L02_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 30,
+    "costMs": 12
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L03_11",
+   "kind": "compute",
+   "deps": [
+    "L02_05",
+    "L02_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L03_12",
+   "kind": "compute",
+   "deps": [
+    "L02_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L03_13",
+   "kind": "compute",
+   "deps": [
+    "L02_07",
+    "L02_18",
+    "L02_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 14,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L03_14",
+   "kind": "compute",
+   "deps": [
+    "L02_06",
+    "L02_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 25,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L03_15",
+   "kind": "compute",
+   "deps": [
+    "L02_16",
+    "L02_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 19,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L03_16",
+   "kind": "external",
+   "deps": [
+    "L02_07",
+    "L02_15",
+    "L02_16"
+   ],
+   "config": {
+    "latencyMs": 6,
+    "script": [
+     "permanent"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L03_17",
+   "kind": "compute",
+   "deps": [
+    "L02_05",
+    "L02_14"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L03_18",
+   "kind": "compute",
+   "deps": [
+    "L02_20",
+    "L02_22",
+    "L02_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 7,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L03_19",
+   "kind": "compute",
+   "deps": [
+    "L02_03",
+    "L02_12",
+    "L02_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L03_20",
+   "kind": "compute",
+   "deps": [
+    "L02_16",
+    "L02_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 21,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L03_21",
+   "kind": "compute",
+   "deps": [
+    "L02_03",
+    "L02_11",
+    "L02_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 15,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L03_22",
+   "kind": "external",
+   "deps": [
+    "L02_02",
+    "L02_04"
+   ],
+   "config": {
+    "latencyMs": 13,
+    "script": [
+     "ok"
+    ],
+    "value": 9
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L03_23",
+   "kind": "compute",
+   "deps": [
+    "L02_09"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L03_24",
+   "kind": "compute",
+   "deps": [
+    "L02_05",
+    "L02_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L04_00",
+   "kind": "external",
+   "deps": [
+    "L03_08",
+    "L03_13"
+   ],
+   "config": {
+    "latencyMs": 6,
+    "script": [
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L04_01",
+   "kind": "compute",
+   "deps": [
+    "L03_02",
+    "L03_14",
+    "L03_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L04_02",
+   "kind": "reduce",
+   "deps": [
+    "L03_02",
+    "L03_14"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L04_03",
+   "kind": "compute",
+   "deps": [
+    "L03_09",
+    "L03_21",
+    "L03_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L04_04",
+   "kind": "compute",
+   "deps": [
+    "L03_08",
+    "L03_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L04_05",
+   "kind": "compute",
+   "deps": [
+    "L03_01",
+    "L03_15",
+    "L03_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 8,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L04_06",
+   "kind": "compute",
+   "deps": [
+    "L03_00",
+    "L03_19"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L04_07",
+   "kind": "compute",
+   "deps": [
+    "L03_10",
+    "L03_15"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L04_08",
+   "kind": "external",
+   "deps": [
+    "L03_04"
+   ],
+   "config": {
+    "latencyMs": 4,
+    "script": [
+     "ok"
+    ],
+    "value": 0
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L04_09",
+   "kind": "compute",
+   "deps": [
+    "L03_02",
+    "L03_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L04_10",
+   "kind": "reduce",
+   "deps": [
+    "L03_04",
+    "L03_14",
+    "L03_17"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L04_11",
+   "kind": "compute",
+   "deps": [
+    "L03_12",
+    "L03_21",
+    "L03_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L04_12",
+   "kind": "compute",
+   "deps": [
+    "L03_01",
+    "L03_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 1,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L04_13",
+   "kind": "external",
+   "deps": [
+    "L03_01",
+    "L03_18"
+   ],
+   "config": {
+    "latencyMs": 3,
+    "script": [
+     "ok"
+    ],
+    "value": 4
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L04_14",
+   "kind": "external",
+   "deps": [
+    "L03_07",
+    "L03_15",
+    "L03_18"
+   ],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "ok"
+    ],
+    "value": 1
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L04_15",
+   "kind": "compute",
+   "deps": [
+    "L03_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 11,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L04_16",
+   "kind": "external",
+   "deps": [
+    "L03_00"
+   ],
+   "config": {
+    "latencyMs": 1,
+    "script": [
+     "ok"
+    ],
+    "value": 3
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L04_17",
+   "kind": "compute",
+   "deps": [
+    "L03_11",
+    "L03_17",
+    "L03_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 22,
+    "costMs": 6
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L04_18",
+   "kind": "compute",
+   "deps": [
+    "L03_06",
+    "L03_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 29,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L04_19",
+   "kind": "external",
+   "deps": [
+    "L03_00",
+    "L03_08",
+    "L03_14"
+   ],
+   "config": {
+    "latencyMs": 8,
+    "script": [
+     "ok"
+    ],
+    "value": 4
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L04_20",
+   "kind": "compute",
+   "deps": [
+    "L03_01",
+    "L03_10",
+    "L03_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L04_21",
+   "kind": "external",
+   "deps": [
+    "L03_05",
+    "L03_21"
+   ],
+   "config": {
+    "latencyMs": 1,
+    "script": [
+     "permanent"
+    ],
+    "value": 6
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L04_22",
+   "kind": "compute",
+   "deps": [
+    "L03_22",
+    "L03_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L04_23",
+   "kind": "compute",
+   "deps": [
+    "L03_07",
+    "L03_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L04_24",
+   "kind": "compute",
+   "deps": [
+    "L03_02"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 14,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L05_00",
+   "kind": "compute",
+   "deps": [
+    "L04_10",
+    "L04_17",
+    "L04_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L05_01",
+   "kind": "compute",
+   "deps": [
+    "L04_09",
+    "L04_10",
+    "L04_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 20,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L05_02",
+   "kind": "compute",
+   "deps": [
+    "L04_01"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 28,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L05_03",
+   "kind": "compute",
+   "deps": [
+    "L04_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L05_04",
+   "kind": "reduce",
+   "deps": [
+    "L04_20"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L05_05",
+   "kind": "compute",
+   "deps": [
+    "L04_00",
+    "L04_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L05_06",
+   "kind": "compute",
+   "deps": [
+    "L04_05",
+    "L04_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 8,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L05_07",
+   "kind": "external",
+   "deps": [
+    "L04_06",
+    "L04_10",
+    "L04_17"
+   ],
+   "config": {
+    "latencyMs": 8,
+    "script": [
+     "ok"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L05_08",
+   "kind": "compute",
+   "deps": [
+    "L04_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 18,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L05_09",
+   "kind": "compute",
+   "deps": [
+    "L04_07",
+    "L04_11",
+    "L04_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L05_10",
+   "kind": "reduce",
+   "deps": [
+    "L04_07",
+    "L04_12"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L05_11",
+   "kind": "compute",
+   "deps": [
+    "L04_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L05_12",
+   "kind": "external",
+   "deps": [
+    "L04_03",
+    "L04_13"
+   ],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "permanent"
+    ],
+    "value": 1
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L05_13",
+   "kind": "compute",
+   "deps": [
+    "L04_02",
+    "L04_08"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 27,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L05_14",
+   "kind": "external",
+   "deps": [
+    "L04_00",
+    "L04_03"
+   ],
+   "config": {
+    "latencyMs": 10,
+    "script": [
+     "retryable",
+     "ok"
+    ],
+    "value": 5
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L05_15",
+   "kind": "compute",
+   "deps": [
+    "L04_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 2
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L05_16",
+   "kind": "compute",
+   "deps": [
+    "L04_03",
+    "L04_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L05_17",
+   "kind": "compute",
+   "deps": [
+    "L04_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 21,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L05_18",
+   "kind": "compute",
+   "deps": [
+    "L04_03",
+    "L04_05",
+    "L04_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L05_19",
+   "kind": "reduce",
+   "deps": [
+    "L04_03",
+    "L04_12",
+    "L04_20"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L05_20",
+   "kind": "compute",
+   "deps": [
+    "L04_07"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L05_21",
+   "kind": "compute",
+   "deps": [
+    "L04_03",
+    "L04_08"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L05_22",
+   "kind": "compute",
+   "deps": [
+    "L04_04",
+    "L04_12"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 19,
+    "costMs": 7
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L05_23",
+   "kind": "compute",
+   "deps": [
+    "L04_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L05_24",
+   "kind": "compute",
+   "deps": [
+    "L04_11",
+    "L04_16",
+    "L04_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 25,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L06_00",
+   "kind": "compute",
+   "deps": [
+    "L05_01",
+    "L05_12",
+    "L05_14"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L06_01",
+   "kind": "compute",
+   "deps": [
+    "L05_00",
+    "L05_17",
+    "L05_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 14,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L06_02",
+   "kind": "compute",
+   "deps": [
+    "L05_13",
+    "L05_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L06_03",
+   "kind": "compute",
+   "deps": [
+    "L05_11",
+    "L05_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L06_04",
+   "kind": "external",
+   "deps": [
+    "L05_09",
+    "L05_22",
+    "L05_23"
+   ],
+   "config": {
+    "latencyMs": 10,
+    "script": [
+     "ok"
+    ],
+    "value": 4
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L06_05",
+   "kind": "compute",
+   "deps": [
+    "L05_01",
+    "L05_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L06_06",
+   "kind": "compute",
+   "deps": [
+    "L05_01"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L06_07",
+   "kind": "compute",
+   "deps": [
+    "L05_17",
+    "L05_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 18,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L06_08",
+   "kind": "compute",
+   "deps": [
+    "L05_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L06_09",
+   "kind": "compute",
+   "deps": [
+    "L05_06",
+    "L05_10",
+    "L05_12"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 26,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L06_10",
+   "kind": "compute",
+   "deps": [
+    "L05_04",
+    "L05_09",
+    "L05_15"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L06_11",
+   "kind": "reduce",
+   "deps": [
+    "L05_06",
+    "L05_08",
+    "L05_19"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L06_12",
+   "kind": "compute",
+   "deps": [
+    "L05_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L06_13",
+   "kind": "compute",
+   "deps": [
+    "L05_00",
+    "L05_01",
+    "L05_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L06_14",
+   "kind": "reduce",
+   "deps": [
+    "L05_02",
+    "L05_08",
+    "L05_19"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L06_15",
+   "kind": "compute",
+   "deps": [
+    "L05_00",
+    "L05_10"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 19,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L06_16",
+   "kind": "compute",
+   "deps": [
+    "L05_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 20,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L06_17",
+   "kind": "compute",
+   "deps": [
+    "L05_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L06_18",
+   "kind": "compute",
+   "deps": [
+    "L05_09",
+    "L05_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 13,
+    "costMs": 5
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L06_19",
+   "kind": "compute",
+   "deps": [
+    "L05_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L06_20",
+   "kind": "compute",
+   "deps": [
+    "L05_03",
+    "L05_06",
+    "L05_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L06_21",
+   "kind": "compute",
+   "deps": [
+    "L05_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 19,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L06_22",
+   "kind": "compute",
+   "deps": [
+    "L05_06",
+    "L05_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L06_23",
+   "kind": "compute",
+   "deps": [
+    "L05_11",
+    "L05_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L06_24",
+   "kind": "compute",
+   "deps": [
+    "L05_00",
+    "L05_02"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L07_00",
+   "kind": "compute",
+   "deps": [
+    "L06_10",
+    "L06_17",
+    "L06_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L07_01",
+   "kind": "compute",
+   "deps": [
+    "L06_04",
+    "L06_10",
+    "L06_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L07_02",
+   "kind": "compute",
+   "deps": [
+    "L06_11",
+    "L06_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 1,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L07_03",
+   "kind": "external",
+   "deps": [
+    "L06_05",
+    "L06_08",
+    "L06_14"
+   ],
+   "config": {
+    "latencyMs": 12,
+    "script": [
+     "ok"
+    ],
+    "value": 4
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L07_04",
+   "kind": "compute",
+   "deps": [
+    "L06_07",
+    "L06_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L07_05",
+   "kind": "compute",
+   "deps": [
+    "L06_10",
+    "L06_15",
+    "L06_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 13,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L07_06",
+   "kind": "compute",
+   "deps": [
+    "L06_08",
+    "L06_11",
+    "L06_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 23,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L07_07",
+   "kind": "compute",
+   "deps": [
+    "L06_03",
+    "L06_07",
+    "L06_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 13,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L07_08",
+   "kind": "compute",
+   "deps": [
+    "L06_00",
+    "L06_11",
+    "L06_15"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 13,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L07_09",
+   "kind": "reduce",
+   "deps": [
+    "L06_02",
+    "L06_22",
+    "L06_23"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L07_10",
+   "kind": "compute",
+   "deps": [
+    "L06_00",
+    "L06_05",
+    "L06_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 20,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L07_11",
+   "kind": "compute",
+   "deps": [
+    "L06_12"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 0
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L07_12",
+   "kind": "compute",
+   "deps": [
+    "L06_01",
+    "L06_14"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 9
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L07_13",
+   "kind": "compute",
+   "deps": [
+    "L06_05",
+    "L06_11",
+    "L06_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L07_14",
+   "kind": "reduce",
+   "deps": [
+    "L06_19",
+    "L06_20",
+    "L06_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L07_15",
+   "kind": "compute",
+   "deps": [
+    "L06_11",
+    "L06_15",
+    "L06_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 11,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L07_16",
+   "kind": "compute",
+   "deps": [
+    "L06_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L07_17",
+   "kind": "compute",
+   "deps": [
+    "L06_01",
+    "L06_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L07_18",
+   "kind": "compute",
+   "deps": [
+    "L06_01",
+    "L06_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 13,
+    "costMs": 12
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L07_19",
+   "kind": "external",
+   "deps": [
+    "L06_12",
+    "L06_23",
+    "L06_24"
+   ],
+   "config": {
+    "latencyMs": 6,
+    "script": [
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L07_20",
+   "kind": "compute",
+   "deps": [
+    "L06_04",
+    "L06_16",
+    "L06_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 16,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L07_21",
+   "kind": "reduce",
+   "deps": [
+    "L06_04",
+    "L06_14",
+    "L06_18"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L07_22",
+   "kind": "compute",
+   "deps": [
+    "L06_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L07_23",
+   "kind": "compute",
+   "deps": [
+    "L06_01"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L07_24",
+   "kind": "compute",
+   "deps": [
+    "L06_00",
+    "L06_05",
+    "L06_15"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L08_00",
+   "kind": "external",
+   "deps": [
+    "L07_05",
+    "L07_11",
+    "L07_19"
+   ],
+   "config": {
+    "latencyMs": 12,
+    "script": [
+     "ok"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L08_01",
+   "kind": "reduce",
+   "deps": [
+    "L07_04",
+    "L07_09",
+    "L07_14"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L08_02",
+   "kind": "compute",
+   "deps": [
+    "L07_12"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L08_03",
+   "kind": "compute",
+   "deps": [
+    "L07_12"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L08_04",
+   "kind": "compute",
+   "deps": [
+    "L07_08",
+    "L07_17",
+    "L07_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 9,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L08_05",
+   "kind": "compute",
+   "deps": [
+    "L07_07",
+    "L07_22",
+    "L07_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L08_06",
+   "kind": "compute",
+   "deps": [
+    "L07_09",
+    "L07_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L08_07",
+   "kind": "compute",
+   "deps": [
+    "L07_12",
+    "L07_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 2,
+    "costMs": 3
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L08_08",
+   "kind": "compute",
+   "deps": [
+    "L07_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 15,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L08_09",
+   "kind": "compute",
+   "deps": [
+    "L07_03",
+    "L07_06",
+    "L07_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L08_10",
+   "kind": "compute",
+   "deps": [
+    "L07_03",
+    "L07_12",
+    "L07_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L08_11",
+   "kind": "compute",
+   "deps": [
+    "L07_00",
+    "L07_12"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L08_12",
+   "kind": "compute",
+   "deps": [
+    "L07_06",
+    "L07_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 7,
+    "costMs": 11
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L08_13",
+   "kind": "external",
+   "deps": [
+    "L07_13",
+    "L07_16",
+    "L07_22"
+   ],
+   "config": {
+    "latencyMs": 1,
+    "script": [
+     "ok"
+    ],
+    "value": 6
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L08_14",
+   "kind": "external",
+   "deps": [
+    "L07_08"
+   ],
+   "config": {
+    "latencyMs": 5,
+    "script": [
+     "ok"
+    ],
+    "value": 7
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L08_15",
+   "kind": "compute",
+   "deps": [
+    "L07_18",
+    "L07_22",
+    "L07_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 11,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L08_16",
+   "kind": "external",
+   "deps": [
+    "L07_06",
+    "L07_17",
+    "L07_20"
+   ],
+   "config": {
+    "latencyMs": 10,
+    "script": [
+     "ok"
+    ],
+    "value": 0
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L08_17",
+   "kind": "compute",
+   "deps": [
+    "L07_07"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L08_18",
+   "kind": "reduce",
+   "deps": [
+    "L07_23"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L08_19",
+   "kind": "external",
+   "deps": [
+    "L07_15"
+   ],
+   "config": {
+    "latencyMs": 1,
+    "script": [
+     "ok"
+    ],
+    "value": 3
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L08_20",
+   "kind": "compute",
+   "deps": [
+    "L07_02"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 18,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L08_21",
+   "kind": "external",
+   "deps": [
+    "L07_01",
+    "L07_09",
+    "L07_19"
+   ],
+   "config": {
+    "latencyMs": 13,
+    "script": [
+     "ok"
+    ],
+    "value": 3
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L08_22",
+   "kind": "compute",
+   "deps": [
+    "L07_08"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 30,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L08_23",
+   "kind": "compute",
+   "deps": [
+    "L07_05"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 17,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L08_24",
+   "kind": "compute",
+   "deps": [
+    "L07_15",
+    "L07_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 26,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L09_00",
+   "kind": "compute",
+   "deps": [
+    "L08_02",
+    "L08_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L09_01",
+   "kind": "compute",
+   "deps": [
+    "L08_02",
+    "L08_09",
+    "L08_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 6,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L09_02",
+   "kind": "reduce",
+   "deps": [
+    "L08_21"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L09_03",
+   "kind": "compute",
+   "deps": [
+    "L08_19"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 29,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L09_04",
+   "kind": "compute",
+   "deps": [
+    "L08_07",
+    "L08_08"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L09_05",
+   "kind": "compute",
+   "deps": [
+    "L08_01",
+    "L08_15",
+    "L08_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L09_06",
+   "kind": "compute",
+   "deps": [
+    "L08_03",
+    "L08_10",
+    "L08_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 1,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L09_07",
+   "kind": "reduce",
+   "deps": [
+    "L08_04"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L09_08",
+   "kind": "external",
+   "deps": [
+    "L08_19"
+   ],
+   "config": {
+    "latencyMs": 11,
+    "script": [
+     "ok"
+    ],
+    "value": 0
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L09_09",
+   "kind": "external",
+   "deps": [
+    "L08_02",
+    "L08_22"
+   ],
+   "config": {
+    "latencyMs": 14,
+    "script": [
+     "ok"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L09_10",
+   "kind": "compute",
+   "deps": [
+    "L08_08",
+    "L08_09",
+    "L08_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 10
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L09_11",
+   "kind": "compute",
+   "deps": [
+    "L08_04"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L09_12",
+   "kind": "compute",
+   "deps": [
+    "L08_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 28,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L09_13",
+   "kind": "compute",
+   "deps": [
+    "L08_09",
+    "L08_10",
+    "L08_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L09_14",
+   "kind": "compute",
+   "deps": [
+    "L08_07",
+    "L08_09",
+    "L08_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L09_15",
+   "kind": "compute",
+   "deps": [
+    "L08_05",
+    "L08_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 30,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L09_16",
+   "kind": "compute",
+   "deps": [
+    "L08_00",
+    "L08_15",
+    "L08_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L09_17",
+   "kind": "compute",
+   "deps": [
+    "L08_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 29,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L09_18",
+   "kind": "reduce",
+   "deps": [
+    "L08_06",
+    "L08_19"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L09_19",
+   "kind": "reduce",
+   "deps": [
+    "L08_06",
+    "L08_08"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L09_20",
+   "kind": "compute",
+   "deps": [
+    "L08_10",
+    "L08_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 0
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L09_21",
+   "kind": "compute",
+   "deps": [
+    "L08_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 22,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L09_22",
+   "kind": "compute",
+   "deps": [
+    "L08_08",
+    "L08_22",
+    "L08_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 7
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L09_23",
+   "kind": "external",
+   "deps": [
+    "L08_06",
+    "L08_24"
+   ],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "ok"
+    ],
+    "value": 5
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L09_24",
+   "kind": "compute",
+   "deps": [
+    "L08_03",
+    "L08_11",
+    "L08_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 22,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L10_00",
+   "kind": "compute",
+   "deps": [
+    "L09_03",
+    "L09_13",
+    "L09_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 15,
+    "costMs": 8
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L10_01",
+   "kind": "reduce",
+   "deps": [
+    "L09_20",
+    "L09_23"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_02",
+   "kind": "compute",
+   "deps": [
+    "L09_05",
+    "L09_10",
+    "L09_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L10_03",
+   "kind": "reduce",
+   "deps": [
+    "L09_10",
+    "L09_15"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_04",
+   "kind": "reduce",
+   "deps": [
+    "L09_00",
+    "L09_06",
+    "L09_12"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_05",
+   "kind": "compute",
+   "deps": [
+    "L09_00",
+    "L09_05",
+    "L09_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 1,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L10_06",
+   "kind": "compute",
+   "deps": [
+    "L09_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L10_07",
+   "kind": "compute",
+   "deps": [
+    "L09_05",
+    "L09_08",
+    "L09_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L10_08",
+   "kind": "compute",
+   "deps": [
+    "L09_02",
+    "L09_14",
+    "L09_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 20,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L10_09",
+   "kind": "compute",
+   "deps": [
+    "L09_02",
+    "L09_19"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 7
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L10_10",
+   "kind": "reduce",
+   "deps": [
+    "L09_01",
+    "L09_10"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_11",
+   "kind": "compute",
+   "deps": [
+    "L09_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 25,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L10_12",
+   "kind": "reduce",
+   "deps": [
+    "L09_04",
+    "L09_19",
+    "L09_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_13",
+   "kind": "reduce",
+   "deps": [
+    "L09_07",
+    "L09_23"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_14",
+   "kind": "compute",
+   "deps": [
+    "L09_00",
+    "L09_09"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L10_15",
+   "kind": "compute",
+   "deps": [
+    "L09_00",
+    "L09_13",
+    "L09_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L10_16",
+   "kind": "compute",
+   "deps": [
+    "L09_01",
+    "L09_04",
+    "L09_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L10_17",
+   "kind": "external",
+   "deps": [
+    "L09_05",
+    "L09_06"
+   ],
+   "config": {
+    "latencyMs": 11,
+    "script": [
+     "ok"
+    ],
+    "value": 9
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L10_18",
+   "kind": "compute",
+   "deps": [
+    "L09_05",
+    "L09_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 14,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L10_19",
+   "kind": "reduce",
+   "deps": [
+    "L09_00",
+    "L09_13"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_20",
+   "kind": "reduce",
+   "deps": [
+    "L09_00"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L10_21",
+   "kind": "compute",
+   "deps": [
+    "L09_02",
+    "L09_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 11,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L10_22",
+   "kind": "compute",
+   "deps": [
+    "L09_00",
+    "L09_06",
+    "L09_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L10_23",
+   "kind": "compute",
+   "deps": [
+    "L09_06",
+    "L09_14",
+    "L09_15"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L10_24",
+   "kind": "compute",
+   "deps": [
+    "L09_04",
+    "L09_05",
+    "L09_13"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L11_00",
+   "kind": "external",
+   "deps": [
+    "L10_02",
+    "L10_16",
+    "L10_23"
+   ],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "permanent"
+    ],
+    "value": 6
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L11_01",
+   "kind": "compute",
+   "deps": [
+    "L10_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 22,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L11_02",
+   "kind": "compute",
+   "deps": [
+    "L10_03",
+    "L10_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L11_03",
+   "kind": "compute",
+   "deps": [
+    "L10_06"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 19,
+    "costMs": 11
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L11_04",
+   "kind": "compute",
+   "deps": [
+    "L10_06"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L11_05",
+   "kind": "compute",
+   "deps": [
+    "L10_04",
+    "L10_08"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 1,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L11_06",
+   "kind": "reduce",
+   "deps": [
+    "L10_20"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L11_07",
+   "kind": "compute",
+   "deps": [
+    "L10_06",
+    "L10_07"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L11_08",
+   "kind": "compute",
+   "deps": [
+    "L10_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L11_09",
+   "kind": "compute",
+   "deps": [
+    "L10_05",
+    "L10_07"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 20,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L11_10",
+   "kind": "reduce",
+   "deps": [
+    "L10_17",
+    "L10_23"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L11_11",
+   "kind": "external",
+   "deps": [
+    "L10_13"
+   ],
+   "config": {
+    "latencyMs": 12,
+    "script": [
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L11_12",
+   "kind": "reduce",
+   "deps": [
+    "L10_18",
+    "L10_24"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L11_13",
+   "kind": "reduce",
+   "deps": [
+    "L10_05",
+    "L10_16"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L11_14",
+   "kind": "compute",
+   "deps": [
+    "L10_15",
+    "L10_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 17,
+    "costMs": 5
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L11_15",
+   "kind": "compute",
+   "deps": [
+    "L10_06",
+    "L10_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L11_16",
+   "kind": "compute",
+   "deps": [
+    "L10_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 29,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L11_17",
+   "kind": "compute",
+   "deps": [
+    "L10_08",
+    "L10_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 5
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L11_18",
+   "kind": "compute",
+   "deps": [
+    "L10_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 18,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L11_19",
+   "kind": "compute",
+   "deps": [
+    "L10_08",
+    "L10_15"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L11_20",
+   "kind": "compute",
+   "deps": [
+    "L10_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L11_21",
+   "kind": "reduce",
+   "deps": [
+    "L10_08",
+    "L10_10"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L11_22",
+   "kind": "compute",
+   "deps": [
+    "L10_04",
+    "L10_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 9,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L11_23",
+   "kind": "compute",
+   "deps": [
+    "L10_05",
+    "L10_10",
+    "L10_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L11_24",
+   "kind": "compute",
+   "deps": [
+    "L10_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 21,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L12_00",
+   "kind": "compute",
+   "deps": [
+    "L11_00",
+    "L11_09",
+    "L11_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 13,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L12_01",
+   "kind": "compute",
+   "deps": [
+    "L11_07",
+    "L11_21",
+    "L11_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 10
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L12_02",
+   "kind": "reduce",
+   "deps": [
+    "L11_12"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L12_03",
+   "kind": "compute",
+   "deps": [
+    "L11_14",
+    "L11_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L12_04",
+   "kind": "compute",
+   "deps": [
+    "L11_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 22,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L12_05",
+   "kind": "reduce",
+   "deps": [
+    "L11_05",
+    "L11_19"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L12_06",
+   "kind": "compute",
+   "deps": [
+    "L11_03",
+    "L11_13"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 5,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L12_07",
+   "kind": "compute",
+   "deps": [
+    "L11_07",
+    "L11_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 6,
+    "costMs": 10
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L12_08",
+   "kind": "compute",
+   "deps": [
+    "L11_08",
+    "L11_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 23,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L12_09",
+   "kind": "compute",
+   "deps": [
+    "L11_04",
+    "L11_15",
+    "L11_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 22,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L12_10",
+   "kind": "compute",
+   "deps": [
+    "L11_10",
+    "L11_16",
+    "L11_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L12_11",
+   "kind": "compute",
+   "deps": [
+    "L11_05"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 29,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L12_12",
+   "kind": "compute",
+   "deps": [
+    "L11_00",
+    "L11_08",
+    "L11_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 22,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L12_13",
+   "kind": "reduce",
+   "deps": [
+    "L11_16"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L12_14",
+   "kind": "compute",
+   "deps": [
+    "L11_05",
+    "L11_09"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L12_15",
+   "kind": "compute",
+   "deps": [
+    "L11_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 5,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L12_16",
+   "kind": "reduce",
+   "deps": [
+    "L11_03",
+    "L11_23"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L12_17",
+   "kind": "compute",
+   "deps": [
+    "L11_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 14,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L12_18",
+   "kind": "compute",
+   "deps": [
+    "L11_00",
+    "L11_02",
+    "L11_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L12_19",
+   "kind": "external",
+   "deps": [
+    "L11_03",
+    "L11_10",
+    "L11_11"
+   ],
+   "config": {
+    "latencyMs": 5,
+    "script": [
+     "ok"
+    ],
+    "value": 7
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L12_20",
+   "kind": "compute",
+   "deps": [
+    "L11_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 7,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L12_21",
+   "kind": "reduce",
+   "deps": [
+    "L11_08",
+    "L11_17"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L12_22",
+   "kind": "compute",
+   "deps": [
+    "L11_11"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 27,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L12_23",
+   "kind": "compute",
+   "deps": [
+    "L11_13",
+    "L11_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 28,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L12_24",
+   "kind": "reduce",
+   "deps": [
+    "L11_12",
+    "L11_15",
+    "L11_23"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L13_00",
+   "kind": "compute",
+   "deps": [
+    "L12_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 9,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L13_01",
+   "kind": "compute",
+   "deps": [
+    "L12_19",
+    "L12_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L13_02",
+   "kind": "compute",
+   "deps": [
+    "L12_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L13_03",
+   "kind": "compute",
+   "deps": [
+    "L12_06",
+    "L12_08",
+    "L12_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L13_04",
+   "kind": "compute",
+   "deps": [
+    "L12_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L13_05",
+   "kind": "compute",
+   "deps": [
+    "L12_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L13_06",
+   "kind": "reduce",
+   "deps": [
+    "L12_02",
+    "L12_07",
+    "L12_09"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L13_07",
+   "kind": "compute",
+   "deps": [
+    "L12_01",
+    "L12_12",
+    "L12_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 13,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L13_08",
+   "kind": "compute",
+   "deps": [
+    "L12_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 30,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L13_09",
+   "kind": "reduce",
+   "deps": [
+    "L12_22"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L13_10",
+   "kind": "reduce",
+   "deps": [
+    "L12_02",
+    "L12_14"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L13_11",
+   "kind": "compute",
+   "deps": [
+    "L12_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 19,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L13_12",
+   "kind": "compute",
+   "deps": [
+    "L12_04",
+    "L12_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 1,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L13_13",
+   "kind": "compute",
+   "deps": [
+    "L12_12"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L13_14",
+   "kind": "compute",
+   "deps": [
+    "L12_09",
+    "L12_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 14,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L13_15",
+   "kind": "external",
+   "deps": [
+    "L12_13"
+   ],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "ok"
+    ],
+    "value": 6
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L13_16",
+   "kind": "external",
+   "deps": [
+    "L12_11",
+    "L12_13",
+    "L12_21"
+   ],
+   "config": {
+    "latencyMs": 12,
+    "script": [
+     "ok"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L13_17",
+   "kind": "reduce",
+   "deps": [
+    "L12_00",
+    "L12_17",
+    "L12_18"
+   ],
+   "config": {
+    "op": "sum"
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L13_18",
+   "kind": "compute",
+   "deps": [
+    "L12_10",
+    "L12_11",
+    "L12_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L13_19",
+   "kind": "compute",
+   "deps": [
+    "L12_05",
+    "L12_09"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 19,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L13_20",
+   "kind": "compute",
+   "deps": [
+    "L12_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L13_21",
+   "kind": "compute",
+   "deps": [
+    "L12_01",
+    "L12_02",
+    "L12_13"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 0
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L13_22",
+   "kind": "compute",
+   "deps": [
+    "L12_03",
+    "L12_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L13_23",
+   "kind": "external",
+   "deps": [
+    "L12_08"
+   ],
+   "config": {
+    "latencyMs": 15,
+    "script": [
+     "ok"
+    ],
+    "value": 9
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L13_24",
+   "kind": "compute",
+   "deps": [
+    "L12_09",
+    "L12_16",
+    "L12_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 16,
+    "costMs": 3
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L14_00",
+   "kind": "reduce",
+   "deps": [
+    "L13_15",
+    "L13_20"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L14_01",
+   "kind": "external",
+   "deps": [
+    "L13_12"
+   ],
+   "config": {
+    "latencyMs": 6,
+    "script": [
+     "permanent"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L14_02",
+   "kind": "compute",
+   "deps": [
+    "L13_08",
+    "L13_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L14_03",
+   "kind": "compute",
+   "deps": [
+    "L13_02",
+    "L13_08",
+    "L13_10"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 23,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L14_04",
+   "kind": "compute",
+   "deps": [
+    "L13_02"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 16,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L14_05",
+   "kind": "compute",
+   "deps": [
+    "L13_09",
+    "L13_10"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 9,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L14_06",
+   "kind": "compute",
+   "deps": [
+    "L13_05",
+    "L13_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 12,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L14_07",
+   "kind": "external",
+   "deps": [
+    "L13_09"
+   ],
+   "config": {
+    "latencyMs": 3,
+    "script": [
+     "ok"
+    ],
+    "value": 7
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L14_08",
+   "kind": "compute",
+   "deps": [
+    "L13_13"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 1,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L14_09",
+   "kind": "compute",
+   "deps": [
+    "L13_01"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L14_10",
+   "kind": "compute",
+   "deps": [
+    "L13_07",
+    "L13_11",
+    "L13_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 13,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L14_11",
+   "kind": "reduce",
+   "deps": [
+    "L13_16"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L14_12",
+   "kind": "compute",
+   "deps": [
+    "L13_02",
+    "L13_04",
+    "L13_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 9,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L14_13",
+   "kind": "compute",
+   "deps": [
+    "L13_07",
+    "L13_12",
+    "L13_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 26,
+    "costMs": 12
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L14_14",
+   "kind": "compute",
+   "deps": [
+    "L13_01"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L14_15",
+   "kind": "compute",
+   "deps": [
+    "L13_16",
+    "L13_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 6,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L14_16",
+   "kind": "compute",
+   "deps": [
+    "L13_04"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L14_17",
+   "kind": "compute",
+   "deps": [
+    "L13_11",
+    "L13_18"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L14_18",
+   "kind": "compute",
+   "deps": [
+    "L13_08",
+    "L13_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L14_19",
+   "kind": "compute",
+   "deps": [
+    "L13_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 28,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L14_20",
+   "kind": "compute",
+   "deps": [
+    "L13_07",
+    "L13_13",
+    "L13_14"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 27,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L14_21",
+   "kind": "external",
+   "deps": [
+    "L13_12"
+   ],
+   "config": {
+    "latencyMs": 2,
+    "script": [
+     "permanent"
+    ],
+    "value": 1
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L14_22",
+   "kind": "compute",
+   "deps": [
+    "L13_10",
+    "L13_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 30,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L14_23",
+   "kind": "compute",
+   "deps": [
+    "L13_17",
+    "L13_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L14_24",
+   "kind": "compute",
+   "deps": [
+    "L13_13",
+    "L13_19"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 11,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L15_00",
+   "kind": "external",
+   "deps": [
+    "L14_12",
+    "L14_17"
+   ],
+   "config": {
+    "latencyMs": 11,
+    "script": [
+     "ok"
+    ],
+    "value": 9
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L15_01",
+   "kind": "reduce",
+   "deps": [
+    "L14_12"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L15_02",
+   "kind": "compute",
+   "deps": [
+    "L14_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 16,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L15_03",
+   "kind": "compute",
+   "deps": [
+    "L14_03",
+    "L14_08"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 4,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L15_04",
+   "kind": "compute",
+   "deps": [
+    "L14_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 18,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L15_05",
+   "kind": "compute",
+   "deps": [
+    "L14_00"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 3
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L15_06",
+   "kind": "external",
+   "deps": [
+    "L14_12"
+   ],
+   "config": {
+    "latencyMs": 7,
+    "script": [
+     "ok"
+    ],
+    "value": 0
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L15_07",
+   "kind": "compute",
+   "deps": [
+    "L14_01",
+    "L14_18",
+    "L14_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L15_08",
+   "kind": "compute",
+   "deps": [
+    "L14_08",
+    "L14_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L15_09",
+   "kind": "compute",
+   "deps": [
+    "L14_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 9,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L15_10",
+   "kind": "compute",
+   "deps": [
+    "L14_06",
+    "L14_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L15_11",
+   "kind": "compute",
+   "deps": [
+    "L14_00",
+    "L14_02"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 18,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L15_12",
+   "kind": "compute",
+   "deps": [
+    "L14_02",
+    "L14_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 11,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L15_13",
+   "kind": "compute",
+   "deps": [
+    "L14_19",
+    "L14_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L15_14",
+   "kind": "compute",
+   "deps": [
+    "L14_03"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L15_15",
+   "kind": "compute",
+   "deps": [
+    "L14_16",
+    "L14_17",
+    "L14_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L15_16",
+   "kind": "reduce",
+   "deps": [
+    "L14_13",
+    "L14_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L15_17",
+   "kind": "external",
+   "deps": [
+    "L14_16"
+   ],
+   "config": {
+    "latencyMs": 11,
+    "script": [
+     "ok"
+    ],
+    "value": 7
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L15_18",
+   "kind": "compute",
+   "deps": [
+    "L14_05"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 3,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L15_19",
+   "kind": "compute",
+   "deps": [
+    "L14_14",
+    "L14_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 0,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L15_20",
+   "kind": "compute",
+   "deps": [
+    "L14_13",
+    "L14_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 8,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L15_21",
+   "kind": "compute",
+   "deps": [
+    "L14_02",
+    "L14_18",
+    "L14_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L15_22",
+   "kind": "reduce",
+   "deps": [
+    "L14_02",
+    "L14_06",
+    "L14_14"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L15_23",
+   "kind": "compute",
+   "deps": [
+    "L14_00"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 18,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L15_24",
+   "kind": "external",
+   "deps": [
+    "L14_22"
+   ],
+   "config": {
+    "latencyMs": 4,
+    "script": [
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L16_00",
+   "kind": "compute",
+   "deps": [
+    "L15_04"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 9,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L16_01",
+   "kind": "compute",
+   "deps": [
+    "L15_01"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L16_02",
+   "kind": "reduce",
+   "deps": [
+    "L15_13"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L16_03",
+   "kind": "reduce",
+   "deps": [
+    "L15_14",
+    "L15_23",
+    "L15_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L16_04",
+   "kind": "compute",
+   "deps": [
+    "L15_01",
+    "L15_03",
+    "L15_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L16_05",
+   "kind": "compute",
+   "deps": [
+    "L15_14"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 9,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L16_06",
+   "kind": "reduce",
+   "deps": [
+    "L15_01",
+    "L15_12",
+    "L15_13"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L16_07",
+   "kind": "compute",
+   "deps": [
+    "L15_01",
+    "L15_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L16_08",
+   "kind": "compute",
+   "deps": [
+    "L15_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L16_09",
+   "kind": "compute",
+   "deps": [
+    "L15_11",
+    "L15_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 27,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L16_10",
+   "kind": "external",
+   "deps": [
+    "L15_04",
+    "L15_23"
+   ],
+   "config": {
+    "latencyMs": 8,
+    "script": [
+     "ok"
+    ],
+    "value": 2
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L16_11",
+   "kind": "compute",
+   "deps": [
+    "L15_21",
+    "L15_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 7,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L16_12",
+   "kind": "compute",
+   "deps": [
+    "L15_03",
+    "L15_06",
+    "L15_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L16_13",
+   "kind": "compute",
+   "deps": [
+    "L15_23",
+    "L15_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 0,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L16_14",
+   "kind": "compute",
+   "deps": [
+    "L15_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L16_15",
+   "kind": "compute",
+   "deps": [
+    "L15_01",
+    "L15_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L16_16",
+   "kind": "compute",
+   "deps": [
+    "L15_03",
+    "L15_04"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L16_17",
+   "kind": "compute",
+   "deps": [
+    "L15_05",
+    "L15_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L16_18",
+   "kind": "reduce",
+   "deps": [
+    "L15_01",
+    "L15_02",
+    "L15_08"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L16_19",
+   "kind": "compute",
+   "deps": [
+    "L15_06",
+    "L15_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L16_20",
+   "kind": "compute",
+   "deps": [
+    "L15_01",
+    "L15_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L16_21",
+   "kind": "compute",
+   "deps": [
+    "L15_10",
+    "L15_19",
+    "L15_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L16_22",
+   "kind": "compute",
+   "deps": [
+    "L15_15",
+    "L15_19",
+    "L15_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 28,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L16_23",
+   "kind": "compute",
+   "deps": [
+    "L15_03",
+    "L15_14",
+    "L15_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 19,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L16_24",
+   "kind": "compute",
+   "deps": [
+    "L15_06"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 1,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L17_00",
+   "kind": "compute",
+   "deps": [
+    "L16_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 22,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L17_01",
+   "kind": "compute",
+   "deps": [
+    "L16_06"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 1,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L17_02",
+   "kind": "compute",
+   "deps": [
+    "L16_01",
+    "L16_04",
+    "L16_13"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L17_03",
+   "kind": "reduce",
+   "deps": [
+    "L16_08",
+    "L16_11",
+    "L16_14"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L17_04",
+   "kind": "compute",
+   "deps": [
+    "L16_02",
+    "L16_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 18,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L17_05",
+   "kind": "reduce",
+   "deps": [
+    "L16_05"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L17_06",
+   "kind": "compute",
+   "deps": [
+    "L16_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L17_07",
+   "kind": "reduce",
+   "deps": [
+    "L16_14"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L17_08",
+   "kind": "compute",
+   "deps": [
+    "L16_02",
+    "L16_15",
+    "L16_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 0,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L17_09",
+   "kind": "compute",
+   "deps": [
+    "L16_06",
+    "L16_11",
+    "L16_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 17,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L17_10",
+   "kind": "compute",
+   "deps": [
+    "L16_05",
+    "L16_08"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L17_11",
+   "kind": "compute",
+   "deps": [
+    "L16_02",
+    "L16_06",
+    "L16_12"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 9,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L17_12",
+   "kind": "compute",
+   "deps": [
+    "L16_22",
+    "L16_23",
+    "L16_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 25,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L17_13",
+   "kind": "compute",
+   "deps": [
+    "L16_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L17_14",
+   "kind": "compute",
+   "deps": [
+    "L16_06",
+    "L16_09"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 8,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L17_15",
+   "kind": "compute",
+   "deps": [
+    "L16_07",
+    "L16_10",
+    "L16_14"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 24,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L17_16",
+   "kind": "compute",
+   "deps": [
+    "L16_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L17_17",
+   "kind": "compute",
+   "deps": [
+    "L16_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 4,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L17_18",
+   "kind": "compute",
+   "deps": [
+    "L16_22"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 11,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L17_19",
+   "kind": "compute",
+   "deps": [
+    "L16_19",
+    "L16_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L17_20",
+   "kind": "reduce",
+   "deps": [
+    "L16_16",
+    "L16_22",
+    "L16_23"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L17_21",
+   "kind": "external",
+   "deps": [
+    "L16_04",
+    "L16_23"
+   ],
+   "config": {
+    "latencyMs": 12,
+    "script": [
+     "ok"
+    ],
+    "value": 3
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L17_22",
+   "kind": "compute",
+   "deps": [
+    "L16_05",
+    "L16_10",
+    "L16_20"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 27,
+    "costMs": 9
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L17_23",
+   "kind": "compute",
+   "deps": [
+    "L16_01",
+    "L16_11",
+    "L16_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 9,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L17_24",
+   "kind": "reduce",
+   "deps": [
+    "L16_12",
+    "L16_13"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L18_00",
+   "kind": "compute",
+   "deps": [
+    "L17_07",
+    "L17_22",
+    "L17_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 7,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L18_01",
+   "kind": "compute",
+   "deps": [
+    "L17_13",
+    "L17_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L18_02",
+   "kind": "compute",
+   "deps": [
+    "L17_08",
+    "L17_14",
+    "L17_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 23,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L18_03",
+   "kind": "compute",
+   "deps": [
+    "L17_02",
+    "L17_11"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 25,
+    "costMs": 4
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L18_04",
+   "kind": "compute",
+   "deps": [
+    "L17_16"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L18_05",
+   "kind": "compute",
+   "deps": [
+    "L17_00"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 8
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L18_06",
+   "kind": "compute",
+   "deps": [
+    "L17_10",
+    "L17_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 26,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L18_07",
+   "kind": "compute",
+   "deps": [
+    "L17_24"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 2,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L18_08",
+   "kind": "reduce",
+   "deps": [
+    "L17_17",
+    "L17_21"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L18_09",
+   "kind": "compute",
+   "deps": [
+    "L17_07",
+    "L17_18",
+    "L17_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 11,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L18_10",
+   "kind": "compute",
+   "deps": [
+    "L17_05",
+    "L17_19"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 8,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L18_11",
+   "kind": "compute",
+   "deps": [
+    "L17_10",
+    "L17_21"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 22,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L18_12",
+   "kind": "external",
+   "deps": [
+    "L17_13",
+    "L17_14"
+   ],
+   "config": {
+    "latencyMs": 5,
+    "script": [
+     "ok"
+    ],
+    "value": 8
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L18_13",
+   "kind": "reduce",
+   "deps": [
+    "L17_15",
+    "L17_21",
+    "L17_24"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L18_14",
+   "kind": "compute",
+   "deps": [
+    "L17_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 19,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L18_15",
+   "kind": "compute",
+   "deps": [
+    "L17_05",
+    "L17_14",
+    "L17_20"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L18_16",
+   "kind": "compute",
+   "deps": [
+    "L17_12",
+    "L17_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 4
+   }
+  },
+  {
+   "id": "L18_17",
+   "kind": "compute",
+   "deps": [
+    "L17_16"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 10,
+    "costMs": 2
+   }
+  },
+  {
+   "id": "L18_18",
+   "kind": "external",
+   "deps": [
+    "L17_04",
+    "L17_20"
+   ],
+   "config": {
+    "latencyMs": 15,
+    "script": [
+     "ok"
+    ],
+    "value": 6
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L18_19",
+   "kind": "compute",
+   "deps": [
+    "L17_01",
+    "L17_03"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L18_20",
+   "kind": "compute",
+   "deps": [
+    "L17_02",
+    "L17_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 5,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L18_21",
+   "kind": "compute",
+   "deps": [
+    "L17_12"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 3,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L18_22",
+   "kind": "compute",
+   "deps": [
+    "L17_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 17,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L18_23",
+   "kind": "external",
+   "deps": [
+    "L17_04",
+    "L17_15",
+    "L17_23"
+   ],
+   "config": {
+    "latencyMs": 3,
+    "script": [
+     "ok"
+    ],
+    "value": 5
+   },
+   "retry": {
+    "maxAttempts": 2,
+    "backoffMs": 1
+   }
+  },
+  {
+   "id": "L18_24",
+   "kind": "compute",
+   "deps": [
+    "L17_09",
+    "L17_16",
+    "L17_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 23,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L19_00",
+   "kind": "compute",
+   "deps": [
+    "L18_06",
+    "L18_15",
+    "L18_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L19_01",
+   "kind": "compute",
+   "deps": [
+    "L18_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 2,
+    "costMs": 7
+   }
+  },
+  {
+   "id": "L19_02",
+   "kind": "compute",
+   "deps": [
+    "L18_01",
+    "L18_07",
+    "L18_23"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 14,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L19_03",
+   "kind": "compute",
+   "deps": [
+    "L18_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 5,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L19_04",
+   "kind": "compute",
+   "deps": [
+    "L18_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 30,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L19_05",
+   "kind": "compute",
+   "deps": [
+    "L18_00",
+    "L18_05",
+    "L18_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L19_06",
+   "kind": "compute",
+   "deps": [
+    "L18_04",
+    "L18_22"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L19_07",
+   "kind": "compute",
+   "deps": [
+    "L18_07"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 15,
+    "costMs": 11
+   }
+  },
+  {
+   "id": "L19_08",
+   "kind": "reduce",
+   "deps": [
+    "L18_16",
+    "L18_17"
+   ],
+   "config": {
+    "op": "sum"
+   }
+  },
+  {
+   "id": "L19_09",
+   "kind": "compute",
+   "deps": [
+    "L18_18"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 24,
+    "costMs": 8
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L19_10",
+   "kind": "compute",
+   "deps": [
+    "L18_08",
+    "L18_14"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 7,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L19_11",
+   "kind": "compute",
+   "deps": [
+    "L18_07",
+    "L18_17"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L19_12",
+   "kind": "compute",
+   "deps": [
+    "L18_05"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 23,
+    "costMs": 0
+   }
+  },
+  {
+   "id": "L19_13",
+   "kind": "compute",
+   "deps": [
+    "L18_00"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 21,
+    "costMs": 12
+   }
+  },
+  {
+   "id": "L19_14",
+   "kind": "compute",
+   "deps": [
+    "L18_04",
+    "L18_07",
+    "L18_08"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 14,
+    "costMs": 9
+   }
+  },
+  {
+   "id": "L19_15",
+   "kind": "compute",
+   "deps": [
+    "L18_08",
+    "L18_23"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 6,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L19_16",
+   "kind": "compute",
+   "deps": [
+    "L18_12",
+    "L18_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 15,
+    "costMs": 3
+   }
+  },
+  {
+   "id": "L19_17",
+   "kind": "compute",
+   "deps": [
+    "L18_02",
+    "L18_21"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 10,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L19_18",
+   "kind": "compute",
+   "deps": [
+    "L18_08",
+    "L18_19"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 28,
+    "costMs": 5
+   }
+  },
+  {
+   "id": "L19_19",
+   "kind": "compute",
+   "deps": [
+    "L18_12"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 9,
+    "costMs": 10
+   }
+  },
+  {
+   "id": "L19_20",
+   "kind": "compute",
+   "deps": [
+    "L18_07",
+    "L18_09",
+    "L18_13"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 26,
+    "costMs": 2
+   },
+   "group": "narrow"
+  },
+  {
+   "id": "L19_21",
+   "kind": "compute",
+   "deps": [
+    "L18_07",
+    "L18_13"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 16,
+    "costMs": 6
+   }
+  },
+  {
+   "id": "L19_22",
+   "kind": "compute",
+   "deps": [
+    "L18_14",
+    "L18_24"
+   ],
+   "config": {
+    "op": "sumTo",
+    "n": 12,
+    "costMs": 1
+   }
+  },
+  {
+   "id": "L19_23",
+   "kind": "compute",
+   "deps": [
+    "L18_17"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 6,
+    "costMs": 8
+   }
+  },
+  {
+   "id": "L19_24",
+   "kind": "compute",
+   "deps": [
+    "L18_03",
+    "L18_04"
+   ],
+   "config": {
+    "op": "fib",
+    "n": 20,
+    "costMs": 1
+   }
+  }
+ ]
+}

@@ -1,0 +1,65 @@
+{
+  "workflow": "s08_cycle",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "deps": [
+        "c"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "c",
+      "kind": "compute",
+      "deps": [
+        "b"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "d",
+      "kind": "compute",
+      "deps": [
+        "d"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "e",
+      "kind": "compute",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

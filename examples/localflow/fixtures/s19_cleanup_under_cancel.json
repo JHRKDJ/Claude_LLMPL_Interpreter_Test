@@ -1,0 +1,38 @@
+{
+  "workflow": "s19_cleanup_under_cancel",
+  "cancelAfterMs": 25,
+  "jobs": [
+    {
+      "id": "t1",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "a.txt",
+        "op": "upper",
+        "latencyMs": 30,
+        "failCleanup": true
+      }
+    },
+    {
+      "id": "t2",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "b.txt",
+        "op": "number",
+        "latencyMs": 40
+      },
+      "timeoutMs": 10
+    },
+    {
+      "id": "t3",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "c.txt",
+        "op": "upper",
+        "latencyMs": 100
+      }
+    }
+  ]
+}

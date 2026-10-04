@@ -1,0 +1,32 @@
+{
+  "workflow": "s06_duplicate",
+  "jobs": [
+    {
+      "id": "x",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "y",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "x",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

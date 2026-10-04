@@ -1,0 +1,20 @@
+{
+  "workflow": "s11_permanent",
+  "jobs": [
+    {
+      "id": "perm",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "permanent",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 5,
+        "backoffMs": 1
+      }
+    }
+  ]
+}

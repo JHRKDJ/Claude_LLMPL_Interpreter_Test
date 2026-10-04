@@ -1,0 +1,41 @@
+{
+  "workflow": "s22b_fanout_from_list",
+  "jobs": [
+    {
+      "id": "src",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "value": [
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "sq",
+      "kind": "map",
+      "deps": [
+        "src"
+      ],
+      "config": {
+        "from": "src",
+        "op": "square",
+        "parallelism": 2,
+        "itemLatencyMs": 4
+      }
+    },
+    {
+      "id": "total",
+      "kind": "reduce",
+      "deps": [
+        "sq",
+        "src"
+      ],
+      "config": {
+        "op": "count"
+      }
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "workflow": "s30_mirrors_race",
+  "jobs": [
+    {
+      "id": "mirrored",
+      "kind": "external",
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 30,
+            "value": "slow"
+          },
+          {
+            "latencyMs": 12,
+            "script": [
+              "retryable",
+              "ok"
+            ],
+            "value": "fast"
+          },
+          {
+            "latencyMs": 12,
+            "value": "tie"
+          }
+        ]
+      },
+      "retry": {
+        "maxAttempts": 2
+      }
+    },
+    {
+      "id": "allfail",
+      "kind": "external",
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 5,
+            "script": [
+              "permanent"
+            ]
+          },
+          {
+            "latencyMs": 8,
+            "script": [
+              "retryable"
+            ]
+          }
+        ]
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      }
+    },
+    {
+      "id": "allperm",
+      "kind": "external",
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 5,
+            "script": [
+              "permanent"
+            ]
+          },
+          {
+            "latencyMs": 3,
+            "script": [
+              "permanent"
+            ]
+          }
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3
+      }
+    }
+  ]
+}

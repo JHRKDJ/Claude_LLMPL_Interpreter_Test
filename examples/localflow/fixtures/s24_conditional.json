@@ -1,0 +1,80 @@
+{
+  "workflow": "s24_conditional",
+  "jobs": [
+    {
+      "id": "score",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "big",
+      "kind": "check",
+      "deps": [
+        "score"
+      ],
+      "config": {
+        "input": "score",
+        "op": "gt",
+        "value": 50
+      }
+    },
+    {
+      "id": "celebrate",
+      "kind": "compute",
+      "deps": [
+        "big"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 1
+      },
+      "when": {
+        "job": "big",
+        "equals": true
+      }
+    },
+    {
+      "id": "console",
+      "kind": "compute",
+      "deps": [
+        "big"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 4,
+        "costMs": 1
+      },
+      "when": {
+        "job": "big",
+        "equals": false
+      }
+    },
+    {
+      "id": "afterCelebrate",
+      "kind": "compute",
+      "deps": [
+        "celebrate"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "final",
+      "kind": "reduce",
+      "deps": [
+        "console"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    }
+  ]
+}

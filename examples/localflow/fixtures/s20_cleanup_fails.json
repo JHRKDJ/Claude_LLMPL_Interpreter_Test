@@ -1,0 +1,37 @@
+{
+  "workflow": "s20_cleanup_fails",
+  "jobs": [
+    {
+      "id": "both",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "x.txt",
+        "op": "upper",
+        "latencyMs": 3,
+        "failAfterWrite": true,
+        "failCleanup": true
+      }
+    },
+    {
+      "id": "only",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "y.txt",
+        "op": "upper",
+        "failCleanup": true
+      }
+    },
+    {
+      "id": "io",
+      "kind": "transform",
+      "config": {
+        "input": "data/none.txt",
+        "output": "z.txt",
+        "op": "upper",
+        "failCleanup": true
+      }
+    }
+  ]
+}

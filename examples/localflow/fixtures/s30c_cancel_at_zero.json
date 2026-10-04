@@ -1,0 +1,15 @@
+{
+  "workflow": "s30c_cancel_at_zero",
+  "cancelAfterMs": 0,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 1,
+        "costMs": 5
+      }
+    }
+  ]
+}

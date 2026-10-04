@@ -214,7 +214,8 @@ class CallMixin:
                 self.oblig("S.EFFECT.MISSING_TRY",
                            f"`{info.name}` may throw {', '.join(sorted(short(n) for n in eff_names))}; mark the call "
                            f"with `try` or handle it", e.span, label="unmarked failure point",
-                           help=f"write `try {e.span.text}` to propagate, or `try ... catch ... => ...` to handle")
+                           help=f"write `try {'await ' if awaited and info.is_async else ''}{e.span.text}` to "
+                                f"propagate, or `try ... catch ... => ...` to handle")
             self.raise_eff(eff_names, eff_unknown, e.span)
         if info.kind == "fn" and info.sig is not None and info.sig.decl is not None and \
                 isinstance(info.sig.decl, A.FnDecl) and info.sig.decl.ret is None and info.sig.ret is DYN:

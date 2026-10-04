@@ -1,0 +1,106 @@
+{
+  "workflow": "s25_subworkflow",
+  "workflows": {
+    "inner": {
+      "workflow": "inner",
+      "maxConcurrency": 2,
+      "jobs": [
+        {
+          "id": "i1",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 6,
+            "costMs": 4
+          }
+        },
+        {
+          "id": "i2",
+          "kind": "compute",
+          "deps": [
+            "i1"
+          ],
+          "config": {
+            "op": "fib",
+            "n": 7,
+            "costMs": 6
+          }
+        },
+        {
+          "id": "it",
+          "kind": "transform",
+          "config": {
+            "input": "data/words.txt",
+            "output": "inner.txt",
+            "op": "number"
+          }
+        }
+      ]
+    },
+    "innerbad": {
+      "workflow": "innerbad",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 3,
+            "script": [
+              "permanent"
+            ]
+          }
+        },
+        {
+          "id": "y",
+          "kind": "compute",
+          "deps": [
+            "x"
+          ],
+          "config": {
+            "op": "fib",
+            "n": 10,
+            "costMs": 0
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "pre",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 2
+      }
+    },
+    {
+      "id": "nested",
+      "kind": "subworkflow",
+      "deps": [
+        "pre"
+      ],
+      "config": {
+        "workflow": "inner"
+      }
+    },
+    {
+      "id": "nestedBad",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "innerbad"
+      }
+    },
+    {
+      "id": "use",
+      "kind": "reduce",
+      "deps": [
+        "nested"
+      ],
+      "config": {
+        "op": "count"
+      }
+    }
+  ]
+}

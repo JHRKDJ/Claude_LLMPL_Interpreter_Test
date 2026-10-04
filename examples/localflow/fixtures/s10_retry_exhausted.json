@@ -1,0 +1,31 @@
+{
+  "workflow": "s10_retry_exhausted",
+  "jobs": [
+    {
+      "id": "flaky",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "retryable"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 2
+      }
+    },
+    {
+      "id": "after",
+      "kind": "compute",
+      "deps": [
+        "flaky"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

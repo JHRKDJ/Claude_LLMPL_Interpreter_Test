@@ -1,0 +1,40 @@
+{
+  "workflow": "s12_timeout",
+  "jobs": [
+    {
+      "id": "slow",
+      "kind": "external",
+      "config": {
+        "latencyMs": 50
+      },
+      "timeoutMs": 20,
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 5
+      }
+    },
+    {
+      "id": "exact",
+      "kind": "external",
+      "config": {
+        "latencyMs": 20
+      },
+      "timeoutMs": 20
+    },
+    {
+      "id": "hang",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "hang",
+          "ok"
+        ]
+      },
+      "timeoutMs": 8,
+      "retry": {
+        "maxAttempts": 2
+      }
+    }
+  ]
+}

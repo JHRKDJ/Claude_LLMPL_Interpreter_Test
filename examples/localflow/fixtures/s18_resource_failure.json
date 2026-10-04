@@ -1,0 +1,34 @@
+{
+  "workflow": "s18_resource_failure",
+  "jobs": [
+    {
+      "id": "missing",
+      "kind": "transform",
+      "config": {
+        "input": "data/nope.txt",
+        "output": "never.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "badcsv",
+      "kind": "transform",
+      "config": {
+        "input": "data/bad.csv",
+        "output": "bad.out",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "late",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "late.txt",
+        "op": "upper",
+        "latencyMs": 4,
+        "failAfterWrite": true
+      }
+    }
+  ]
+}

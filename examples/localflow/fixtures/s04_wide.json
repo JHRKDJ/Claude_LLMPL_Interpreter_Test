@@ -1,0 +1,315 @@
+{
+  "workflow": "s04_wide",
+  "maxConcurrency": 8,
+  "jobs": [
+    {
+      "id": "w00",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 0,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w01",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 1,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w02",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 2,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w03",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w04",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 4,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w05",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w06",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 6,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w07",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 7,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w08",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 8,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w09",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 9,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w10",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w11",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 11,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w12",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 12,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w13",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 13,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w14",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 14,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w15",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 15,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w16",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 16,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w17",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 17,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w18",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 18,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w19",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 19,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w20",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 20,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w21",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 21,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w22",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 22,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w23",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 23,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w24",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 24,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w25",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 25,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w26",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 26,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w27",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 27,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w28",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 28,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "w29",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 29,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "all",
+      "kind": "reduce",
+      "deps": [
+        "w00",
+        "w01",
+        "w02",
+        "w03",
+        "w04",
+        "w05",
+        "w06",
+        "w07",
+        "w08",
+        "w09",
+        "w10",
+        "w11",
+        "w12",
+        "w13",
+        "w14",
+        "w15",
+        "w16",
+        "w17",
+        "w18",
+        "w19",
+        "w20",
+        "w21",
+        "w22",
+        "w23",
+        "w24",
+        "w25",
+        "w26",
+        "w27",
+        "w28",
+        "w29"
+      ],
+      "config": {
+        "op": "count"
+      }
+    }
+  ]
+}

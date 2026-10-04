@@ -1,0 +1,23 @@
+{
+  "workflow": "s09_retry_success",
+  "jobs": [
+    {
+      "id": "flaky",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "retryable",
+          "retryable",
+          "ok"
+        ],
+        "value": 42
+      },
+      "retry": {
+        "maxAttempts": 4,
+        "backoffMs": 3,
+        "multiplier": 2
+      }
+    }
+  ]
+}

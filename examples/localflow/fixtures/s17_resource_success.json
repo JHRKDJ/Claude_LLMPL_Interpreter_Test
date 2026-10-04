@@ -1,0 +1,34 @@
+{
+  "workflow": "s17_resource_success",
+  "jobs": [
+    {
+      "id": "up",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "upper.txt",
+        "op": "upper",
+        "latencyMs": 5
+      }
+    },
+    {
+      "id": "num",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "numbered.txt",
+        "op": "number"
+      }
+    },
+    {
+      "id": "csv",
+      "kind": "transform",
+      "config": {
+        "input": "data/numbers.csv",
+        "output": "sums.csv",
+        "op": "csvSum",
+        "latencyMs": 2
+      }
+    }
+  ]
+}

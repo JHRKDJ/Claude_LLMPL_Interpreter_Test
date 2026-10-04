@@ -1,0 +1,60 @@
+{
+  "workflow": "s14_collect_continue",
+  "onFailure": "continue",
+  "jobs": [
+    {
+      "id": "bad",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "good1",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 4,
+        "costMs": 20
+      }
+    },
+    {
+      "id": "good2",
+      "kind": "compute",
+      "deps": [
+        "good1"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 30
+      }
+    },
+    {
+      "id": "sum",
+      "kind": "reduce",
+      "deps": [
+        "good1",
+        "good2"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "blocked",
+      "kind": "compute",
+      "deps": [
+        "bad"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 10,
+        "costMs": 0
+      }
+    }
+  ]
+}

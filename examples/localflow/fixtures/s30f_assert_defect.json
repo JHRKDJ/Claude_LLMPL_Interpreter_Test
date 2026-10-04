@@ -1,0 +1,33 @@
+{
+  "workflow": "s30f_assert_defect",
+  "jobs": [
+    {
+      "id": "fine",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 2
+      }
+    },
+    {
+      "id": "bug",
+      "kind": "compute",
+      "config": {
+        "op": "assert",
+        "value": 1,
+        "expect": 2,
+        "costMs": 3
+      }
+    },
+    {
+      "id": "long",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 50
+      }
+    }
+  ]
+}
