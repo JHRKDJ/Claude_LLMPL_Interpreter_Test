@@ -139,5 +139,5 @@ Regression test failed before fix: yes (2 of 3; the third pins the genuine spin 
 Fix: the advisory fires only when the select's value is discarded (statement
   position in a loop/function body) and the closed branch neither exits nor assigns
   (lang/check/selectcheck.py, walk.py).
-Commit: (next commit)
+Commit: dcaa94f
 Status: fixed
