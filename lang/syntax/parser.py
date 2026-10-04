@@ -173,6 +173,7 @@ class Parser:
 
     # ------------------------------------------------------------ recovery
     def sync_stmt(self) -> None:
+        start = self.i
         depth = 0
         while True:
             t = self.toks[self.i]
@@ -188,6 +189,8 @@ class Parser:
             elif t.kind in (")", "]", "}"):
                 depth -= 1
                 if depth < 0:
+                    if self.i == start and t.kind != "}":
+                        self.i += 1  # always make progress past a stray closer (BUG-0007)
                     return
             self.i += 1
 
@@ -935,6 +938,12 @@ class Parser:
             self._binary_rhs_skip()
             right = self.parse_and()
             left = A.Binary(span=self.sp(left).to(self.sp(right)), op="||", left=left, right=right)
+        t = self.peek()
+        if t.kind == "IDENT" and t.value in ("and", "or"):
+            op = "&&" if t.value == "and" else "||"
+            raise self.error("S.SYNTAX.UNSUPPORTED_SYNTAX", f"`{t.value}` is not an operator in this language",
+                             t.span, help=f"use `{op}` (operands must be Bool)",
+                             fix=Fix(f"replace `{t.value}` with `{op}`", [TextEdit(t.span, op)]))
         return left
 
     def parse_and(self) -> A.Expr:

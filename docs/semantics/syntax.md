@@ -1,8 +1,8 @@
 # Syntax — implementation contract
 
-> This file is an implementation contract derived from V3.
-> It has no authority over V3.
-> If this file conflicts with V3, V3 wins.
+This file is an implementation contract derived from V3.
+It has no authority over V3.
+If this file conflicts with V3, V3 wins.
 
 ## 1. Relevant V3 commitments
 Braces (6.1, 7.1.1); newline-terminated statements with defined continuation rules
@@ -132,4 +132,4 @@ suppressed; errors produced while recovering from an unclosed delimiter are mark
 
 ## 6. Conformance examples
 See `tests/unit/test_lexer.py`, `tests/unit/test_parser.py`,
-`tests/negative/test_syntax_errors.py`.
+`tests/negative/test_static_errors.py`, `tests/fuzz/test_parser_fuzz.py`.

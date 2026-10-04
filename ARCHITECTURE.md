@@ -20,54 +20,42 @@ lang.diagnostics structured diagnostics + text/JSON renderers (used by every sta
 lang.tooling    CLI (run/check/format/test/repl), test runner, REPL
 ```
 
-## Packages and responsibilities
+## Packages and responsibilities (actual layout)
 
-| Package | Responsibility | Notes |
-|---|---|---|
-| `lang/source.py` | Source files, spans, line/column mapping | leaf |
-| `lang/diagnostics/` | `model.py` (Diagnostic, Label, Code, Note, provenance records), `codes.py` (stable code registry), `render_text.py`, `render_json.py` | never imports runtime/check |
-| `lang/syntax/` | `tokens.py`, `lexer.py`, `ast.py` (node classes), `parser.py` (recursive descent + recovery) | |
-| `lang/typesys.py` | Type terms shared by checker and runtime (Int, List[T], Fn(...), Record ref, effect sets) | depends on syntax AST only for type-expression conversion |
-| `lang/format/` | Canonical formatter; comment/blank-line preservation | |
-| `lang/modules/` | `project.py` (manifest/lockfile), `loader.py` (module graph, init cycles), `resolver.py` (scopes, bindings, captures, definite assignment), `autoimport.py` | |
-| `lang/check/` | Gradual static checker split by concern: `types.py`, `expr.py`, `effects.py`, `exhaustive.py`, `contracts.py`, `resources.py`, `concurrency.py`, `protocols.py`, `modes.py` | does not import runtime |
-| `lang/runtime/values.py` | Runtime value classes (frozen/mutable records, collections, variants, closures, handles) | |
-| `lang/runtime/equality.py` | Structural equality, typed hash keys, ordering, display | no Python `==` leakage (1 == 1.0, True == 1) |
-| `lang/runtime/signals.py` | Exit taxonomy as distinct internal signals: Return/Break/Continue, `Thrown` (recoverable), `Cancelled`, `Abandoned`, `HardTermination` | not one hierarchy (V3 7.2.3) |
-| `lang/runtime/errors.py` | Error values, categories, `AggregateException`, Result provenance | |
-| `lang/runtime/rtypes.py` | Transient runtime type checks, protocol shape checks, conformance table | |
-| `lang/runtime/contracts.py` | Contract/invariant evaluation, `old` snapshots, value capture for failures | |
-| `lang/runtime/capture.py` | Bounded, cycle-safe, redacting value representation for diagnostics | never calls user code |
-| `lang/runtime/coro.py`, `scheduler.py`, `clock.py` | Baton-passing coroutines, deterministic/seeded scheduler, real/virtual clock | IMPL-001/002 |
-| `lang/runtime/cancellation.py` | Cancel requests, masking, delivery points | |
-| `lang/runtime/tasks.py` | Task groups (4 modes), handles, observation, outcomes, reports | |
-| `lang/runtime/isolation.py` | Sendability classification and graph copy | |
-| `lang/runtime/channels.py` | Channels, ports, holder tracking, broadcast | |
-| `lang/runtime/select.py` | Select arbitration, fairness cursors, ring buffer | |
-| `lang/runtime/resources.py` | Use scopes, providers, borrows, release registration, cleanup combination | |
-| `lang/runtime/interp/` | Evaluator: `core.py` (dispatch, env), `exprs.py`, `stmts.py`, `calls.py`, `patterns.py`, `exits.py` (defer/unwinding) | top of runtime |
-| `lang/runtime/builtins/` | Native standard library: core, collections, strings, math, fs, json, time, cancel | |
-| `lang/stdlib/*.lang` | Library code written in the language | |
-| `lang/tooling/` | `cli.py`, `driver.py` (load→check→run), `testrunner.py`, `repl.py` | top |
+| Path | Responsibility |
+|---|---|
+| `lang/source.py` | `SourceFile`, `Span`, line/column mapping (leaf) |
+| `lang/diagnostics/` | `model.py` (Diagnostic, Label, Note, Fix, TextEdit, provenance records), `codes.py` (stable code registry, `A/R/S/W/C/H.DOMAIN.REASON`), `render_text.py`, `render_json.py` |
+| `lang/syntax/` | `tokens.py`, `lexer.py` (tokens, comments, string interpolation), `ast.py` (nodes with spans + `ann` slots), `parser.py` (recursive descent, newline-continuation contexts, recovery) |
+| `lang/typesys.py` | Type terms shared by checker and runtime (`TPrim`, `TCon`, `TNominal`, `TFn`, `Effect`, …) and type-expression conversion |
+| `lang/format/` | Canonical formatter (`__init__.py`) and structural AST equivalence (`equiv.py`) used as its safety net |
+| `lang/modules/` | `project.py` (lang.toml / lang.lock), `loader.py` (module graph, import resolution, stdlib/native modules) |
+| `lang/check/` | Static checking. `resolve.py` (scopes, bindings, captures, definite assignment, placement rules, import suggestions); `typecheck.py` (`Checker`: declarations, signatures, conformance, effect-inference fixpoint); mixins `walk.py` (function bodies, statements, effects collectors), `expr.py` (expressions, patterns, annotation origins), `callcheck.py` (calls, effects, try/capture/await, resources, tasks, sendability), `selectcheck.py`; `exhaustive.py` (usefulness algorithm), `contracts_check.py` (restricted contract language), `advisories.py` (state-horizon / invariant-across-await advisories), `types.py`, `decls.py` |
+| `lang/runtime/` (core) | `values.py` (runtime values), `equality.py` (equality/hashing/ordering/display without Python coercions), `frozen.py`, `signals.py` (exit taxonomy), `core_types.py` (core errors, Option/Result, reports), `rtypes.py` (transient type checks, protocol shapes), `capture.py` (bounded redacting value capture), `isolation.py` (share / graph-copy / reject), `scheduler.py` (baton-passing coroutines, FIFO/seeded scheduling, real/virtual clock), `tasks.py` (tasks, cancel scopes, groups), `channels.py` |
+| `lang/runtime/builtins/` | Native standard library and builtin method tables (`registry.py`), collections, strings, numbers, Option/Result, fs, json, math, time |
+| `lang/runtime/interp/` | Evaluator assembled from mixins: `core.py` (Env, Frame, dispatch), `exprs.py`, `stmts.py` (defer/unwinding), `calls.py` (calls, contracts, invariants, effects, construction), `patterns.py`, `conc.py` (await/spawn/groups/within/deadlock), `res.py` (use/provider/borrow/release), `chan.py`, `selectx.py`, `link.py` (module linking, constants, conformance) |
+| `lang/tooling/` | `cli.py` (run/check/format/test/repl/lock), `driver.py` (load → check → run), `testrunner.py`, `repl.py`, `fixes.py` (import fixes) |
 
 ## Allowed dependency directions
 
-Lower layers never import higher layers. Enforced by `tests/unit/test_architecture.py`.
+Enforced on the real import graph by `tests/unit/test_architecture.py`.
 
 ```
-L0  source
-L1  diagnostics            → L0
-L2  syntax, typesys        → L0..L1
-L3  format, modules        → L0..L2
-L4  check                  → L0..L3          (never runtime)
-L4  runtime                → L0..L3          (never check)
-L5  tooling                → everything
+source
+diagnostics            → source
+syntax                 → source, diagnostics
+typesys                → source, diagnostics, syntax
+format, modules        → source, diagnostics, syntax, typesys
+runtime (core)         → source, diagnostics, syntax, typesys
+runtime.builtins       → + runtime core
+runtime.interp         → + runtime core, runtime.builtins
+check                  → + modules, runtime core, runtime.builtins   (metadata only; never runtime.interp)
+tooling                → everything
 ```
 
-Inside `runtime`: `values/equality/signals/errors/capture` → `rtypes/contracts/isolation`
-→ `coro/scheduler/clock/cancellation` → `tasks/channels/resources` → `select` →
-`interp` → `builtins` (builtins may import interp-facing helper protocols only via
-`runtime/native.py`).
+The runtime never imports the checker, formatter or tooling: the checker communicates
+with the runtime only through AST annotations (IMPL-004). No third-party runtime
+dependencies.
 
 ## Key runtime design points
 
@@ -87,5 +75,5 @@ Inside `runtime`: `values/equality/signals/errors/capture` → `rtypes/contracts
 
 - Parser with recovery and newline continuation rules.
 - Static checker (gradual types + effects + exhaustiveness + resources + tasks).
-- Task groups × cancellation × cleanup (`tasks.py`, `interp/exits.py`).
+- Task groups × cancellation × cleanup (`runtime/tasks.py`, `interp/conc.py`, `interp/stmts.py`).
 - Select arbitration and channel commit protocol.

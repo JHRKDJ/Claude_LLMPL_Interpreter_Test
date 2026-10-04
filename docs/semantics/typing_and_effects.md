@@ -1,8 +1,8 @@
 # Static checking, gradual types and effects — implementation contract
 
-> This file is an implementation contract derived from V3.
-> It has no authority over V3.
-> If this file conflicts with V3, V3 wins.
+This file is an implementation contract derived from V3.
+It has no authority over V3.
+If this file conflicts with V3, V3 wins.
 
 ## 1. Relevant V3 commitments
 Dynamic, strong, non-coercing default (5.3.1, 5.3.4); written annotations are

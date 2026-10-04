@@ -112,3 +112,17 @@ Fix: the rule now requires a line break immediately before the `-` and a previou
   edit is anchored at that token (lang/syntax/parser.py).
 Commit: 4285cb7
 Status: fixed
+
+BUG-0007
+Origin: parser fuzzing (mutated corpus program, seed 115: `select {"outer")`)
+Subsystems: parser error recovery × item loops (select branches, match arms, members)
+Symptom: statement-level recovery stopped at a stray `)`/`]` without consuming it; an
+  enclosing item loop then re-parsed the same token forever, appending diagnostics
+  until the process ran out of memory (observed as the process being killed).
+Minimal reproduction: tests/regressions/test_bug_0007_recovery_progress.py (runs in
+  a memory-capped subprocess with a timeout)
+Regression test failed before fix: yes
+Fix: sync_stmt consumes a stray closing `)`/`]` when it has not advanced, so every
+  recovery step makes progress (lang/syntax/parser.py).
+Commit: (next commit)
+Status: fixed
