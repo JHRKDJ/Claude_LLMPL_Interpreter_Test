@@ -32,7 +32,7 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
 ## Tooling
 - [x] CLI run/check/format/test/repl; JSON/quiet/deep; schedule random; exit codes
 - [x] Test runner with seeded stress; REPL with explicit reload
-- [ ] docs/LANGUAGE_GUIDE.md (user-facing reference)
+- [x] docs/LANGUAGE_GUIDE.md (examples executed by tests/unit/test_language_guide.py)
 
 ## Tests
 - [x] Unit (lexer, parser, architecture, docs consistency, runtime annotations)
