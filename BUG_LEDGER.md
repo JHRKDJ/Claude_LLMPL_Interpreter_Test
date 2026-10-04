@@ -124,5 +124,5 @@ Minimal reproduction: tests/regressions/test_bug_0007_recovery_progress.py (runs
 Regression test failed before fix: yes
 Fix: sync_stmt consumes a stray closing `)`/`]` when it has not advanced, so every
   recovery step makes progress (lang/syntax/parser.py).
-Commit: (next commit)
+Commit: f347523
 Status: fixed
