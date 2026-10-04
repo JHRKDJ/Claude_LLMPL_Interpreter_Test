@@ -100,6 +100,14 @@ fn main() { use x = twice() { print(x) } }""")
 def test_provider_only_in_use():
     r = run(PROV + """
 fn main() { let c = connect(1) }""")
+    assert "S.RESOURCE.PROVIDER_OUTSIDE_USE" in r.check_errors
+
+
+def test_provider_only_in_use_dynamic():
+    # provider reached through a Dyn callable: the runtime refuses it outside `use`
+    r = run(PROV + """
+fn call(f) { return f(1) }
+fn main() { let c = call(connect) }""")
     assert r.codes == ["A.RESOURCE.PROVIDER_OUTSIDE_USE"]
 
 
@@ -180,7 +188,7 @@ resource fn p() yields R {
     yield r
 }
 fn main() { use x = p() { } }""")
-    assert r.codes == ["A.RESOURCE.PROVIDER_OUTSIDE_USE"]
+    assert r.check_errors == ["S.RESOURCE.ON_ABANDON_RESTRICTED"]
 
 
 def test_on_abandon_runs_registered_release(tmp_path):

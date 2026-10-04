@@ -158,6 +158,7 @@ CODES: dict[str, str] = {
     "A.RESOURCE.NO_YIELD": "provider finished without yielding",
     "A.RESOURCE.MULTIPLE_YIELD": "provider yielded more than once",
     "A.RESOURCE.PROVIDER_OUTSIDE_USE": "provider invoked outside a use scope",
+    "A.RESOURCE.ON_ABANDON_RESTRICTED": "onAbandon action is not a built-in abandonment-safe release primitive",
     "A.RESOURCE.CROSS_TASK": "borrow used from a different task",
     "A.TASK.NOT_SENDABLE": "value cannot cross a task/channel boundary",
     "A.TASK.GROUP_FAILURE": "child abandonment abandoned the enclosing task group",

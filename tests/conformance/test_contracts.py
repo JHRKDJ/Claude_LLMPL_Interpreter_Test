@@ -36,12 +36,22 @@ fn main() { print(double(1)) }""")
     assert r.diag.primary.span.text == "result == x * 2"
 
 
-def test_old_must_be_frozen():
+def test_old_must_be_frozen_static():
+    # statically known mutable result: rejected by the checker (legality rule, V3 5.10.5)
     r = run("""
 mutable record Box { items: MutableList[Int]
     fn add(self, x: Int) ensures self.items.length == old(self.items).length + 1 { self.items.push(x) } }
 fn main() { let b = Box(items: MutableList[Int]())
  b.add(1) }""")
+    assert r.check_errors == ["S.CONTRACT.OLD_NOT_SNAPSHOTTABLE"]
+    assert r.exit_code is None
+
+
+def test_old_must_be_frozen_dynamic():
+    # statically unknown (Dyn) result: the runtime refuses to snapshot a mutable value
+    r = run("""
+fn grow(xs, x: Int) ensures xs.length == old(xs).length + 1 { xs.push(x) }
+fn main() { grow(MutableList[Int](), 1) }""")
     assert r.codes == ["A.CONTRACT.EVALUATION_FAILED"]
 
 
@@ -94,6 +104,7 @@ fn main() { let p = Pair(a: 1, b: 1)
 
 
 def test_invariant_fields_controlled():
+    # statically known receiver: rejected by the checker
     r = run("""
 mutable record Account { balance: Int
  note: Str
@@ -101,6 +112,18 @@ mutable record Account { balance: Int
 fn main() { let a = Account(balance: 1, note: "")
  a.note = "ok"
  a.balance = -1 }""")
+    assert r.check_errors == ["S.CONTRACT.INVARIANT_FIELD_WRITE"]
+
+
+def test_invariant_fields_controlled_dynamic():
+    # Dyn receiver: the runtime rejects the write to an invariant-participating field
+    r = run("""
+mutable record Account { balance: Int
+ note: Str
+ invariant balance >= 0 }
+fn poke(a) { a.note = "ok"
+ a.balance = -1 }
+fn main() { poke(Account(balance: 1, note: "")) }""")
     assert r.codes == ["A.CONTRACT.INVARIANT_FIELD_WRITE"]
 
 

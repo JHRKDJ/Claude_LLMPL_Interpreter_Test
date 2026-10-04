@@ -85,3 +85,20 @@ def ok(src: str, **kw) -> Run:
     r = run(src, **kw)
     assert r.exit_code == 0 and not [c for c in r.check if c.severity == "error"], r.text()
     return r
+
+
+def run_unchecked(src: str, mode: str = "draft", clock: str = "virtual", schedule: str = "fifo",
+                  seed: Optional[int] = None) -> Run:
+    """Execute parsed source *without* the static checker, to exercise the runtime's own
+    defence-in-depth checks for rules the checker normally rejects first."""
+    from lang.modules.loader import load_program
+    from lang.runtime.interp import Interpreter
+    d = Path(tempfile.mkdtemp(prefix="langraw-"))
+    path = d / "main.lang"
+    path.write_text(src)
+    prog = load_program(path)
+    assert prog.parse_ok, render_all(list(prog.all_diagnostics()))
+    out = io.StringIO()
+    opts = RunOptions(mode=mode, clock=clock, schedule=schedule, seed=seed, stdout=out, stderr=io.StringIO())
+    r = Interpreter(prog, opts).run_main()
+    return Run(out.getvalue(), r.exit_code, r.outcome, r.diagnostics, [], r.warnings, r.value)

@@ -105,6 +105,14 @@ fn main() { let x = try f(raiser) catch ParseError => 0 }""")
 def test_only_errors_can_be_thrown():
     r = run("""record NotErr { x: Int }
 fn main() { throw NotErr(x: 1) }""")
+    assert r.check_errors == ["S.EFFECT.NOT_AN_ERROR"]
+    assert r.check_warnings == []
+
+
+def test_only_errors_can_be_thrown_dynamic():
+    r = run("""record NotErr { x: Int }
+fn mk() { return NotErr(x: 1) }
+fn main() { throw mk() }""")
     assert r.codes == ["A.TYPE.OPERAND_MISMATCH"]
 
 

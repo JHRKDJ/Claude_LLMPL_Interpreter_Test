@@ -11,7 +11,7 @@ async fn sleeper() { await sleep(1.seconds) }
 async fn group() { parallel { spawn sleeper() } }
 async fn main() {
     let r = try within 5.millis {
-        group()
+        await group()
         print("group returned normally (wrong)")
         "no"
     } catch DeadlineExceeded => "deadline"

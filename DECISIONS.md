@@ -232,6 +232,15 @@ select [priority | now] {
   `stable_code` separately. Outcomes: `A` abandonment, `R` recoverable, `S`
   static, `W` warning/advisory, `C` cancellation, `H` hard termination.
 
+### SPEC-023 Calling an async function (V3 7.10.2, 7.7.3)
+- A call of an `async fn` is written `await f(args)` ("`await` is visible"); only an
+  async function may contain it. `await` applied to a non-async call is a mismatch.
+- Draft source that omits `await` on an async call receives
+  `S.ASYNC.MISSING_AWAIT` (warning) and the call still runs to completion in the
+  calling task (it is awaited implicitly), by analogy with V3 7.7.3's draft rule for
+  an omitted `try` marker. Verified mode makes it an error. Calling an async function
+  from a non-async function is always an error (`S.ASYNC.SYNC_CALLS_ASYNC`).
+
 ---
 
 ## B. Semantic resolutions (ambiguities and gaps)

@@ -207,14 +207,14 @@ class ResourceMixin:
                                st.span, env)
         call = st.call
         if call.__class__ is not A.Call or call.callee.__class__ is not A.Field or call.args:
-            raise self.abandon("A.RESOURCE.PROVIDER_OUTSIDE_USE",
+            raise self.abandon("A.RESOURCE.ON_ABANDON_RESTRICTED",
                                "`onAbandon` takes a call of a built-in release primitive, e.g. `onAbandon file.close()`",
                                st.span, env)
         recv = self.eval(call.callee.obj, env)
         target = recv.target if type(recv) is Borrow else recv
         m = self.get_member(target, call.callee.name, call.callee, env)
         if type(m) is not BuiltinBound or not m.builtin.abandon_safe:
-            raise self.abandon("A.RESOURCE.PROVIDER_OUTSIDE_USE",
+            raise self.abandon("A.RESOURCE.ON_ABANDON_RESTRICTED",
                                f"`{call.callee.name}` is not an abandonment-safe release primitive; abandonment-safe "
                                f"release may only close/release/revoke/roll back built-in resources", st.span, env)
         ctx.abandon_actions.append((m.builtin, target, st.span))

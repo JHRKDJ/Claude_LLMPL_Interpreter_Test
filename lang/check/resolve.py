@@ -801,6 +801,7 @@ class Resolver:
         if c is A.Propagate:
             return self.expr(e.expr, scope, da)
         if c is A.Await:
+            e.ann["marked"] = self.marked_depth() > 0
             if not ctx.is_async:
                 self.err("S.ASYNC.AWAIT_OUTSIDE_ASYNC", "`await` is only allowed inside `async fn`", e.span,
                          help="mark the enclosing function `async fn` (only async functions may suspend)")

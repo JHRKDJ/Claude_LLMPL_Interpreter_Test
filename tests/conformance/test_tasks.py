@@ -384,7 +384,7 @@ async fn outer() throws AggregateException {
 }
 async fn main() {
     let r = try within 5.millis {
-        let x = try outer() catch AggregateException => "group failed"
+        let x = try await outer() catch AggregateException => "group failed"
         print(x)
         await sleep(100.millis)
         "not reached"
