@@ -79,5 +79,5 @@ Regression test failed before fix: yes (4 of 5 cases; the fifth pins that a miss
   separator without a comma is still reported)
 Fix: a consumed `,` now ends the item exactly like a newline at all three sites in
   lang/syntax/parser.py; syntax.md grammar and SPEC-007 updated to state it.
-Commit: (next commit)
+Commit: be0d02c
 Status: fixed
