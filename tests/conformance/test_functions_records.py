@@ -317,7 +317,13 @@ def test_module_constants_frozen():
 const NAMES = ["a", "b"]
 fn main() { print(LIMIT, NAMES) }""")
     assert r.lines == ['10 ["a", "b"]']
+    # statically known mutable initialiser: rejected by the checker
     r = run("""const STATE = MutableList.of(1)
+fn main() { print(1) }""")
+    assert r.check_errors == ["S.MODULE.MUTABLE_GLOBAL"]
+    # Dyn initialiser: rejected when the constant is initialised at link time
+    r = run("""fn mk() { return MutableList.of(1) }
+const STATE = mk()
 fn main() { print(1) }""")
     assert r.codes == ["S.MODULE.MUTABLE_GLOBAL"]
 
