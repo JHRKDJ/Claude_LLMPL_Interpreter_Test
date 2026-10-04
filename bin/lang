@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Toolchain entry point: bin/lang run|check|format|test|repl|lock ...
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+exec python3 -c "import sys; sys.path.insert(0, '$DIR'); from lang.tooling.cli import main; sys.exit(main())" "$@"
