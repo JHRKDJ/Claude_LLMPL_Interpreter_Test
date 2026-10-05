@@ -68,11 +68,18 @@ def type_name(v) -> str:
 
 
 # ----------------------------------------------------------------------------- equality
+_STRUCTURAL = (FrozenRecord, VariantValue, TupleValue, FrozenList, FrozenMap)
+
+
 def lang_eq(a, b) -> bool:
     if a is b:
-        if type(a) is float:
+        t = type(a)
+        if t is float:
             return a == a  # NaN != NaN (IEEE)
-        return True
+        if t not in _STRUCTURAL:
+            return True
+        # frozen values have no observable identity: compare structurally even when
+        # both sides are the same object (a contained NaN makes them unequal; BUG-0020)
     ta, tb = type(a), type(b)
     if ta is not tb:
         if (ta is int and tb is float) or (ta is float and tb is int):

@@ -195,9 +195,11 @@ class ResourceMixin:
             task.depth = depth
         ctx.outcome = outcome
         kind = outcome[0]
+        # normal release always runs under cancellation masking: a cancellation that
+        # arrives during release is redelivered after it (V3 5.5.9, 8.5; BUG-0022)
+        task.mask += 1
+        ctx.masked = True
         if kind == "cancelled":
-            task.mask += 1
-            ctx.masked = True
             return SCOPE_EXIT.nullary("Cancelled")
         if kind == "threw":
             return SCOPE_EXIT.nullary("Failed")
@@ -250,8 +252,7 @@ class ResourceMixin:
             raise
         exit_class = {"ok": "Normal", "transfer": "Normal", "threw": "Failed", "cancelled": "Cancelled"}[outcome[0]]
         release_error = None
-        if outcome[0] == "cancelled":
-            task.mask += 1
+        task.mask += 1  # release is masked on every exit class (BUG-0022)
         try:
             prov.release(self, exit_class, node.span)
         except Thrown as t:
@@ -259,8 +260,7 @@ class ResourceMixin:
                 t.prov.chain.append(try_node.span)
             release_error = t
         finally:
-            if outcome[0] == "cancelled":
-                task.mask -= 1
+            task.mask -= 1
         return self._combine_release(outcome, release_error, prov.name, node, env, state)
 
     # ------------------------------------------------------------------ combination

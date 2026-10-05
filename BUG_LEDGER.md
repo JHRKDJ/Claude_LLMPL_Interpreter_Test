@@ -281,3 +281,71 @@ Fix: capture "reassigned" flags are finalised after the whole program is resolve
   (lang/check/resolve.py).
 Commit: 4825290
 Status: fixed
+
+BUG-0019
+Origin: second independent audit (types auditor, T01)
+Subsystems: numerics × diagnostics capture (Python leakage)
+Symptom: Ints over 4300 digits could not be printed or parsed (CPython's conversion
+  limit leaked as H.RUNTIME.INTERNAL_ERROR, exit 4, even while rendering the locals of
+  an unrelated abandonment); `Int / Int` overflowing Float and oversized format
+  widths/precisions leaked OverflowError/ValueError the same way.
+Minimal reproduction: tests/regressions/test_bug_0019_big_int_python_leaks.py
+Regression test failed before fix: yes (all 4)
+Fix: the runtime lifts the digit limit; Int/Int overflow abandons with
+  A.NUMERIC.INVALID_CONVERSION; format width/precision above 1000 abandons with
+  A.RUNTIME.INVALID_ARGUMENT (lang/runtime/__init__.py, interp/exprs.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0020
+Origin: second independent audit (types auditor, T02)
+Subsystems: structural equality
+Symptom: `lang_eq` short-circuited on Python identity, so `a == a` was true but
+  `a == b` false for structurally identical frozen values containing NaN — frozen
+  values exposed reference identity (V3 5.1.1).
+Minimal reproduction: tests/regressions/test_bug_0020_nan_identity_equality.py
+Regression test failed before fix: yes
+Fix: no identity shortcut for frozen containers (lang/runtime/equality.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0021
+Origin: second independent audit (concurrency auditor, F4)
+Subsystems: isolation (frozen graph scan)
+Symptom: task handles nested in frozen collections (or captured by a frozen closure)
+  crossed task and channel boundaries; the frozen scan only looked for ports.
+Minimal reproduction: tests/regressions/test_bug_0021_handle_in_frozen_graph.py
+Regression test failed before fix: yes (2 of 3 initial; closure case added with fix)
+Fix: the frozen scan rejects reject-policy capabilities and also scans frozen closure
+  captures; scanning is enabled once any port or handle exists (lang/runtime/isolation.py,
+  interp/conc.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0022
+Origin: second independent audit (concurrency auditor, F5)
+Subsystems: resources × cancellation masking
+Symptom: normal release was masked only when the scope body had been cancelled; a
+  cancellation arriving during the release of a normally completed body cut the
+  release short at its first await (resource leak).
+Minimal reproduction: tests/regressions/test_bug_0022_release_masking.py
+Regression test failed before fix: yes
+Fix: release always runs masked; pending cancellation is redelivered after it
+  (lang/runtime/interp/res.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0023
+Origin: second independent audit (concurrency auditor, F6)
+Subsystems: task groups × external cancellation × observation
+Symptom: with external cancellation coinciding with a child failure, firstSuccess and
+  collect groups raised plain cancellation and the failure vanished (V3 5.12.11); a
+  collect body that threw dropped earlier unobserved child failures (5.12.5).
+Minimal reproduction: tests/regressions/test_bug_0023_group_failures_with_cancel.py
+Regression test failed before fix: yes (all 3)
+Fix: firstSuccess aggregates failures whenever any exist (cancellation pending);
+  collect returns its report when children failed (cancellation pending); a throwing
+  collect body aggregates unobserved child failures before the body's exception
+  (lang/runtime/interp/conc.py).
+Commit: PENDING
+Status: fixed

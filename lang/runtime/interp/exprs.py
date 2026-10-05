@@ -23,6 +23,7 @@ from ... import typesys as T
 # An erased generic type parameter used as a value-position type argument (IMPL-006).
 DYN_TYPE = TypeValue("prim", T.PRIMS["Dyn"], (), "Dyn")
 
+MAX_FORMAT_WIDTH = 1000
 _SPEC = re.compile(r"^([<>^])?(\d+)?(?:\.(\d+))?$")
 
 
@@ -68,6 +69,9 @@ class ExprMixin:
             raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", f"invalid format spec `{spec}`", span, env,
                                help="format specs are `[<|>|^]width` and/or `.precision`, e.g. {x:>8.2}")
         align, width, prec = m.groups()
+        if (width is not None and int(width) > MAX_FORMAT_WIDTH) or (prec is not None and int(prec) > MAX_FORMAT_WIDTH):
+            raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", f"format spec `{spec}` exceeds the maximum width/precision "
+                               f"of {MAX_FORMAT_WIDTH}", span, env)
         if prec is not None:
             if type(v) is not float:
                 raise self.abandon("A.TYPE.OPERAND_MISMATCH",
@@ -626,7 +630,11 @@ def binop(op: str, a, b):
                 if b == 0:
                     raise Fault("A.NUMERIC.DIVISION_BY_ZERO", "division by zero",
                                 help="Int / Int yields Float; guard the divisor or use `checkedDiv`")
-                return a / b
+                try:
+                    return a / b
+                except OverflowError:
+                    raise Fault("A.NUMERIC.INVALID_CONVERSION", "Int / Int result is too large for a Float",
+                                help="use `div` for integer division of large values")
             if op == "%":
                 if b == 0:
                     raise Fault("A.NUMERIC.DIVISION_BY_ZERO", "modulo by zero")

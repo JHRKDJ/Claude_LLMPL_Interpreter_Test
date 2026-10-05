@@ -136,6 +136,14 @@ class Transfer:
             return new
         if t is Closure:
             if closure_is_frozen(v):
+                caps = v.decl.ann.get("captures") if hasattr(v.decl, "ann") else None
+                if caps and v.env is not None:
+                    vals = []
+                    for name, _ in caps:
+                        e = v.env.find(name)
+                        if e is not None and e.kind not in ("module", "prelude"):
+                            vals.append(e.vars[name])
+                    self._scan_frozen(vals, f"{path}.<captures>")
                 return v
             self.reject(v, "closure with mutable captures", path)
         if t is BoundMethod:
@@ -160,7 +168,8 @@ class Transfer:
         self.reject(v, "runtime capability", path)
 
     def _scan_frozen(self, items, path):
-        """Frozen graphs are shared; they are only traversed to find embedded ports."""
+        """Frozen graphs are shared; they are traversed to find embedded ports and to
+        reject embedded capabilities such as task handles (BUG-0021)."""
         if not PORTS_EXIST[0]:
             return
         stack = list(items)
@@ -171,6 +180,8 @@ class Transfer:
             t = type(x)
             if getattr(t, "is_port", False):
                 self.ports.append(x)
+            elif getattr(t, "lang_sendable", None) == "reject":
+                self.reject(x, getattr(t, "lang_reject_reason", "runtime capability"), path)
             elif t is FrozenRecord or t is VariantValue:
                 stack.extend(x.values)
             elif t is FrozenList or t is TupleValue:
@@ -179,6 +190,7 @@ class Transfer:
                 stack.extend(val for _, val in x.data.values())
 
 
+# True once any port or task handle exists, i.e. once frozen graphs may embed one.
 PORTS_EXIST = [False]
 
 _REJECT_HELP = {

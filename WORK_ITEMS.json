@@ -1695,21 +1695,21 @@
   {
    "id": "AUD2-C04",
    "title": "F4 task handles nested in frozen collections cross boundaries",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C05",
    "title": "F5 normal release not masked when cancellation arrives during release",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C06",
    "title": "F6 firstSuccess/collect drop child failures on external cancel; collect body throw drops child failure",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
@@ -1793,14 +1793,14 @@
   {
    "id": "AUD2-T01",
    "title": "Big Int / format spec Python ValueError/OverflowError leaks as hard termination",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T02",
    "title": "NaN identity leaks into frozen-value equality",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

@@ -8,7 +8,7 @@ from ..capture import Budget, safe_repr
 from ..core_types import (ABANDONMENT_REPORT, DEADLINE_EXCEEDED, TASK_GROUP_REPORT, TASK_OUTCOME, make_error)
 from ..equality import type_name
 from ..frozen import is_frozen
-from ..isolation import Transfer
+from ..isolation import PORTS_EXIST, Transfer
 from ..scheduler import Coro
 from ..signals import (Abandoned, BreakSignal, Cancelled, ContinueSignal, Fault, HardTermination, ReturnSignal,
                        Thrown)
@@ -247,11 +247,19 @@ class ConcMixin:
             return value
         if mode == "collect":
             if isinstance(body_exc, Thrown):
-                raise self.aggregate_thrown([("body", (f"{task.path}/{group.label}/<body>", body_exc))], group.site,
-                                            cancel_pending=outer_cancel)
+                # the report is lost with the body, so unobserved child failures join the
+                # aggregate rather than vanishing (V3 5.12.5; BUG-0023)
+                parts = [("task", (c.path, c.outcome.thrown)) for c in children
+                         if c.outcome.kind == "threw" and not c.origin.observed]
+                parts = self._order(parts, children)
+                parts.append(("body", (f"{task.path}/{group.label}/<body>", body_exc)))
+                raise self.aggregate_thrown(parts, group.site, cancel_pending=outer_cancel)
             if isinstance(body_exc, Cancelled):
                 raise body_exc
-            self._propagate_external_cancel(task, children, group)
+            if not any(c.outcome.kind in ("threw", "abandoned") for c in children):
+                self._propagate_external_cancel(task, children, group)
+            # otherwise the report (holding the failures) is returned and the external
+            # cancellation stays pending for redelivery (V3 5.12.11; BUG-0023)
             return self.build_report(group, env)
         # race / firstSuccess
         if isinstance(body_exc, Thrown):
@@ -279,8 +287,10 @@ class ConcMixin:
         if w is not None and w.outcome.kind == "ok":
             return w.outcome.value
         threw = [("task", (c.path, c.outcome.thrown)) for c in children if c.outcome.kind == "threw"]
-        if outer_cancel or any(c.outcome.kind == "cancelled" for c in children) and not threw:
+        if not threw:
             raise Cancelled("all firstSuccess children cancelled", group.site)
+        # failures are processed even when external cancellation coincides; the
+        # cancellation stays pending for redelivery (V3 5.12.11; BUG-0023)
         raise self.aggregate_thrown(threw, group.site, cancel_pending=outer_cancel)
 
     def _propagate_external_cancel(self, task, children, group) -> None:
@@ -328,6 +338,7 @@ class ConcMixin:
             raise self.abandon("A.TASK.SPAWN_OUTSIDE_GROUP", "`spawn` must appear inside a `parallel` block of the "
                                "same function", node.span, env)
         group = frame.groups[-1]
+        PORTS_EXIST[0] = True  # a handle now exists and may be embedded in frozen graphs
         tr = Transfer("spawn argument")
         if node.call is not None:
             call = node.call
