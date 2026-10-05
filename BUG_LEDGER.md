@@ -435,7 +435,7 @@ Fix: a lambda capturing a borrow is typed `borrow fn(...)`, so all borrow escape
   apply; calls through it are typed; `borrow fn` parameters accept callables; the
   runtime rejects a borrow-capturing closure as a scope value (lang/check/expr.py,
   callcheck.py, lang/runtime/frozen.py, interp/res.py, interp/calls.py, rtypes.py).
-Commit: PENDING
+Commit: 56c8b45
 Status: fixed
 
 BUG-0030
@@ -448,5 +448,5 @@ Regression test failed before fix: yes (both)
 Fix: borrows passed to any record/variant constructor (including generic `Some`),
   tuple literals and field assignments are S.RESOURCE.ESCAPE (lang/check/callcheck.py,
   expr.py, walk.py).
-Commit: PENDING
+Commit: 56c8b45
 Status: fixed
