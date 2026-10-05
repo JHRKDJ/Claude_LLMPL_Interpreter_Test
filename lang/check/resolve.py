@@ -727,6 +727,12 @@ class Resolver:
         if c is A.Index:
             da = self.expr(e.obj, scope, da)
             for i in e.indices:
+                # A generic type parameter written as a type argument in value position,
+                # e.g. `MutableList[T]()` (BUG-0011); it is erased at runtime (IMPL-006).
+                if (i.__class__ is A.Name and scope.lookup(i.name) is None
+                        and i.name in self.type_params_in_scope()):
+                    i.ann["tparam"] = True
+                    continue
                 da = self.expr(i, scope, da)
             return da
         if c is A.Field:

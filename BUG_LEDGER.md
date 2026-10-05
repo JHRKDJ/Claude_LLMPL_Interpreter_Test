@@ -168,3 +168,33 @@ Fix: block() types a block whose last statement transfers control as Never
   (lang/check/walk.py).
 Commit: d886ef1
 Status: fixed
+
+BUG-0011
+Origin: writing the standard library in the language (lang/stdlib/chan.lang)
+Subsystems: name resolution × runtime type application
+Symptom: inside a generic function, a type parameter written as a type argument in
+  value position (`MutableList[T]()`, `Channel[A].rendezvous()`) was reported
+  `S.NAME.UNRESOLVED`, and at run time it could not be evaluated, although the same
+  parameter already worked in annotations (`let x: T`).
+Minimal reproduction: tests/regressions/test_bug_0011_type_param_value_position.py
+Regression test failed before fix: yes (both tests)
+Fix: the resolver marks such an index as a type parameter instead of resolving it as
+  a value; the runtime applies the erased parameter as `Dyn` (IMPL-006)
+  (lang/check/resolve.py, lang/runtime/interp/exprs.py).
+Commit: (pending)
+Status: fixed
+
+BUG-0012
+Origin: first V3 coverage audit (diagnostic-code coverage sweep)
+Subsystems: runtime diagnostics (member access)
+Symptom: calling a missing method on a dynamically typed value (`p.go()` with
+  `p: Dyn`) abandoned with `A.TYPE.UNKNOWN_FIELD`; the code-selection expression in
+  `unknown_member` could never produce `A.TYPE.UNKNOWN_METHOD`, so the runtime code
+  disagreed with the checker's `S.TYPE.UNKNOWN_METHOD` for the same source.
+Minimal reproduction: tests/regressions/test_bug_0012_unknown_method_code.py
+Regression test failed before fix: yes (2 of 3; the third pins field reads)
+Fix: member lookup knows whether it serves a call; a missing callee member is
+  `A.TYPE.UNKNOWN_METHOD`, a missing read is `A.TYPE.UNKNOWN_FIELD`
+  (lang/runtime/interp/exprs.py, calls.py).
+Commit: (pending)
+Status: fixed

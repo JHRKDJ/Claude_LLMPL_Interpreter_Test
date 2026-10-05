@@ -113,7 +113,7 @@ class CallMixin:
                 b = METHODS.get(k, {}).get(name)
                 if b is not None:
                     return self.call_builtin(b, obj, args, kwargs, node.span, awaited)
-        f = self.get_member(obj, name, node, env)
+        f = self.get_member(obj, name, node, env, call=True)
         return self.call_value(f, args, kwargs, node.span, awaited, node, env)
 
     # ------------------------------------------------------------------ builtins

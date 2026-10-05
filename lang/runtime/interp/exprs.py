@@ -18,6 +18,10 @@ from ..values import (UNIT, Borrow, BoundMethod, BuiltinBound, CategoryType, Clo
                       MutableRecord, MutableSet, Namespace, ProtocolType, RangeValue, RecordType, TupleValue,
                       TypeValue, Uninit, UnitType, VariantValue)
 from .core import Env
+from ... import typesys as T
+
+# An erased generic type parameter used as a value-position type argument (IMPL-006).
+DYN_TYPE = TypeValue("prim", T.PRIMS["Dyn"], (), "Dyn")
 
 _SPEC = re.compile(r"^([<>^])?(\d+)?(?:\.(\d+))?$")
 
@@ -175,7 +179,8 @@ class ExprMixin:
     def eval_Index(self, node: A.Index, env: Env):
         obj = self.eval(node.obj, env)
         if type(obj) is TypeValue:
-            return self.type_apply(obj, [self.eval(i, env) for i in node.indices], node, env)
+            return self.type_apply(obj, [DYN_TYPE if i.ann.get("tparam") else self.eval(i, env)
+                                         for i in node.indices], node, env)
         if len(node.indices) != 1:
             raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", "exactly one index is supported", node.span, env)
         idx = self.eval(node.indices[0], env)
@@ -223,7 +228,7 @@ class ExprMixin:
         obj = self.eval(node.obj, env)
         return self.get_member(obj, node.name, node, env)
 
-    def get_member(self, obj, name: str, node, env):
+    def get_member(self, obj, name: str, node, env, call: bool = False):
         t = type(obj)
         if t is Borrow:
             target = self.borrow_target(obj, node.span, env)
@@ -256,7 +261,7 @@ class ExprMixin:
                 b = METHODS.get(k, {}).get(name)
                 if b is not None:
                     return BuiltinBound(obj, b)
-            raise self.unknown_member(obj, name, node, env, list(rt.field_index) + list(rt.methods))
+            raise self.unknown_member(obj, name, node, env, list(rt.field_index) + list(rt.methods), call)
         if t is VariantValue:
             m = obj.case.etype.methods.get(name)
             if m is not None:
@@ -272,7 +277,7 @@ class ExprMixin:
                                    f"variant payload field `{name}` cannot be read with `.`; match on the case",
                                    node.span, env,
                                    help=f"write `match v {{ {obj.case.qualname}({name}: x) => ... }}`")
-            raise self.unknown_member(obj, name, node, env, list(obj.case.etype.methods))
+            raise self.unknown_member(obj, name, node, env, list(obj.case.etype.methods), call)
         if t is TupleValue:
             if name.isdigit():
                 i = int(name)
@@ -306,10 +311,10 @@ class ExprMixin:
             if b is not None:
                 return BuiltinBound(obj, b)
             members = list(PROPS.get(k, {})) + list(METHODS.get(k, {}))
-            raise self.unknown_member(obj, name, node, env, members)
-        raise self.unknown_member(obj, name, node, env, [])
+            raise self.unknown_member(obj, name, node, env, members, call)
+        raise self.unknown_member(obj, name, node, env, [], call)
 
-    def unknown_member(self, obj, name, node, env, members):
+    def unknown_member(self, obj, name, node, env, members, call: bool = False):
         import difflib
         tn = type_name(obj)
         help_ = None
@@ -323,7 +328,8 @@ class ExprMixin:
             help_ = "did you mean " + ", ".join(f"`{c}`" for c in close) + "?"
         if name == "length" and tn in ("Int", "Float", "Bool"):
             help_ = None
-        return self.abandon("A.TYPE.UNKNOWN_FIELD" if not members or name not in members else "A.TYPE.UNKNOWN_METHOD",
+        # a missing member used as a call callee is an unknown method (BUG-0012)
+        return self.abandon("A.TYPE.UNKNOWN_METHOD" if call else "A.TYPE.UNKNOWN_FIELD",
                             f"{tn} has no field or method `{name}`", node.span, env, help=help_)
 
     def type_member(self, tv: TypeValue, name: str, node, env):
