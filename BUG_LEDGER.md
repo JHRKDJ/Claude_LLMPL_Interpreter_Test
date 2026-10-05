@@ -211,7 +211,7 @@ Regression test failed before fix: yes (3 of 4; the fourth pins runtime behaviou
 Fix: the call's full substitution (types and effects) is applied to its return type;
   `substitute` replaces a type variable only by a type, and effect variables inside
   function-type effects by their bound sets (lang/check/callcheck.py, lang/typesys.py).
-Commit: (pending)
+Commit: 139d451
 Status: fixed
 
 BUG-0014
@@ -222,7 +222,7 @@ Minimal reproduction: tests/regressions/test_bug_0014_empty_destructuring.py
 Regression test failed before fix: yes (all 3)
 Fix: an empty destructuring pattern is `S.SYNTAX.UNEXPECTED_TOKEN` ("needs at least
   one name") (lang/syntax/parser.py).
-Commit: (pending)
+Commit: f909cfc
 Status: fixed
 
 BUG-0015
@@ -238,5 +238,5 @@ Regression test failed before fix: yes (3 of 4; qualified access was already typ
 Fix: names bound by named imports are recorded and rebound to the filled entries
   after signature construction (lang/check/typecheck.py). LocalFlow now passes
   verified mode with zero errors and its manifest selects verified.
-Commit: (pending)
+Commit: c596dfb
 Status: fixed
