@@ -462,7 +462,7 @@ Minimal reproduction: tests/regressions/test_bug_0031_yield_count_paths.py
 Regression test failed before fix: yes (5 of 11)
 Fix: a path analysis over capped yield counts (fall-through/return/break/continue,
   throws dropped, loop fixpoint) replaces the syntactic count (lang/check/yieldflow.py).
-Commit: PENDING
+Commit: 4078e43
 Status: fixed
 
 BUG-0032
@@ -474,5 +474,5 @@ Minimal reproduction: tests/regressions/test_bug_0032_defer_effect_aggregate.py
 Regression test failed before fix: yes
 Fix: aggregate only when the body can fail or more than one cleanup can fail
   (V3 5.6 table) (lang/check/walk.py).
-Commit: PENDING
+Commit: 4078e43
 Status: fixed
