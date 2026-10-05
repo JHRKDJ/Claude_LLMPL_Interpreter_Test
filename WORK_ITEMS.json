@@ -1849,7 +1849,7 @@
   {
    "id": "AUD2-T09",
    "title": "Formatter refuses code with comments in common positions; inline comment moves; stdlib not canonical",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

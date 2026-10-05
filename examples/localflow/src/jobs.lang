@@ -102,7 +102,13 @@ async fn workUntil(clock: Clock, a: Attempt, ms: Int) {
 
 // --------------------------------------------------------------------- attempt loop
 // Runs a started job to completion. Never throws: failures become data.
-pub async fn perform(job: Job, inputs: Map[Str, Dyn], ctx: Context, p: Progress, startMs: Int) -> Completion {
+pub async fn perform(
+    job: Job,
+    inputs: Map[Str, Dyn],
+    ctx: Context,
+    p: Progress,
+    startMs: Int,
+) -> Completion {
     let k = 1
     let start = startMs
     while true {
@@ -133,7 +139,14 @@ pub async fn perform(job: Job, inputs: Map[Str, Dyn], ctx: Context, p: Progress,
     return Completion(id: job.id, ok: false, attempts: k, output: null, error: null, subreport: null)
 }
 
-async fn attemptWithTimeout(job: Job, k: Int, inputs: Map[Str, Dyn], ctx: Context, p: Progress, a: Attempt) -> Dyn throws JobFailed {
+async fn attemptWithTimeout(
+    job: Job,
+    k: Int,
+    inputs: Map[Str, Dyn],
+    ctx: Context,
+    p: Progress,
+    a: Attempt,
+) -> Dyn throws JobFailed {
     return match a.deadline {
         Some(d) => try within ctx.clock.t0 + d.millis {
             try await attempt(job, k, inputs, ctx, p, a)
@@ -145,7 +158,14 @@ async fn attemptWithTimeout(job: Job, k: Int, inputs: Map[Str, Dyn], ctx: Contex
     }
 }
 
-async fn attempt(job: Job, k: Int, inputs: Map[Str, Dyn], ctx: Context, p: Progress, a: Attempt) -> Dyn throws JobFailed {
+async fn attempt(
+    job: Job,
+    k: Int,
+    inputs: Map[Str, Dyn],
+    ctx: Context,
+    p: Progress,
+    a: Attempt,
+) -> Dyn throws JobFailed {
     let c = job.config
     return match job.kind {
         Kind.Compute => await compute(c, ctx.clock, a)
@@ -237,7 +257,13 @@ async fn external(c: Map[Str, Dyn], k: Int, clock: Clock, a: Attempt) -> Dyn thr
 
 // `rank` orders simultaneous answers: mirror i answers i nanoseconds after the logical
 // instant, so the earliest mirror wins a tie (§4.2) without changing logical time.
-async fn callProvider(m: Map[Str, Dyn], k: Int, clock: Clock, a: Attempt, rank: Int) -> Dyn throws JobFailed {
+async fn callProvider(
+    m: Map[Str, Dyn],
+    k: Int,
+    clock: Clock,
+    a: Attempt,
+    rank: Int,
+) -> Dyn throws JobFailed {
     let script = match m.getOrDefault("script", null) {
         s: List[Dyn] => s
         _ => ["ok"]
@@ -376,7 +402,12 @@ fn transformText(op: Str, text: Str) -> Str throws JobFailed {
 }
 
 // --------------------------------------------------------------------- map (§4.4)
-async fn mapItems(c: Map[Str, Dyn], inputs: Map[Str, Dyn], clock: Clock, a: Attempt) -> Dyn throws JobFailed {
+async fn mapItems(
+    c: Map[Str, Dyn],
+    inputs: Map[Str, Dyn],
+    clock: Clock,
+    a: Attempt,
+) -> Dyn throws JobFailed {
     let source = if c.containsKey("items") {
         c.getOrDefault("items", null)
     } else {
@@ -423,7 +454,14 @@ async fn mapItems(c: Map[Str, Dyn], inputs: Map[Str, Dyn], clock: Clock, a: Atte
     return out
 }
 
-async fn mapItem(op: Str, x: Int, failOn: List[Int], clock: Clock, a: Attempt, endMs: Int) -> Int throws ItemFailed {
+async fn mapItem(
+    op: Str,
+    x: Int,
+    failOn: List[Int],
+    clock: Clock,
+    a: Attempt,
+    endMs: Int,
+) -> Int throws ItemFailed {
     await workUntil(clock, a, endMs)
     if failOn.contains(x) {
         throw ItemFailed(item: x)
@@ -490,7 +528,13 @@ fn check(c: Map[Str, Dyn], inputs: Map[Str, Dyn]) -> Dyn throws JobFailed {
 }
 
 // --------------------------------------------------------------------- subworkflow (§4.7)
-async fn subworkflow(job: Job, c: Map[Str, Dyn], ctx: Context, p: Progress, a: Attempt) -> Dyn throws JobFailed {
+async fn subworkflow(
+    job: Job,
+    c: Map[Str, Dyn],
+    ctx: Context,
+    p: Progress,
+    a: Attempt,
+) -> Dyn throws JobFailed {
     let name = cfgStr(c, "workflow")
     let wf = match ctx.workflows.get(name) {
         Some(w) => w

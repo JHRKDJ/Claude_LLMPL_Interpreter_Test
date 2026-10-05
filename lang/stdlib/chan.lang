@@ -5,18 +5,25 @@
 // Receives until the channel is closed and returns every message in order.
 pub async fn drain[T](rx: ReceivePort[T]) -> List[T] {
     let out = MutableList[T]()
-    for await v in rx { out.push(v) }
+    for await v in rx {
+        out.push(v)
+    }
     return out.freeze()
 }
 
 async fn forward[T](rx: ReceivePort[T], tx: SendPort[T]) throws ChannelClosed {
-    for await v in rx { try await tx.send(v) }
+    for await v in rx {
+        try await tx.send(v)
+    }
 }
 
 // Fan-in: forwards every message from `inputs` into `out` until all inputs close.
 // Messages from one input keep their order; interleaving across inputs follows
 // the global commit sequence.
-pub async fn fanIn[T](inputs: List[ReceivePort[T]], out: SendPort[T]) throws ChannelClosed, AggregateException {
+pub async fn fanIn[T](
+    inputs: List[ReceivePort[T]],
+    out: SendPort[T],
+) throws ChannelClosed, AggregateException {
     parallel {
         for rx in inputs {
             cancel.check()
@@ -26,10 +33,18 @@ pub async fn fanIn[T](inputs: List[ReceivePort[T]], out: SendPort[T]) throws Cha
 }
 
 // A request paired with the port its reply must be sent on (request-response).
-pub record Request[Q, A] { id: Int, body: Q, reply: SendPort[A] }
+pub record Request[Q, A] {
+    id: Int
+    body: Q
+    reply: SendPort[A]
+}
 
 // Sends one request carrying a fresh reply port and waits for its answer.
-pub async fn ask[Q, A](server: SendPort[Request[Q, A]], id: Int, body: Q) -> A throws ChannelClosed {
+pub async fn ask[Q, A](
+    server: SendPort[Request[Q, A]],
+    id: Int,
+    body: Q,
+) -> A throws ChannelClosed {
     let replies = Channel[A].rendezvous()
     let rx = replies.receiver()
     try await server.send(Request(id: id, body: body, reply: replies.sender()))
@@ -37,12 +52,22 @@ pub async fn ask[Q, A](server: SendPort[Request[Q, A]], id: Int, body: Q) -> A t
 }
 
 // Serves requests until the request channel closes, answering each with `handle`.
-pub async fn serve[Q, A](requests: ReceivePort[Request[Q, A]], handle: fn(Q) -> A) throws ChannelClosed {
-    for await req in requests { try await req.reply.send(handle(req.body)) }
+pub async fn serve[Q, A](
+    requests: ReceivePort[Request[Q, A]],
+    handle: fn(Q) -> A,
+) throws ChannelClosed {
+    for await req in requests {
+        try await req.reply.send(handle(req.body))
+    }
 }
 
 // Worker pool: `n` workers compete for jobs and send `work(job)` to `results`.
-pub async fn workerPool[J, R](n: Int, jobs: ReceivePort[J], results: SendPort[R], work: fn(J) -> R) throws ChannelClosed, AggregateException {
+pub async fn workerPool[J, R](
+    n: Int,
+    jobs: ReceivePort[J],
+    results: SendPort[R],
+    work: fn(J) -> R,
+) throws ChannelClosed, AggregateException {
     parallel {
         for _ in 0..n {
             cancel.check()
@@ -51,6 +76,12 @@ pub async fn workerPool[J, R](n: Int, jobs: ReceivePort[J], results: SendPort[R]
     }
 }
 
-async fn serveJobs[J, R](jobs: ReceivePort[J], results: SendPort[R], work: fn(J) -> R) throws ChannelClosed {
-    for await j in jobs { try await results.send(work(j)) }
+async fn serveJobs[J, R](
+    jobs: ReceivePort[J],
+    results: SendPort[R],
+    work: fn(J) -> R,
+) throws ChannelClosed {
+    for await j in jobs {
+        try await results.send(work(j))
+    }
 }

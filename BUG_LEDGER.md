@@ -569,3 +569,21 @@ Fix: lang/check/walk.py, selectcheck.py, callcheck.py, types.py,
   lang/runtime/equality.py, interp/conc.py, interp/selectx.py.
 Commit: 1754ff9
 Status: fixed
+
+BUG-0040
+Origin: second independent audit (types auditor, T09)
+Subsystems: formatter
+Symptom: `lang format` refused ordinary code with a trailing comment after `{`, a
+  match header, `else {`, a map entry, a call argument or between contract clauses
+  (self-verification compared the comment's own-line flag); function headers longer
+  than 100 columns were not wrapped; the shipped std.chan was not canonical.
+Minimal reproduction: tests/regressions/test_bug_0040_formatter_trailing_comments.py
+Regression test failed before fix: yes (all 7 comment cases; wrapping and stdlib cases
+  added with the fix)
+Fix: placement is no longer part of the equivalence check (comment text and order
+  still are); match-arm and contract-clause comments stay attached to their item;
+  parameter lists over the width wrap one per line with a trailing comma; std and
+  LocalFlow sources reformatted (lang/format/__init__.py, equiv.py). Inline block
+  comments inside a single-line list still move after the list (text and order kept).
+Commit: PENDING
+Status: fixed

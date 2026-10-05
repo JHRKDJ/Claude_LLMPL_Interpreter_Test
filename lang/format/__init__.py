@@ -151,6 +151,18 @@ class Formatter:
                 self.out.append_to_last("  " + c.text.rstrip())
                 self.ci += 1
 
+    def take_trailing(self, end: int):
+        """The text of a single-line comment sharing the source line where an item ends,
+        consumed so it stays attached to that item (BUG-0040)."""
+        end_line = self.line_of(max(end - 1, 0))
+        if self.ci < len(self.comments):
+            c = self.comments[self.ci]
+            if c.span.start >= end - 1 and not c.own_line and self.line_of(c.span.start) == end_line \
+                    and "\n" not in c.text:
+                self.ci += 1
+                return c.text.rstrip()
+        return None
+
     def flush_comments(self, pos: int, indent: int) -> None:
         self.leading_comments(pos, indent)
 
@@ -284,23 +296,29 @@ class Formatter:
         else:
             self.out.line(ind, c.name + "(" + ", ".join(f"{f.name}: {self.type_(f.type)}" for f in c.fields) + ")")
 
-    def fn_header(self, d: A.FnDecl) -> str:
+    def fn_header(self, d: A.FnDecl, ind: int = 0) -> str:
         s = "pub " if d.is_pub else ""
         if d.is_async:
             s += "async "
         if d.is_resource:
             s += "resource "
-        s += f"fn {d.name}{self.tparams(d.type_params)}({self.params(d.params)})"
+        s += f"fn {d.name}{self.tparams(d.type_params)}"
+        tail = ""
         if d.yields is not None:
-            s += f" yields {self.type_(d.yields)}"
+            tail += f" yields {self.type_(d.yields)}"
         elif d.ret is not None:
-            s += f" -> {self.type_(d.ret)}"
+            tail += f" -> {self.type_(d.ret)}"
         if d.throws is not None:
-            s += " throws " + ", ".join(self.type_(t) for t in d.throws)
-        return s
+            tail += " throws " + ", ".join(self.type_(t) for t in d.throws)
+        one_line = f"{s}({self.params(d.params)}){tail}"
+        if len(INDENT * ind + one_line + " {") <= WIDTH or not d.params:
+            return one_line
+        # over the width: one parameter per line with a trailing comma (SPEC-025; BUG-0040)
+        inner = "".join(f"\n{INDENT * (ind + 1)}{self.param(p)}," for p in d.params)
+        return f"{s}({inner}\n{INDENT * ind}){tail}"
 
     def fn_decl(self, d: A.FnDecl, ind: int) -> None:
-        head = self.fn_header(d)
+        head = self.fn_header(d, ind)
         contracts = [("requires", e) for e in d.requires] + [("ensures", e) for e in d.ensures]
         if not contracts:
             if d.body is None:
@@ -309,8 +327,13 @@ class Formatter:
                 self.block_after(head, d.body, ind)
             return
         self.out.line(ind, head)
+        self.prev_end_line = self.line_of(d.span.start)
+        self.block_start = True  # no blank line between the header and the first clause
         for kw, e in contracts:
+            self.leading_comments(e.span.start, ind + 1)  # comments stay with their clause (BUG-0040)
             self.out.line(ind + 1, f"{kw} {self.expr(e, ind + 1)}")
+            self.trailing_comment(e.span.end)
+            self.block_start = False
         if d.body is not None:
             self.block_lines("{", d.body, ind)
 
@@ -609,7 +632,9 @@ class Formatter:
             self.out = saved_out
             lines.extend(pre)
             g = f" if {self.expr(arm.guard, ind + 1)}" if arm.guard is not None else ""
-            lines.append(INDENT * (ind + 1) + f"{self.pattern(arm.pattern)}{g} => {self.arm_body(arm.body, ind + 1)}")
+            text = INDENT * (ind + 1) + f"{self.pattern(arm.pattern)}{g} => {self.arm_body(arm.body, ind + 1)}"
+            trailing = self.take_trailing(arm.span.end)
+            lines.append(text + ("  " + trailing if trailing else ""))
         lines.append(INDENT * ind + "}")
         return "\n".join(lines)
 

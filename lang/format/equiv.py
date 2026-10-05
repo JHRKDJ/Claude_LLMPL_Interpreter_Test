@@ -6,7 +6,9 @@ import dataclasses
 from ..source import Span
 from ..syntax import ast as A
 
-IGNORED = {"span", "id", "ann", "name_span", "end_span", "guard_span"}
+# `own_line`: moving a trailing comment onto its own line is canonicalisation, not a
+# change (comment text and order are still compared; BUG-0040)
+IGNORED = {"span", "id", "ann", "name_span", "end_span", "guard_span", "own_line"}
 
 
 def _norm(x):

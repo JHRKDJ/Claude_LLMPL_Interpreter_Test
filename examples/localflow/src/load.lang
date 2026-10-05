@@ -126,7 +126,13 @@ fn scriptHangs(m: Map[Str, Dyn]) -> Bool {
 }
 
 // Kind-specific configuration checks (§4); returns a problem message or None.
-fn configProblem(kind: Kind, c: Map[Str, Dyn], deps: List[Str], subs: Map[Str, Dyn]?, top: Bool) -> Str? {
+fn configProblem(
+    kind: Kind,
+    c: Map[Str, Dyn],
+    deps: List[Str],
+    subs: Map[Str, Dyn]?,
+    top: Bool,
+) -> Str? {
     match kind {
         Kind.Compute => {
             let op = asStr(c.getOrDefault("op", null)).unwrapOr("")
