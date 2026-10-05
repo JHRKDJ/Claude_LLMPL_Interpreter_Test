@@ -129,3 +129,32 @@ def test_release_requires_verified(tmp_path):
 def test_repl_via_stdin(tmp_path):
     r = cli(["repl", "--clock", "virtual"], tmp_path, stdin="let x = 2\nfn sq(n: Int) -> Int {\n return n * n\n}\nsq(x)\n:quit\n")
     assert r.stdout.splitlines() == ["defined sq", "4"]
+
+
+GROUP = """async fn crash(n: Int) { await sleep(1.millis)
+    let xs = [1]
+    print(xs[n]) }
+async fn slow() { await sleep(1.seconds) }
+async fn main() { parallel { spawn crash(4)
+    spawn slow()
+    spawn slow()
+    spawn slow() } }
+"""
+
+
+def test_diagnostic_display_modes(tmp_path):
+    """default / quiet / deep / JSON views of one nested task-group failure (V3 6.12, 7.13.6)."""
+    p = write(tmp_path, "g.lang", GROUP)
+    default = cli(["run", "--clock=virtual", str(p)], tmp_path).stderr
+    assert "A.TASK.GROUP_FAILURE" in default and "A.INDEX.OUT_OF_RANGE" in default
+    assert "3 sibling task(s) cancelled" in default and "C.TASK.CANCELLED" not in default
+    quiet = cli(["run", "--clock=virtual", "--quiet", str(p)], tmp_path).stderr
+    assert "-->" in quiet and "|" not in quiet  # no snippets
+    assert "  - A.INDEX.OUT_OF_RANGE (main/parallel@5:19/1:crash)" in quiet  # flattened leaf
+    deep = cli(["run", "--clock=virtual", "--deep", str(p)], tmp_path).stderr
+    assert deep.count("C.TASK.CANCELLED") == 3  # nothing summarised in deep mode
+    js = cli(["run", "--clock=virtual", "--json", str(p)], tmp_path).stderr
+    doc = json.loads(js)
+    top = doc["diagnostics"][0]
+    assert top["code"]["stable_code"] == "A.TASK.GROUP_FAILURE"
+    assert [c["code"]["stable_code"] for c in top["children"]] == ["A.INDEX.OUT_OF_RANGE"] + ["C.TASK.CANCELLED"] * 3

@@ -22,7 +22,11 @@ If this file conflicts with V3, V3 wins.
   `reason`, `stable_code` separately.
 - Text rendering (`render_text.py`): header `kind[CODE]: message`, `--> file:line:col`,
   source excerpt with labels, expected/found, values, notes, help, fixes, task path,
-  stack with frame variables, children (aggregates, task groups).
+  stack with frame variables, children (aggregates, task groups). Human views only
+  (7.13.6): default mode summarises two or more cancelled siblings in one line;
+  quiet mode prints one header per diagnostic plus its flattened leaf failures;
+  deep mode summarises nothing and shows all frames and event histories. JSON is
+  always the canonical nested form.
 - Exit codes: 0 ok, 1 unhandled recoverable error, 2 static errors, 3 abandonment,
   4 hard termination, 130 cancelled; an `Int` returned by `main` is the exit code.
 

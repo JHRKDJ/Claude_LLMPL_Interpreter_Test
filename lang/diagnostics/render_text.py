@@ -66,6 +66,10 @@ def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: i
         if mode != "quiet" and d.primary.span.file.text:
             lines += _snippet(d.primary.span, d.primary.message, gutter)
     if mode == "quiet":
+        # human view: nested failures flattened to their leaves (V3 7.13.6)
+        for leaf in leaves(d):
+            where = f" ({leaf.task.path})" if leaf.task is not None else ""
+            lines.append(f"  - {leaf.stable_code}{where}: {leaf.message}")
         return "\n".join(indent + l for l in lines)
     for lab in d.secondary:
         msg = lab.message or "related"
@@ -151,10 +155,30 @@ def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: i
         out.append(indent + "  caused by:")
         out.append(render(c, mode, indent + "    ", max_frames))
     if d.children:
-        out.append(indent + f"  contains {len(d.children)} failure(s):")
+        out.append(indent + f"  contains {len(d.children)} child report(s):")
+        cancelled = [c for c in d.children if c.stable_code == "C.TASK.CANCELLED" and not c.children]
         for c in d.children:
+            if c in cancelled and mode != "deep" and len(cancelled) > 1:
+                continue
             out.append(render(c, mode, indent + "    ", max_frames))
+        if mode != "deep" and len(cancelled) > 1:
+            # repetitive cancellations are summarised in the human view (V3 7.13.6)
+            paths = [c.task.path for c in cancelled if c.task is not None]
+            out.append(indent + f"    {len(cancelled)} sibling task(s) cancelled: " + ", ".join(paths[:6])
+                       + (f", ... (+{len(paths) - 6}, use --deep)" if len(paths) > 6 else ""))
     return "\n".join(out)
+
+
+def leaves(d: Diagnostic) -> list[Diagnostic]:
+    """Leaf failures of a nested diagnostic, in canonical (task-path) order; cancelled
+    siblings are not failures and are omitted from the flattened view."""
+    out: list[Diagnostic] = []
+    for c in list(d.causes) + list(d.children):
+        if c.children or c.causes:
+            out.extend(leaves(c))
+        elif c.stable_code != "C.TASK.CANCELLED":
+            out.append(c)
+    return out
 
 
 def render_all(diags: Iterable[Diagnostic], mode: str = "default") -> str:
