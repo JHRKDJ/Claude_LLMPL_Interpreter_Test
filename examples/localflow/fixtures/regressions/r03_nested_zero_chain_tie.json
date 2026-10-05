@@ -1,0 +1,24 @@
+{
+  "workflow": "r03_nested_zero_chain_tie",
+  "maxConcurrency": 2,
+  "workflows": {
+    "tail": {
+      "workflow": "tail",
+      "jobs": [
+        {"id": "a", "kind": "compute", "config": {"op": "fib", "n": 3, "costMs": 10}},
+        {"id": "r1", "kind": "reduce", "deps": ["a"], "config": {"op": "sum"}},
+        {"id": "r2", "kind": "reduce", "deps": ["r1"], "config": {"op": "sum"}},
+        {"id": "r3", "kind": "reduce", "deps": ["r2"], "config": {"op": "sum"}},
+        {"id": "r4", "kind": "reduce", "deps": ["r3"], "config": {"op": "sum"}},
+        {"id": "r5", "kind": "reduce", "deps": ["r4"], "config": {"op": "sum"}}
+      ]
+    }
+  },
+  "jobs": [
+    {"id": "d1", "kind": "compute", "deps": ["sub"], "config": {"op": "fib", "n": 1, "costMs": 1}},
+    {"id": "d2", "kind": "compute", "deps": ["sub"], "config": {"op": "fib", "n": 2, "costMs": 1}},
+    {"id": "sub", "kind": "subworkflow", "config": {"workflow": "tail"}},
+    {"id": "x", "kind": "external", "config": {"latencyMs": 10}},
+    {"id": "w1", "kind": "compute", "config": {"op": "fib", "n": 5, "costMs": 5}}
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "workflow": "a10",
+  "cancelAfterMs": 7,
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "t",
+          "kind": "transform",
+          "config": {
+            "input": "../data/words.txt",
+            "output": "o.txt",
+            "op": "upper",
+            "latencyMs": 20
+          }
+        },
+        {
+          "id": "c",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 2,
+            "costMs": 3
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

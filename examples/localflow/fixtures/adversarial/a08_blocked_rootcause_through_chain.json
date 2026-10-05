@@ -1,0 +1,72 @@
+{
+  "workflow": "a08",
+  "jobs": [
+    {
+      "id": "f1",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "f2",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "m1",
+      "kind": "compute",
+      "deps": [
+        "f1"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "m2",
+      "kind": "compute",
+      "deps": [
+        "f2",
+        "ok"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "ok",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "leaf",
+      "kind": "compute",
+      "deps": [
+        "m2",
+        "m1"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    }
+  ]
+}

@@ -243,7 +243,9 @@ class WalkMixin:
                     result = self.expr(st.expr, sc)
                 else:
                     self.stmt(st, sc)
-                    result = T.UNIT
+                    # control leaves the block: its value is never produced (BUG-0010)
+                    result = T.NEVER if isinstance(st, (A.ReturnStmt, A.BreakStmt, A.ContinueStmt,
+                                                        A.ThrowStmt)) else T.UNIT
         finally:
             self.eff_stack.pop()
         if defer_throw and (defer_throw > 1 or len(body_coll.names) > 0):
@@ -270,6 +272,14 @@ class WalkMixin:
                 self.check_lambda_escape(st.value, "bound to a variable")
             if st.destructure:
                 items = t.items if isinstance(t, T.TTuple) else None
+                if t is not None and t is not DYN and not isinstance(t, (T.TTuple, T.TVar)) and t is not T.NEVER:
+                    self.oblig("S.TYPE.STATIC_MISMATCH", f"cannot destructure {t} into {len(st.names)} names: it is "
+                               f"not a tuple", st.value.span,
+                               help="unwrap the Option first (e.g. `match e { Some((a, b)) => ... }`)"
+                               if isinstance(t, T.TCon) and t.name == "Option" else None)
+                elif items is not None and len(items) != len(st.names):
+                    self.oblig("S.TYPE.STATIC_MISMATCH", f"tuple has {len(items)} elements, {len(st.names)} names "
+                               f"given", st.value.span)
                 for i, (name, span) in enumerate(st.names):
                     it = items[i] if items is not None and i < len(items) else DYN
                     sc.vars[name] = (it, "let", span)

@@ -1,0 +1,46 @@
+{
+  "workflow": "a11",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "deps": [
+        "b"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "deps": [
+        "a",
+        "ghost"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "x",
+      "kind": "map",
+      "config": {
+        "op": "inc"
+      }
+    }
+  ]
+}

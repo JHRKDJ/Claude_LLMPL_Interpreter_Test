@@ -26,6 +26,7 @@ PREC = {"||": 1, "&&": 2, "==": 3, "!=": 3, "<": 4, "<=": 4, ">": 4, ">=": 4,
         "+": 7, "-": 7, "*": 8, "/": 8, "%": 8}
 NONASSOC = {"==", "!=", "<", "<=", ">", ">="}
 P_IS, P_RANGE, P_UNARY, P_POSTFIX, P_LOW = 5, 6, 9, 10, 0
+BLOCKY = (A.If, A.Match, A.Use, A.Parallel, A.Within, A.Select, A.Spawn, A.Lambda)
 
 
 class FormatError(ValueError):
@@ -108,6 +109,7 @@ class Formatter:
         self.out = Out()
         self.prev_end_line: Optional[int] = None
         self.block_start = False
+        self.stmt_level = False
 
     # ------------------------------------------------------------ positions
     def line_of(self, pos: int) -> int:
@@ -162,12 +164,13 @@ class Formatter:
             self.trailing_comment(imp.span.end)
         first = True
         for d in m.decls:
+            # the separating blank line goes *before* the declaration's leading comments,
+            # so a comment stays attached to the declaration it documents
+            if (m.imports or not first) and not (isinstance(d, A.ConstDecl) and self._prev_decl_const
+                                                 and not self._source_gap(self._first_pos(d))):
+                self.out.blank()
             self.leading_comments(d.span.start, 0)
-            if m.imports or not first:
-                if isinstance(d, A.ConstDecl) and self._prev_decl_const and not self._source_gap(d):
-                    pass
-                else:
-                    self.out.blank()
+            self.gap_before(d.span.start)
             self.decl(d, 0)
             self.trailing_comment(d.span.end)
             self._prev_decl_const = isinstance(d, A.ConstDecl)
@@ -179,8 +182,14 @@ class Formatter:
 
     _prev_decl_const = False
 
-    def _source_gap(self, d) -> bool:
-        return self.prev_end_line is not None and self.line_of(d.span.start) - self.prev_end_line > 1
+    def _source_gap(self, pos: int) -> bool:
+        return self.prev_end_line is not None and self.line_of(pos) - self.prev_end_line > 1
+
+    def _first_pos(self, node) -> int:
+        """Start of the node or of the first pending comment before it."""
+        if self.ci < len(self.comments) and self.comments[self.ci].span.start < node.span.start:
+            return self.comments[self.ci].span.start
+        return node.span.start
 
     def import_(self, imp: A.Import) -> str:
         s = "import " + ".".join(imp.path)
@@ -241,12 +250,11 @@ class Formatter:
         self.block_start = True
         prev_kind = None
         for pos, kind, m in members:
-            self.leading_comments(pos, ind + 1)
             if prev_kind is not None and (kind == "method" or prev_kind == "method" or kind != prev_kind):
                 self.out.blank()
                 self.block_start = False
-            else:
-                self.gap_before(pos)
+            self.leading_comments(pos, ind + 1)
+            self.gap_before(pos)
             if kind == "field":
                 self.field(m, ind + 1)
             elif kind == "inv":
@@ -378,7 +386,9 @@ class Formatter:
     def stmt(self, st, ind: int) -> None:
         c = st.__class__
         if c is A.ExprStmt:
+            self.stmt_level = isinstance(st.expr, A.If)  # statement-position `if` keeps block layout
             self.expr_line(ind, "", st.expr, "")
+            self.stmt_level = False
         elif c is A.LetStmt:
             kw = "const" if st.is_const else "let"
             if st.destructure:
@@ -551,9 +561,30 @@ class Formatter:
             return s + " " + self.sub_block(e.body, ind)
         return s + " => " + self.expr(e.body, ind)
 
+    def _single_expr(self, b) -> str | None:
+        """Inline text of a block holding exactly one simple expression, else None."""
+        if not isinstance(b, A.Block) or len(b.stmts) != 1 or not isinstance(b.stmts[0], A.ExprStmt):
+            return None
+        if any(c.span.start >= b.span.start and c.span.start < b.span.end for c in self.comments[self.ci:]):
+            return None
+        if any(isinstance(n, BLOCKY) for n in A.walk(b.stmts[0].expr)):
+            return None  # nested blocks keep their own layout (and their comments)
+        text = self.expr(b.stmts[0].expr, 0)
+        return None if "\n" in text else text
+
     def e_If(self, e, ind):
         if e.ann.get("block_expr"):
             return self.sub_block(e.then, ind)
+        if not self.stmt_level and isinstance(e.else_, A.Block):
+            # an if *expression* with one simple expression per branch stays on one line
+            saved = (self.ci, self.prev_end_line, self.block_start)
+            a, b = self._single_expr(e.then), self._single_expr(e.else_)
+            if a is not None and b is not None and not any(isinstance(n, BLOCKY) for n in A.walk(e.cond)):
+                flat = f"if {self.expr(e.cond, ind)} {{ {a} }} else {{ {b} }}"
+                if "\n" not in flat and len(INDENT * ind) + len(flat) <= WIDTH:
+                    return flat
+            self.ci, self.prev_end_line, self.block_start = saved
+        self.stmt_level = False
         s = "if " + self.expr(e.cond, ind) + " " + self.sub_block(e.then, ind)
         if e.else_ is not None:
             if isinstance(e.else_, A.If):

@@ -1,0 +1,373 @@
+// The execution engine (PROGRAM_SPEC §5): dependency resolution, bounded concurrent
+// starts, same-instant event batching, fail-fast and external cancellation.
+//
+// Each started job runs in its own child task (`runner`) inside one task group. A
+// runner never fails: it sends a `Done` event with its completion, or — if it is
+// cancelled — a `Cancelled` event from its cleanup. The engine aborts the group by
+// failing the group body, which cancels the running jobs (structured fail-fast).
+
+import model.{Job, Workflow, Status, Completion, Event, Context, JobFailed, isFinal, isBad, statusName, nowMs}
+import jobs.{Progress, perform}
+import report
+
+// Mutable state of one job, owned by the engine task.
+pub mutable record JobState {
+    status: Status
+    start: Int?
+    end: Int?
+    attempts: Int
+    output: Dyn
+    error: JobFailed?
+    blockedBy: Str?
+    rootCause: List[Str]?
+    skipReason: Str?
+    subreport: Dyn
+}
+
+// Mutable execution state of one run, owned by the engine task.
+pub mutable record RunState {
+    jobs: List[Job]
+    states: MutableMap[Str, JobState]
+    running: Int
+    limit: Int
+    now: Int
+    cancelled: Bool
+
+    invariant running >= 0 && running <= limit
+
+    fn of(self, id: Str) -> JobState {
+        return self.states.get(id).expect("unknown job {id}")
+    }
+
+    fn get(self, id: Str) -> Status {
+        return self.of(id).status
+    }
+
+    fn allFinal(self) -> Bool {
+        return self.jobs.all(fn(j) => isFinal(self.get(j.id)))
+    }
+
+    fn settle(self, id: Str, status: Status) {
+        let js = self.of(id)
+        js.status = status
+        js.end = Some(self.now)
+    }
+
+    fn markStarted(self, id: Str)
+        requires self.get(id) == Status.Ready && self.running < self.limit
+    {
+        let js = self.of(id)
+        js.status = Status.Running
+        js.start = Some(self.now)
+        self.running = self.running + 1
+    }
+
+    fn markFinished(self, c: Completion)
+        requires self.get(c.id) == Status.Running
+    {
+        self.running = self.running - 1
+        self.settle(c.id, if c.ok { Status.Succeeded } else { Status.Failed })
+        let js = self.of(c.id)
+        js.attempts = c.attempts
+        js.output = c.output
+        js.error = c.error
+        js.subreport = c.subreport
+    }
+
+    fn markCancelled(self, id: Str, attempts: Int, subreport: Dyn)
+        requires self.get(id) == Status.Running
+    {
+        self.running = self.running - 1
+        self.settle(id, Status.Cancelled)
+        let js = self.of(id)
+        js.attempts = attempts
+        js.error = Some(JobFailed(class: "cancelled", message: "cancelled while running"))
+        js.subreport = subreport
+    }
+
+    // Every job that has not finished ends now (§5.4, §5.5).
+    fn endAll(self) {
+        for j in self.jobs {
+            match self.get(j.id) {
+                Status.Pending | Status.Ready => self.settle(j.id, Status.NotRun)
+                _ => ()
+            }
+        }
+    }
+}
+
+// Result of a (possibly nested) run.
+pub record RunOutcome {
+    status: Str
+    report: Map[Str, Dyn]
+    outputs: Map[Str, Dyn]
+}
+
+error Abort {
+    at: Int
+}
+
+fn newState(wf: Workflow) -> RunState {
+    let states = MutableMap[Str, JobState]()
+    for j in wf.jobs {
+        states.set(j.id, JobState(
+                status: Status.Pending,
+                start: null,
+                end: null,
+                attempts: 0,
+                output: null,
+                error: null,
+                blockedBy: null,
+                rootCause: null,
+                skipReason: null,
+                subreport: null,
+            ))
+    }
+    return RunState(jobs: wf.jobs, states: states, running: 0, limit: wf.maxConcurrency, now: 0, cancelled: false)
+}
+
+// Settles pending jobs whose dependencies are final (§5.2 step 2), until nothing changes.
+fn resolve(st: RunState) {
+    let changed = true
+    while changed {
+        changed = false
+        for j in st.jobs {
+            if st.get(j.id) != Status.Pending || !j.deps.all(fn(d) => isFinal(st.get(d))) {
+                continue
+            }
+            let bad = j.deps.filter(fn(d) => isBad(st.get(d)))
+            let js = st.of(j.id)
+            if !bad.isEmpty() {
+                st.settle(j.id, Status.Blocked)
+                js.blockedBy = Some(bad[0])
+                let roots = MutableSet.of()
+                for d in bad {
+                    match st.get(d) {
+                        Status.Failed | Status.Cancelled => roots.add(d)
+                        _ => {
+                            for r in st.of(d).rootCause.unwrapOr([]) {
+                                roots.add(r)
+                            }
+                        }
+                    }
+                }
+                js.rootCause = Some(st.jobs.map(fn(x) => x.id).filter(fn(x) => roots.contains(x)))
+            } else if j.deps.any(fn(d) => st.get(d) == Status.Skipped) {
+                st.settle(j.id, Status.Skipped)
+                js.skipReason = Some("upstream-skipped")
+            } else if conditionFalse(st, j) {
+                st.settle(j.id, Status.Skipped)
+                js.skipReason = Some("condition")
+            } else {
+                js.status = Status.Ready
+            }
+            changed = true
+        }
+    }
+}
+
+fn conditionFalse(st: RunState, j: Job) -> Bool {
+    return match j.when {
+        Some(w) => st.of(w.job).output != w.equals
+        None => false
+    }
+}
+
+// Ready jobs that may start now, in declaration order, within global and group limits.
+fn startable(st: RunState, wf: Workflow) -> List[Job] {
+    let out = MutableList[Job]()
+    let groupRunning = MutableMap[Str, Int]()
+    for j in st.jobs {
+        if st.get(j.id) == Status.Running {
+            match j.group {
+                Some(g) => groupRunning.set(g, groupRunning.getOrDefault(g, 0) + 1)
+                None => ()
+            }
+        }
+    }
+    let running = st.running
+    for j in st.jobs {
+        if st.get(j.id) != Status.Ready || running >= st.limit {
+            continue
+        }
+        let fits = match j.group {
+            Some(g) => groupRunning.getOrDefault(g, 0) < wf.groups.getOrDefault(g, 1)
+            None => true
+        }
+        if fits {
+            out.push(j)
+            running = running + 1
+            match j.group {
+                Some(g) => groupRunning.set(g, groupRunning.getOrDefault(g, 0) + 1)
+                None => ()
+            }
+        }
+    }
+    return out.freeze()
+}
+
+fn inputsFor(st: RunState, j: Job) -> Map[Str, Dyn] {
+    let m = MutableMap[Str, Dyn]()
+    for d in j.deps {
+        if st.get(d) == Status.Succeeded {
+            m.set(d, st.of(d).output)
+        }
+    }
+    return m.freeze()
+}
+
+// One job, in its own task. Reports its completion, or its cancellation from cleanup.
+async fn runner(job: Job, inputs: Map[Str, Dyn], ctx: Context, tx: SendPort[Event], startMs: Int) {
+    let p = Progress(attempts: 0, subreport: null, beat: Some(tx))
+    let done = false
+    defer {
+        if !done {
+            tx.trySend(Event.Cancelled(id: job.id, attempts: p.attempts, subreport: p.subreport))
+        }
+    }
+    let c = await perform(job, inputs, ctx, p, startMs)
+    done = true
+    tx.trySend(Event.Done(c: c))
+}
+
+// Runs a workflow. `cancelAt` is the external cancellation request time, if any; the
+// final (or, if this run is itself cancelled, the partial) report is stored in `sink`.
+pub async fn run(wf: Workflow, ctx: Context, cancelAt: Int?, sink: Progress) -> RunOutcome {
+    let st = newState(wf)
+    let t0 = ctx.clock.t0
+    let events = Channel[Event].unbounded()
+    let rx = events.receiver()
+    let tx = events.sender()
+    let finished = false
+    defer {
+        if !finished {
+            // this run is being cancelled from outside: record what its jobs reported
+            st.now = nowMs(ctx.clock)
+            drainCancellations(st, rx)
+            st.cancelled = true
+            st.endAll()
+            sink.subreport = report.build(wf, st)
+        }
+    }
+    let hasDeadline = cancelAt.isSome()
+    let deadline = t0 + cancelAt.unwrapOr(0).millis
+    heartbeat(sink)
+    let aborted = try parallel {
+        while true {
+            // a cancellation request due now is handled before anything starts (§5.2; LF-001)
+            if hasDeadline && st.now >= cancelAt.unwrapOr(0) && !st.allFinal() {
+                st.cancelled = true
+                throw Abort(at: st.now)
+            }
+            resolve(st)
+            for j in startable(st, wf) {
+                st.markStarted(j.id)
+                spawn runner(j, inputsFor(st, j), ctx, tx, st.now)
+            }
+            if st.allFinal() {
+                break
+            }
+            // wait for the next moment at which something happens …
+            let first = try select {
+                receive ev from rx => Some(ev)
+                when hasDeadline: at deadline => null
+            }
+                catch ChannelClosed => null
+            // … then record everything that happens at that moment (§5.2 step 1). All
+            // durations end exactly on the millisecond grid; the barrier keeps waiting
+            // while anything (including a nested run's heartbeat) is still arriving, so
+            // the batch is complete whatever order the scheduler runs ready tasks in.
+            let batch = MutableList[Event]()
+            match first {
+                Some(ev) => batch.push(ev)
+                None => ()
+            }
+            let active = true
+            while active {
+                await sleep(ctx.clock.barrierNs.nanos)
+                active = drainInto(rx, batch) > 0
+            }
+            st.now = nowMs(ctx.clock)
+            heartbeat(sink)
+            let failedNow = false
+            for ev in batch {
+                match ev {
+                    Event.Done(c) => {
+                        st.markFinished(c)
+                        failedNow = failedNow || !c.ok
+                    }
+                    Event.Cancelled(id, attempts, sub) => st.markCancelled(id, attempts, sub)
+                    Event.Busy => ()
+                }
+            }
+            if st.allFinal() {
+                break
+            }
+            if hasDeadline && st.now >= cancelAt.unwrapOr(0) {
+                st.cancelled = true
+                throw Abort(at: st.now)
+            }
+            if wf.failFast && failedNow {
+                throw Abort(at: st.now)
+            }
+        }
+        false
+    }
+        catch AggregateException => true
+    if aborted {
+        // the running jobs were cancelled by the group; collect their reports
+        drainCancellations(st, rx)
+        st.endAll()
+    }
+    finished = true
+    let rep = report.build(wf, st)
+    sink.subreport = rep
+    let outputs = MutableMap[Str, Dyn]()
+    for j in wf.jobs {
+        if st.get(j.id) == Status.Succeeded {
+            outputs.set(j.id, st.of(j.id).output)
+        }
+    }
+    return RunOutcome(status: report.statusOf(st), report: rep, outputs: outputs.freeze())
+}
+
+fn drainInto(rx: ReceivePort[Event], batch: MutableList[Event]) -> Int {
+    let n = 0
+    let more = true
+    while more {
+        match rx.tryReceive() {
+            TryReceive.Message(ev) => {
+                batch.push(ev)
+                n = n + 1
+            }
+            _ => {
+                more = false
+            }
+        }
+    }
+    return n
+}
+
+fn heartbeat(sink: Progress) {
+    match sink.beat {
+        Some(b) => b.trySend(Event.Busy)
+        None => ()
+    }
+}
+
+fn drainCancellations(st: RunState, rx: ReceivePort[Event]) {
+    let more = true
+    while more {
+        match rx.tryReceive() {
+            TryReceive.Message(Event.Cancelled(id, attempts, sub)) => {
+                if st.get(id) == Status.Running {
+                    st.markCancelled(id, attempts, sub)
+                }
+            }
+            TryReceive.Message(_) => ()
+            _ => {
+                more = false
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "workflow": "r01_ready_at_cancel_time",
+  "cancelAfterMs": 5,
+  "jobs": [
+    {"id": "a", "kind": "compute", "config": {"op": "fib", "n": 4, "costMs": 5}},
+    {"id": "b", "kind": "compute", "deps": ["a"], "config": {"op": "fib", "n": 5, "costMs": 0}},
+    {"id": "c", "kind": "compute", "deps": ["a"], "config": {"op": "fib", "n": 5, "costMs": 3}}
+  ]
+}

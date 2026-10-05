@@ -208,7 +208,10 @@ def main(argv=None) -> int:
     if getattr(args, "release", False) and getattr(args, "mode", None) == "draft":
         sys.stderr.write("error[S.MODE.RELEASE_REQUIRES_VERIFIED]: release builds require verified acceptance\n")
         return 2
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except BrokenPipeError:  # output piped into e.g. `head`
+        return 0
 
 
 if __name__ == "__main__":

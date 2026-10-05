@@ -1,0 +1,31 @@
+{
+  "workflow": "a01",
+  "maxConcurrency": 1,
+  "jobs": [
+    {
+      "id": "flaky",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 1
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 10
+      }
+    },
+    {
+      "id": "waiter",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 4,
+        "costMs": 1
+      }
+    }
+  ]
+}

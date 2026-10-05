@@ -1,0 +1,81 @@
+// Dependency-graph analysis: which jobs lie on a dependency cycle (PROGRAM_SPEC §3.4).
+//
+// Iterative Tarjan strongly-connected components (no recursion depth limits on large
+// generated workflows). A job is on a cycle if its component has more than one
+// member or it depends on itself. Result in declaration order.
+
+mutable record Tarjan {
+    index: MutableMap[Str, Int]
+    low: MutableMap[Str, Int]
+    onStack: MutableSet[Str]
+    stack: MutableList[Str]
+    members: MutableSet[Str]
+    counter: Int
+}
+
+pub fn cycleMembers(order: List[Str], edges: Map[Str, List[Str]]) -> List[Str] {
+    let t = Tarjan(
+        index: MutableMap[Str, Int](),
+        low: MutableMap[Str, Int](),
+        onStack: MutableSet.of(),
+        stack: MutableList[Str](),
+        members: MutableSet.of(),
+        counter: 0,
+    )
+    for root in order {
+        if !t.index.containsKey(root) {
+            visit(t, root, edges)
+        }
+    }
+    return order.filter(fn(id) => t.members.contains(id))
+}
+
+// One DFS from `root`, with an explicit work stack of (node, next edge position).
+fn visit(t: Tarjan, root: Str, edges: Map[Str, List[Str]]) {
+    let work = MutableList[(Str, Int)]()
+    enter(t, root)
+    work.push((root, 0))
+    while !work.isEmpty() {
+        let (v, i) = work.pop().unwrap()
+        let succ = edges.getOrDefault(v, [])
+        if i < succ.length {
+            work.push((v, i + 1))
+            let w = succ[i]
+            if !t.index.containsKey(w) {
+                enter(t, w)
+                work.push((w, 0))
+            } else if t.onStack.contains(w) {
+                t.low.set(v, t.low.getOrDefault(v, 0).min(t.index.getOrDefault(w, 0)))
+            }
+        } else {
+            // v is finished: propagate its low-link to the parent, then maybe pop a component
+            match work.last() {
+                Some((parent, _)) => t.low.set(parent, t.low.getOrDefault(parent, 0).min(t.low.getOrDefault(v, 0)))
+                None => ()
+            }
+            if t.low.getOrDefault(v, 0) == t.index.getOrDefault(v, 0) {
+                let comp = MutableList[Str]()
+                let more = true
+                while more {
+                    let w = t.stack.pop().unwrap()
+                    t.onStack.remove(w)
+                    comp.push(w)
+                    more = w != v
+                }
+                if comp.length > 1 || edges.getOrDefault(v, []).contains(v) {
+                    for c in comp {
+                        t.members.add(c)
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn enter(t: Tarjan, v: Str) {
+    t.index.set(v, t.counter)
+    t.low.set(v, t.counter)
+    t.counter = t.counter + 1
+    t.stack.push(v)
+    t.onStack.add(v)
+}

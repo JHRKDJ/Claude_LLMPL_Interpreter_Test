@@ -141,3 +141,30 @@ Fix: the advisory fires only when the select's value is discarded (statement
   (lang/check/selectcheck.py, walk.py).
 Commit: dcaa94f
 Status: fixed
+
+BUG-0009
+Origin: writing LocalFlow (graph.lang)
+Subsystems: static checker (type arguments in value position × destructuring)
+Symptom: (a) `MutableList[(Str, Int)]()` gave elements type Dyn, so matches on
+  `xs.last()` with tuple patterns were falsely reported non-exhaustive; (b)
+  `let (a, b) = xs.pop()` (an Option) was not reported although it can only abandon.
+Minimal reproduction: tests/regressions/test_bug_0009_tuple_type_args.py
+Regression test failed before fix: yes (2 of 3; the third pins the runtime backstop)
+Fix: type_from_value_expr converts tuple literals to tuple types; destructuring a
+  statically non-tuple value (or a tuple of the wrong arity) is
+  S.TYPE.STATIC_MISMATCH with an unwrap hint for Options (lang/check/expr.py, walk.py).
+Commit: (next commit)
+Status: fixed
+
+BUG-0010
+Origin: writing LocalFlow (load.lang)
+Subsystems: static checker (block typing × control flow)
+Symptom: a block ending in return/break/continue/throw had type Unit instead of
+  Never, so a match with a diverging arm (`None => { continue }`) produced Dyn and
+  later code lost static precision (false "open type" exhaustiveness warnings).
+Minimal reproduction: tests/regressions/test_bug_0010_diverging_blocks.py
+Regression test failed before fix: yes
+Fix: block() types a block whose last statement transfers control as Never
+  (lang/check/walk.py).
+Commit: (next commit)
+Status: fixed

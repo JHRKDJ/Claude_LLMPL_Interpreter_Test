@@ -1,0 +1,80 @@
+{
+  "workflow": "a06",
+  "jobs": [
+    {
+      "id": "v",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 4,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "chk",
+      "kind": "check",
+      "deps": [
+        "v"
+      ],
+      "config": {
+        "input": "v",
+        "op": "gt",
+        "value": 100
+      }
+    },
+    {
+      "id": "onlyIfBig",
+      "kind": "compute",
+      "deps": [
+        "chk"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      },
+      "when": {
+        "job": "chk",
+        "equals": true
+      }
+    },
+    {
+      "id": "sum",
+      "kind": "reduce",
+      "deps": [
+        "v",
+        "onlyIfBig"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "onlyIfSmall",
+      "kind": "compute",
+      "deps": [
+        "chk"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 2,
+        "costMs": 2
+      },
+      "when": {
+        "job": "chk",
+        "equals": false
+      }
+    },
+    {
+      "id": "sum2",
+      "kind": "reduce",
+      "deps": [
+        "v",
+        "onlyIfSmall"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    }
+  ]
+}

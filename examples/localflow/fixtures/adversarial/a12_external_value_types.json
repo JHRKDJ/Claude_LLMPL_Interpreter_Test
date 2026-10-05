@@ -1,0 +1,39 @@
+{
+  "workflow": "a12",
+  "jobs": [
+    {
+      "id": "obj",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": {
+          "k": [
+            1,
+            {
+              "z": null
+            }
+          ],
+          "s": "é"
+        }
+      }
+    },
+    {
+      "id": "neg",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": -5
+      }
+    },
+    {
+      "id": "mx",
+      "kind": "reduce",
+      "deps": [
+        "neg"
+      ],
+      "config": {
+        "op": "max"
+      }
+    }
+  ]
+}

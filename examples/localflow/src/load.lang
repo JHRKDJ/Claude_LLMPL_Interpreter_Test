@@ -1,0 +1,529 @@
+// Loading and validating workflow definitions (PROGRAM_SPEC §2, §3).
+//
+// The JSON document is dynamic data; every value is narrowed with a type pattern
+// before typed code relies on it. Validation collects *all* problems in the order
+// the spec prescribes instead of stopping at the first one.
+
+import std.json
+import model.{Kind, Retry, When, Job, Workflow, Problem}
+import graph
+
+const KINDS = ["compute", "external", "transform", "map", "reduce", "check", "subworkflow"]
+const STEPS = ["ok", "retryable", "permanent", "hang"]
+
+fn asMap(v: Dyn) -> Map[Str, Dyn]? {
+    return match v {
+        m: Map[Str, Dyn] => Some(m)
+        _ => None
+    }
+}
+
+fn asList(v: Dyn) -> List[Dyn]? {
+    return match v {
+        xs: List[Dyn] => Some(xs)
+        _ => None
+    }
+}
+
+fn asStr(v: Dyn) -> Str? {
+    return match v {
+        s: Str => Some(s)
+        _ => None
+    }
+}
+
+fn asInt(v: Dyn) -> Int? {
+    return match v {
+        n: Int => Some(n)
+        _ => None
+    }
+}
+
+fn asBool(v: Dyn) -> Bool? {
+    return match v {
+        b: Bool => Some(b)
+        _ => None
+    }
+}
+
+// Integer field with a default and a lower bound; None if present but invalid.
+fn intField(m: Map[Str, Dyn], key: Str, default: Int, minimum: Int) -> Int? {
+    return match m.get(key) {
+        None => Some(default)
+        Some(v) => match asInt(v) {
+            Some(n) if n >= minimum => Some(n)
+            _ => None
+        }
+    }
+}
+
+fn boolField(m: Map[Str, Dyn], key: Str) -> Bool? {
+    return match m.get(key) {
+        None => Some(false)
+        Some(v) => asBool(v)
+    }
+}
+
+fn validId(s: Str) -> Bool {
+    if s.isEmpty() {
+        return false
+    }
+    return s.chars().all(fn(c) => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-".contains(c))
+}
+
+fn isIntList(v: Dyn) -> Bool {
+    return match asList(v) {
+        Some(xs) => xs.all(fn(x) => asInt(x).isSome())
+        None => false
+    }
+}
+
+fn kindOf(s: Str) -> Kind? {
+    return match s {
+        "compute" => Some(Kind.Compute)
+        "external" => Some(Kind.External)
+        "transform" => Some(Kind.Transform)
+        "map" => Some(Kind.Map)
+        "reduce" => Some(Kind.Reduce)
+        "check" => Some(Kind.Check)
+        "subworkflow" => Some(Kind.Subworkflow)
+        _ => None
+    }
+}
+
+// Collects problems for one workflow (top level or sub-workflow).
+mutable record Problems {
+    items: MutableList[Problem]
+    workflow: Str?
+
+    fn add(self, code: Str, job: Str?, message: Str) {
+        self.items.push(Problem(code: code, job: job, workflow: self.workflow, jobs: null, message: message))
+    }
+}
+
+// Checks a step script ("ok" | "retryable" | "permanent" | "hang").
+fn validScript(m: Map[Str, Dyn]) -> Bool {
+    let lat = intField(m, "latencyMs", 10, 0)
+    let script = match m.get("script") {
+        None => Some(["ok"])
+        Some(v) => asList(v)
+    }
+    return match (lat, script) {
+        (Some(_), Some(steps)) => !steps.isEmpty() && steps.all(fn(s) => match asStr(s) {
+                Some(x) => STEPS.contains(x)
+                None => false
+            })
+        _ => false
+    }
+}
+
+fn scriptHangs(m: Map[Str, Dyn]) -> Bool {
+    let script = match m.get("script") {
+        None => []
+        Some(v) => asList(v).unwrapOr([])
+    }
+    return script.any(fn(s) => asStr(s) == Some("hang"))
+}
+
+// Kind-specific configuration checks (§4); returns a problem message or None.
+fn configProblem(kind: Kind, c: Map[Str, Dyn], deps: List[Str], subs: Map[Str, Dyn]?, top: Bool) -> Str? {
+    match kind {
+        Kind.Compute => {
+            let op = asStr(c.getOrDefault("op", null)).unwrapOr("")
+            if ["fib", "sumTo", "primeCount"].contains(op) {
+                if intField(c, "n", -1, 0).isNone() || !c.containsKey("n") {
+                    return Some("compute needs n >= 0")
+                }
+            } else if op == "assert" {
+                if asInt(c.getOrDefault("value", null)).isNone() || asInt(c.getOrDefault("expect", null)).isNone() {
+                    return Some("assert needs integer value and expect")
+                }
+            } else {
+                return Some("unknown compute op")
+            }
+            if intField(c, "costMs", 0, 0).isNone() {
+                return Some("costMs must be >= 0")
+            }
+        }
+        Kind.External => {
+            if !validScript(c) {
+                return Some("invalid external config")
+            }
+            match c.get("mirrors") {
+                Some(ms) => {
+                    let ok = match asList(ms) {
+                        Some(xs) => !xs.isEmpty() && xs.all(fn(m) => match asMap(m) {
+                                Some(mm) => validScript(mm)
+                                None => false
+                            })
+                        None => false
+                    }
+                    if !ok {
+                        return Some("invalid mirrors")
+                    }
+                }
+                None => ()
+            }
+        }
+        Kind.Transform => {
+            let input = asStr(c.getOrDefault("input", null))
+            let output = asStr(c.getOrDefault("output", null))
+            if input.isNone() || output.isNone() || output == Some("") {
+                return Some("transform needs input and output")
+            }
+            if !["upper", "number", "csvSum"].contains(asStr(c.getOrDefault("op", null)).unwrapOr("")) {
+                return Some("unknown transform op")
+            }
+            if intField(c, "latencyMs", 0, 0).isNone() {
+                return Some("latencyMs must be >= 0")
+            }
+            if boolField(c, "failAfterWrite").isNone() || boolField(c, "failCleanup").isNone() {
+                return Some("failAfterWrite and failCleanup must be booleans")
+            }
+        }
+        Kind.Map => {
+            let hasItems = c.containsKey("items")
+            let hasFrom = c.containsKey("from")
+            if hasItems == hasFrom {
+                return Some("map needs exactly one of items or from")
+            }
+            if hasItems && !isIntList(c.getOrDefault("items", null)) {
+                return Some("items must be integers")
+            }
+            if hasFrom && !deps.contains(asStr(c.getOrDefault("from", null)).unwrapOr("")) {
+                return Some("from must be a dependency")
+            }
+            if !["square", "inc"].contains(asStr(c.getOrDefault("op", null)).unwrapOr("")) {
+                return Some("unknown map op")
+            }
+            if c.containsKey("failOn") && !isIntList(c.getOrDefault("failOn", null)) {
+                return Some("failOn must be integers")
+            }
+            if intField(c, "itemLatencyMs", 0, 0).isNone() || intField(c, "parallelism", 4, 1).isNone() {
+                return Some("invalid map timing")
+            }
+            if boolField(c, "allowPartial").isNone() {
+                return Some("allowPartial must be a boolean")
+            }
+        }
+        Kind.Reduce => {
+            if !["sum", "max", "concat", "count"].contains(asStr(c.getOrDefault("op", null)).unwrapOr("")) {
+                return Some("unknown reduce op")
+            }
+        }
+        Kind.Check => {
+            let input = asStr(c.getOrDefault("input", null)).unwrapOr("")
+            let op = asStr(c.getOrDefault("op", null)).unwrapOr("")
+            if !deps.contains(input) || !["gt", "lt", "eq"].contains(op) || asInt(c.getOrDefault("value", null)).isNone() {
+                return Some("check needs a dependency input, op and integer value")
+            }
+        }
+        Kind.Subworkflow => {
+            match asStr(c.getOrDefault("workflow", null)) {
+                None => {
+                    return Some("subworkflow needs workflow")
+                }
+                Some(name) => {
+                    let known = match subs {
+                        Some(s) => s.containsKey(name)
+                        None => false
+                    }
+                    if !known {
+                        return Some("missing-workflow")
+                    }
+                }
+            }
+        }
+    }
+    return None
+}
+
+// Validates one workflow object; `top` is false for sub-workflows.
+fn validate(doc: Dyn, name: Str?, top: Bool, out: MutableList[Problem]) {
+    let probs = Problems(items: out, workflow: name)
+    let wf = match asMap(doc) {
+        Some(m) => m
+        None => {
+            probs.add("malformed", null, "workflow must be an object")
+            return
+        }
+    }
+    if asStr(wf.getOrDefault("workflow", null)).unwrapOr("").isEmpty() {
+        probs.add("malformed", null, "workflow id must be a non-empty string")
+    }
+    let jobs = match asList(wf.getOrDefault("jobs", null)) {
+        Some(xs) => xs
+        None => {
+            probs.add("malformed", null, "jobs must be an array")
+            []
+        }
+    }
+    if intField(wf, "maxConcurrency", 4, 1).isNone() {
+        probs.add("malformed", null, "maxConcurrency must be an integer >= 1")
+    }
+    let groupsOk = match wf.get("groups") {
+        None => true
+        Some(g) => match asMap(g) {
+            Some(gm) => gm.values().all(fn(v) => match asInt(v) {
+                    Some(n) => n >= 1
+                    None => false
+                })
+            None => false
+        }
+    }
+    if !groupsOk {
+        probs.add("malformed", null, "groups must map names to integers >= 1")
+    }
+    let groups = if groupsOk { asMap(wf.getOrDefault("groups", {})).unwrapOr(Map.empty()) } else { Map.empty() }
+    let onFailure = asStr(wf.getOrDefault("onFailure", "continue")).unwrapOr("")
+    if onFailure != "continue" && onFailure != "failFast" {
+        probs.add("malformed", null, "onFailure must be continue or failFast")
+    }
+    if wf.containsKey("cancelAfterMs") {
+        if !top {
+            probs.add("malformed", null, "sub-workflows cannot have cancelAfterMs")
+        } else if intField(wf, "cancelAfterMs", 0, 0).isNone() {
+            probs.add("malformed", null, "cancelAfterMs must be an integer >= 0")
+        }
+    }
+    if !top && wf.containsKey("workflows") {
+        probs.add("malformed", null, "sub-workflows cannot define workflows")
+    }
+    let subsOk = match wf.get("workflows") {
+        None => true
+        Some(s) => match asMap(s) {
+            Some(sm) => sm.values().all(fn(v) => asMap(v).isSome())
+            None => false
+        }
+    }
+    if !subsOk {
+        probs.add("malformed", null, "workflows must map names to workflow objects")
+    }
+    let subs = if top && subsOk { asMap(wf.getOrDefault("workflows", {})) } else { Some({}) }
+    let hasCancel = top && asInt(wf.getOrDefault("cancelAfterMs", null)).isSome()
+
+    let allIds = MutableSet.of()
+    let kindsById = MutableMap[Str, Str]()
+    for j in jobs {
+        match asMap(j) {
+            Some(jm) => match asStr(jm.getOrDefault("id", null)) {
+                Some(id) => {
+                    allIds.add(id)
+                    if !kindsById.containsKey(id) {
+                        kindsById.set(id, asStr(jm.getOrDefault("kind", null)).unwrapOr(""))
+                    }
+                }
+                None => ()
+            }
+            None => ()
+        }
+    }
+
+    let seen = MutableSet.of()
+    let graphEdges = MutableMap[Str, List[Str]]()
+    let order = MutableList[Str]()
+    for j in jobs {
+        let jm = match asMap(j) {
+            Some(m) => m
+            None => {
+                probs.add("malformed", null, "job must be an object")
+                continue
+            }
+        }
+        let rawId = asStr(jm.getOrDefault("id", null))
+        let jid: Str? = match rawId {
+            Some(s) if validId(s) => Some(s)
+            _ => null
+        }
+        if jid.isNone() {
+            probs.add("malformed", null, "job id must match [A-Za-z0-9_.-]+")
+        }
+        match jid {
+            Some(id) => {
+                if seen.contains(id) {
+                    probs.add("duplicate-id", Some(id), "duplicate job id")
+                }
+                seen.add(id)
+            }
+            None => ()
+        }
+        let kindName = asStr(jm.getOrDefault("kind", null)).unwrapOr("")
+        let kind = kindOf(kindName)
+        if kind.isNone() {
+            probs.add("malformed", jid, "unknown kind")
+        }
+        if kind == Some(Kind.Subworkflow) && !top {
+            probs.add("malformed", jid, "sub-workflows cannot contain subworkflow jobs")
+        }
+        let deps = match jm.get("deps") {
+            None => []
+            Some(d) => match asList(d) {
+                Some(xs) if xs.all(fn(x) => asStr(x).isSome()) && xs.distinct().length == xs.length => xs.map(fn(x) => asStr(x).unwrapOr(""))
+                _ => {
+                    probs.add("malformed", jid, "deps must be an array of distinct job ids")
+                    []
+                }
+            }
+        }
+        for d in deps {
+            if !allIds.contains(d) {
+                probs.add("missing-dependency", jid, "unknown dependency {d}")
+            }
+        }
+        match jm.get("when") {
+            Some(w) => {
+                let ok = match asMap(w) {
+                    Some(wm) => match (asStr(wm.getOrDefault("job", null)), asBool(wm.getOrDefault("equals", null))) {
+                        (Some(target), Some(_)) => deps.contains(target)
+                        _ => false
+                    }
+                    None => false
+                }
+                if !ok {
+                    probs.add("malformed", jid, "when must name a dependency and a boolean")
+                } else {
+                    let target = asStr(asMap(w).unwrapOr({}).getOrDefault("job", null)).unwrapOr("")
+                    if kindsById.getOrDefault(target, "") != "check" {
+                        probs.add("malformed", jid, "when must name a check job")
+                    }
+                }
+            }
+            None => ()
+        }
+        match jm.get("group") {
+            Some(g) => match asStr(g) {
+                Some(gn) if groups.containsKey(gn) => ()
+                _ => probs.add("malformed", jid, "unknown group")
+            }
+            None => ()
+        }
+        let retryOk = match jm.get("retry") {
+            None => true
+            Some(r) => match asMap(r) {
+                Some(rm) => intField(rm, "maxAttempts", 1, 1).isSome() && intField(rm, "backoffMs", 0, 0).isSome() && intField(rm, "multiplier", 1, 1).isSome()
+                None => false
+            }
+        }
+        if !retryOk {
+            probs.add("malformed", jid, "invalid retry policy")
+        }
+        if intField(jm, "timeoutMs", 1, 1).isNone() {
+            probs.add("malformed", jid, "timeoutMs must be an integer >= 1")
+        }
+        let cfg = match asMap(jm.getOrDefault("config", {})) {
+            Some(c) => c
+            None => {
+                probs.add("malformed", jid, "config must be an object")
+                continue
+            }
+        }
+        match kind {
+            Some(k) => match configProblem(k, cfg, deps, subs, top) {
+                Some("missing-workflow") => probs.add("missing-workflow", jid, "unknown sub-workflow")
+                Some(msg) => probs.add("malformed", jid, msg)
+                None => ()
+            }
+            None => ()
+        }
+        if kind == Some(Kind.External) && !jm.containsKey("timeoutMs") && !hasCancel {
+            let mirrorsHang = match asList(cfg.getOrDefault("mirrors", [])) {
+                Some(ms) => ms.any(fn(m) => scriptHangs(asMap(m).unwrapOr({})))
+                None => false
+            }
+            if scriptHangs(cfg) || mirrorsHang {
+                probs.add("malformed", jid, "a hang step needs timeoutMs or cancelAfterMs")
+            }
+        }
+        match rawId {
+            Some(id) => if !graphEdges.containsKey(id) {
+                graphEdges.set(id, deps.filter(fn(d) => allIds.contains(d)))
+                order.push(id)
+            }
+            None => ()
+        }
+    }
+    let onCycle = graph.cycleMembers(order.freeze(), graphEdges.freeze())
+    if !onCycle.isEmpty() {
+        out.push(Problem(
+                code: "cycle",
+                job: null,
+                workflow: name,
+                jobs: Some(onCycle),
+                message: "dependency cycle",
+            ))
+    }
+    if top {
+        match subs {
+            Some(s) => {
+                for (subName, sub) in s.entries() {
+                    validate(sub, Some(subName), false, out)
+                }
+            }
+            None => ()
+        }
+    }
+}
+
+// Builds the typed workflow; only called on documents that passed validation.
+fn build(m: Map[Str, Dyn], subs: Map[Str, Workflow]) -> Workflow {
+    let jobs = MutableList[Job]()
+    for j in asList(m.getOrDefault("jobs", [])).unwrapOr([]) {
+        let jm = asMap(j).unwrapOr({})
+        let r = asMap(jm.getOrDefault("retry", {})).unwrapOr({})
+        let when = match asMap(jm.getOrDefault("when", null)) {
+            Some(w) => Some(When(
+                    job: asStr(w.getOrDefault("job", null)).unwrapOr(""),
+                    equals: asBool(w.getOrDefault("equals", null)).unwrapOr(false),
+                ))
+            None => null
+        }
+        jobs.push(Job(id: asStr(jm.getOrDefault("id", null)).unwrapOr(""), kind: kindOf(asStr(jm.getOrDefault("kind", null)).unwrapOr("")).unwrapOr(Kind.Compute), deps: asList(jm.getOrDefault("deps", [])).unwrapOr([]).map(fn(x) => asStr(x).unwrapOr("")), when: when, group: asStr(jm.getOrDefault("group", null)), retry: Retry(
+                    maxAttempts: intField(r, "maxAttempts", 1, 1).unwrapOr(1),
+                    backoffMs: intField(r, "backoffMs", 0, 0).unwrapOr(0),
+                    multiplier: intField(r, "multiplier", 1, 1).unwrapOr(1),
+                ), timeoutMs: asInt(jm.getOrDefault("timeoutMs", null)), config: asMap(jm.getOrDefault("config", {})).unwrapOr({})))
+    }
+    let groups = MutableMap[Str, Int]()
+    for (g, v) in asMap(m.getOrDefault("groups", {})).unwrapOr({}).entries() {
+        groups.set(g, asInt(v).unwrapOr(1))
+    }
+    return Workflow(
+        name: asStr(m.getOrDefault("workflow", null)).unwrapOr(""),
+        jobs: jobs.freeze(),
+        maxConcurrency: intField(m, "maxConcurrency", 4, 1).unwrapOr(4),
+        groups: groups.freeze(),
+        failFast: asStr(m.getOrDefault("onFailure", "continue")) == Some("failFast"),
+        cancelAfterMs: asInt(m.getOrDefault("cancelAfterMs", null)),
+        workflows: subs,
+    )
+}
+
+pub error InvalidWorkflow {
+    problems: List[Problem]
+    doc: Dyn
+}
+
+// Parses and validates a workflow document: the typed workflow, or all problems.
+pub fn load(text: Str) -> Workflow throws InvalidWorkflow {
+    let doc = try json.parse(text)
+        catch JsonError as e => {
+            throw InvalidWorkflow(problems: [Problem(
+                        code: "malformed",
+                        job: null,
+                        workflow: null,
+                        jobs: null,
+                        message: "invalid JSON at line {e.line}: {e.message}",
+                    )], doc: null)
+        }
+    let problems = MutableList[Problem]()
+    validate(doc, null, true, problems)
+    if !problems.isEmpty() {
+        throw InvalidWorkflow(problems: problems.freeze(), doc: doc)
+    }
+    let top = asMap(doc).unwrapOr({})
+    let subs = MutableMap[Str, Workflow]()
+    for (name, sub) in asMap(top.getOrDefault("workflows", {})).unwrapOr({}).entries() {
+        subs.set(name, build(asMap(sub).unwrapOr({}), {}))
+    }
+    return build(top, subs.freeze())
+}

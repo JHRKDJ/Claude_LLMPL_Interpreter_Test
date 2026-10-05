@@ -1,0 +1,78 @@
+// LocalFlow command line: lang run --clock=virtual main.lang WORKFLOW.json OUTDIR
+// (PROGRAM_SPEC §1).
+
+import std.fs
+import std.json
+import model.{Workflow, Context, Clock, Problem}
+import load
+import load.{InvalidWorkflow}
+import engine
+import jobs.{Progress}
+import report
+
+fn dirName(path: Str) -> Str {
+    let parts = path.split("/")
+    if parts.length <= 1 {
+        return "."
+    }
+    let dir = parts.take(parts.length - 1).join("/")
+    return if dir == "" { "/" } else { dir }
+}
+
+fn writeReport(outDir: Str, rep: Map[Str, Dyn]) throws IOFailure, FileNotFound, PermissionDenied {
+    try fs.writeText(fs.join(outDir, "report.json"), json.stringify(rep, 2) + "\n")
+}
+
+fn field(m: Map[Str, Dyn], key: Str) -> Str {
+    return match m.getOrDefault(key, null) {
+        s: Str => s
+        _ => "-"
+    }
+}
+
+async fn main(args: List[Str]) -> Int throws IOFailure, FileNotFound, PermissionDenied {
+    if args.length != 2 {
+        print("usage: localflow WORKFLOW.json OUTDIR")
+        return 64
+    }
+    let wfPath = args[0]
+    let outDir = args[1]
+    try fs.makeDirs(outDir)
+    let text = try fs.readText(wfPath)
+    let wf = try load.load(text)
+        catch InvalidWorkflow as bad => {
+            let rep = report.invalid(bad.doc, bad.problems)
+            try writeReport(outDir, rep)
+            for p in bad.problems {
+                print("error {p.code} {p.job.unwrapOr("-")}")
+            }
+            let name = match rep.getOrDefault("workflow", null) {
+                s: Str => s
+                _ => "-"
+            }
+            print("workflow {name} INVALID")
+            return 10
+        }
+    let clock = Clock(t0: time.now(), barrierNs: 8000)
+    let ctx = Context(baseDir: dirName(wfPath), outDir: outDir, workflows: wf.workflows, clock: clock)
+    let sink = Progress(attempts: 0, subreport: null, beat: null)
+    let result = await engine.run(wf, ctx, wf.cancelAfterMs, sink)
+    try writeReport(outDir, result.report)
+    match result.report.getOrDefault("jobs", null) {
+        js: List[Dyn] => {
+            for j in js {
+                match j {
+                    jm: Map[Str, Dyn] => print("{field(jm, "id")} {field(jm, "status")}")
+                    _ => ()
+                }
+            }
+        }
+        _ => ()
+    }
+    print("workflow {wf.name} {result.status}")
+    return match result.status {
+        "SUCCEEDED" => 0
+        "CANCELLED" => 12
+        _ => 11
+    }
+}

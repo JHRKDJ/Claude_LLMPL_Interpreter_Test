@@ -500,10 +500,12 @@ def plan_sub(job, start, ctx):
     max_att, backoff, mult = r.get("maxAttempts", 1), r.get("backoffMs", 0), r.get("multiplier", 1)
     t = start
     starts = []
+    attempt_effects = []
     for k in range(1, max_att + 1):
         starts.append(t)
-        run = Run(sub, ctx["base"], outdir, ctx["workflows"], cancel_at=timeout, nested=True)
+        run = Run(sub, ctx["base"], outdir, ctx["workflows"], cancel_at=timeout, nested=True, offset=t)
         run.simulate()
+        attempt_effects.extend(run.effects)
         if run.cancelled:
             end, kind = t + timeout, "timeout"
         else:
@@ -513,6 +515,7 @@ def plan_sub(job, start, ctx):
             t = end + backoff * mult ** (k - 1)
             continue
         o = Outcome(end, starts, kind == "ok", None, None if kind == "ok" else kind)
+        o.effects = attempt_effects  # absolute times; the parent run has offset 0 relative to them
         o.subrun = run
         if kind == "ok":
             o.output = {jid: run.out[jid] for jid in run.order if run.st[jid] == "SUCCEEDED"}
@@ -522,8 +525,10 @@ def plan_sub(job, start, ctx):
 
 # ----------------------------------------------------------------------------- simulation
 class Run:
-    def __init__(self, wf, base, outdir, workflows, cancel_at=None, nested=False):
+    def __init__(self, wf, base, outdir, workflows, cancel_at=None, nested=False, offset=0):
         self.wf = wf
+        self.offset = offset  # absolute logical time of this run's time 0
+        self.effects = []     # (absolute time, file effect) of jobs that completed
         self.base = base
         self.outdir = outdir
         self.workflows = workflows
@@ -637,11 +642,12 @@ class Run:
         self.extra[j]["attempts"] = len(p.attempts_at)
         if p.subrun is not None:
             self.extra[j]["subreport"] = p.subrun.report()
+        # file effects become real only when (and if) they happen in the timeline
+        self.effects.extend((t if self.jobs[j]["kind"] == "subworkflow" else self.offset + t, eff)
+                            for t, eff in p.effects if t <= p.end)
         if p.ok:
             self.st[j] = "SUCCEEDED"
             self.out[j] = p.output
-            for _, eff in p.effects:
-                apply_effect(eff)
         else:
             self.st[j] = "FAILED"
             self.extra[j]["error"] = {"class": p.cls, "details": list(p.details)}
@@ -653,12 +659,16 @@ class Run:
             if self.st[j] == "RUNNING":
                 p = self.plan[j]
                 self.st[j], self.end[j] = "CANCELLED", T
+                # effects of nested jobs that completed before the cancellation stay
+                self.effects.extend((t if self.jobs[j]["kind"] == "subworkflow" else self.offset + t, eff)
+                                    for t, eff in p.effects if t <= T)
                 self.extra[j]["attempts"] = sum(1 for a in p.attempts_at if a <= T)
                 self.extra[j]["error"] = {"class": "cancelled", "details": []}
                 if p.subrun is not None or self.jobs[j]["kind"] == "subworkflow":
                     sub = Run(self.workflows[self.jobs[j]["config"]["workflow"]], self.base,
                               os.path.join(self.outdir, j), self.workflows,
-                              cancel_at=T - max(a for a in p.attempts_at if a <= T), nested=True)
+                              cancel_at=T - max(a for a in p.attempts_at if a <= T), nested=True,
+                              offset=max(a for a in p.attempts_at if a <= T))
                     sub.simulate()
                     self.extra[j]["subreport"] = sub.report()
             elif self.st[j] not in FINAL:
@@ -735,6 +745,8 @@ def main(argv):
         run.simulate()
     except DefectStop:
         return 3
+    for _, eff in sorted(run.effects, key=lambda e: e[0]):
+        apply_effect(eff)
     rep = run.report()
     (outdir / "report.json").write_text(json.dumps(rep, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for j in rep["jobs"]:

@@ -513,6 +513,8 @@ class ExprMixin:
                     return T.TVar(e.name)
         if isinstance(e, A.Index) and isinstance(e.obj, A.Name) and e.obj.name in T.CON_ARITY:
             return T.TCon(e.obj.name, tuple(self.type_from_value_expr(i) for i in e.indices))
+        if isinstance(e, A.TupleLit):  # `(Str, Int)` written as a type argument (BUG-0009)
+            return T.TTuple(tuple(self.type_from_value_expr(i) for i in e.items))
         return DYN
 
     # ------------------------------------------------------------------ records

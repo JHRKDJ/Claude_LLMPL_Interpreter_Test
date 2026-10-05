@@ -1,0 +1,42 @@
+{
+  "workflow": "a07",
+  "jobs": [
+    {
+      "id": "m",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "op": "inc",
+        "parallelism": 2,
+        "itemLatencyMs": 4
+      },
+      "timeoutMs": 10,
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      }
+    },
+    {
+      "id": "m2",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "op": "inc",
+        "parallelism": 2,
+        "itemLatencyMs": 4
+      },
+      "timeoutMs": 9
+    }
+  ]
+}

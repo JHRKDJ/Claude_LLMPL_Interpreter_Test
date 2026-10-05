@@ -1,0 +1,10 @@
+{
+  "workflow": "r02_cancel_at_zero_dag",
+  "cancelAfterMs": 0,
+  "maxConcurrency": 2,
+  "jobs": [
+    {"id": "a", "kind": "compute", "config": {"op": "fib", "n": 4, "costMs": 0}},
+    {"id": "b", "kind": "external", "config": {"latencyMs": 4}},
+    {"id": "c", "kind": "reduce", "deps": ["a"], "config": {"op": "count"}}
+  ]
+}

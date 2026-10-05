@@ -1,0 +1,520 @@
+// Job kinds (PROGRAM_SPEC §4) and the per-job attempt loop with retries and
+// timeouts (§5.3). Every failure a job can have is reported as a `JobFailed` with its
+// report class; nothing else escapes `perform`.
+
+import std.fs
+import model.{Kind, Job, JobFailed, Completion, Context, Clock, Workflow, Event, isRetryable, nowMs}
+import engine
+
+// Mutable progress of one job, owned by that job's runner task. A nested run writes
+// its report here even when it is cancelled (it is the same task).
+pub mutable record Progress {
+    attempts: Int
+    subreport: Dyn
+    beat: SendPort[Event]?  // where a nested run reports that it is still busy
+}
+
+// Cleanup of a transform workspace failed (PROGRAM_SPEC §4.3 step 6).
+error CleanupFailed {
+    marker: Str
+}
+
+error ItemFailed {
+    item: Int
+}
+
+// --------------------------------------------------------------------- config access
+fn cfgInt(c: Map[Str, Dyn], key: Str, default: Int) -> Int {
+    return match c.getOrDefault(key, null) {
+        n: Int => n
+        _ => default
+    }
+}
+
+fn cfgStr(c: Map[Str, Dyn], key: Str) -> Str {
+    return match c.getOrDefault(key, null) {
+        s: Str => s
+        _ => ""
+    }
+}
+
+fn cfgBool(c: Map[Str, Dyn], key: Str) -> Bool {
+    return match c.getOrDefault(key, null) {
+        b: Bool => b
+        _ => false
+    }
+}
+
+fn cfgMap(v: Dyn) -> Map[Str, Dyn] {
+    return match v {
+        m: Map[Str, Dyn] => m
+        _ => Map.empty()
+    }
+}
+
+fn intList(v: Dyn) -> List[Int]? {
+    let xs = match v {
+        l: List[Dyn] => l
+        _ => {
+            return null
+        }
+    }
+    let out = MutableList[Int]()
+    for x in xs {
+        match x {
+            n: Int => out.push(n)
+            _ => {
+                return null
+            }
+        }
+    }
+    return Some(out.freeze())
+}
+
+fn fail(cls: Str, message: Str) -> JobFailed {
+    return JobFailed(class: cls, message: message)
+}
+
+// --------------------------------------------------------------------- logical time
+// Waits until logical time `ms` of the run (absolute, so drift never accumulates).
+async fn until(clock: Clock, ms: Int) {
+    let left = (clock.t0 + ms.millis).since(time.now())
+    if left.nanos > 0 {
+        await sleep(left)
+    }
+}
+
+// The timing of one attempt: when it started and when it times out (if it can).
+record Attempt {
+    start: Int
+    deadline: Int?
+}
+
+// Work that would end at `ms`. An attempt that would end at or after its deadline
+// times out instead (§5.3: finishing exactly at `timeoutMs` is a timeout), so the
+// boundary never depends on which of two simultaneous timers fires first.
+async fn workUntil(clock: Clock, a: Attempt, ms: Int) {
+    match a.deadline {
+        Some(d) if ms >= d => await sleep(1000000.hours)
+        _ => await until(clock, ms)
+    }
+}
+
+// --------------------------------------------------------------------- attempt loop
+// Runs a started job to completion. Never throws: failures become data.
+pub async fn perform(job: Job, inputs: Map[Str, Dyn], ctx: Context, p: Progress, startMs: Int) -> Completion {
+    let k = 1
+    let start = startMs
+    while true {
+        p.attempts = k
+        let a = Attempt(start: start, deadline: job.timeoutMs.map(fn(t) => start + t))
+        let outcome = capture await attemptWithTimeout(job, k, inputs, ctx, p, a)
+        let jf = match outcome {
+            Ok(v) => {
+                return Completion(id: job.id, ok: true, attempts: k, output: v, error: null, subreport: p.subreport)
+            }
+            Err(e) => e
+        }
+        if !(isRetryable(jf) && k < job.retry.maxAttempts) {
+            let final = if jf.class == "retryable" { jf with { class: "retries-exhausted" } } else { jf }
+            return Completion(
+                id: job.id,
+                ok: false,
+                attempts: k,
+                output: final.output,
+                error: Some(final),
+                subreport: p.subreport,
+            )
+        }
+        start = nowMs(ctx.clock) + job.retry.backoffMs * job.retry.multiplier.pow(k - 1)
+        await until(ctx.clock, start)
+        k = k + 1
+    }
+    return Completion(id: job.id, ok: false, attempts: k, output: null, error: null, subreport: null)
+}
+
+async fn attemptWithTimeout(job: Job, k: Int, inputs: Map[Str, Dyn], ctx: Context, p: Progress, a: Attempt) -> Dyn throws JobFailed {
+    return match a.deadline {
+        Some(d) => try within ctx.clock.t0 + d.millis {
+            try await attempt(job, k, inputs, ctx, p, a)
+        }
+            catch DeadlineExceeded => {
+                throw fail("timeout", "attempt {k} did not finish within {d - a.start} ms")
+            }
+        None => try await attempt(job, k, inputs, ctx, p, a)
+    }
+}
+
+async fn attempt(job: Job, k: Int, inputs: Map[Str, Dyn], ctx: Context, p: Progress, a: Attempt) -> Dyn throws JobFailed {
+    let c = job.config
+    return match job.kind {
+        Kind.Compute => await compute(c, ctx.clock, a)
+        Kind.External => try await external(c, k, ctx.clock, a)
+        Kind.Transform => try await transform(job.id, c, ctx, a)
+        Kind.Map => try await mapItems(c, inputs, ctx.clock, a)
+        Kind.Reduce => try reduce(c, job.deps, inputs)
+        Kind.Check => try check(c, inputs)
+        Kind.Subworkflow => try await subworkflow(job, c, ctx, p, a)
+    }
+}
+
+// --------------------------------------------------------------------- compute (§4.1)
+async fn compute(c: Map[Str, Dyn], clock: Clock, a: Attempt) -> Dyn {
+    let cost = cfgInt(c, "costMs", 0)
+    if cost > 0 {
+        await workUntil(clock, a, a.start + cost)
+    }
+    let n = cfgInt(c, "n", 0)
+    return match cfgStr(c, "op") {
+        "fib" => fib(n)
+        "sumTo" => (n * (n + 1)).div(2)
+        "primeCount" => primeCount(n)
+        _ => {
+            let v = cfgInt(c, "value", 0)
+            let expect = cfgInt(c, "expect", 0)
+            // an internal-defect check: a false assumption stops LocalFlow (§4.1)
+            assert v == expect, "compute assertion failed: value {v} != expected {expect}"
+            v
+        }
+    }
+}
+
+fn fib(n: Int) -> Int {
+    let a = 0
+    let b = 1
+    for i in 0..n {
+        let next = a + b
+        a = b
+        b = next
+    }
+    return a
+}
+
+fn primeCount(n: Int) -> Int {
+    let count = 0
+    for x in 2..=n {
+        cancel.check()
+        let prime = true
+        let d = 2
+        while d * d <= x && prime {
+            if x % d == 0 {
+                prime = false
+            }
+            d = d + 1
+        }
+        if prime {
+            count = count + 1
+        }
+    }
+    return count
+}
+
+// --------------------------------------------------------------------- external (§4.2)
+async fn external(c: Map[Str, Dyn], k: Int, clock: Clock, a: Attempt) -> Dyn throws JobFailed {
+    let mirrors = match c.getOrDefault("mirrors", null) {
+        ms: List[Dyn] => ms
+        _ => {
+            return try await callProvider(c, k, clock, a, 0)
+        }
+    }
+    // query every mirror; the first success wins and the others are cancelled
+    return try parallel firstSuccess {
+        for (i, m) in mirrors.enumerate() {
+            spawn callProvider(cfgMap(m), k, clock, a, i)
+        }
+    }
+        catch AggregateException as agg => {
+            let allPermanent = agg.entries.all(fn(e) => match e.error {
+                    f: JobFailed => f.class == "permanent"
+                    _ => false
+                })
+            throw fail(
+                if allPermanent { "permanent" } else { "retryable" },
+                "all {mirrors.length} mirrors failed",
+            )
+        }
+}
+
+// `rank` orders simultaneous answers: mirror i answers i nanoseconds after the logical
+// instant, so the earliest mirror wins a tie (§4.2) without changing logical time.
+async fn callProvider(m: Map[Str, Dyn], k: Int, clock: Clock, a: Attempt, rank: Int) -> Dyn throws JobFailed {
+    let script = match m.getOrDefault("script", null) {
+        s: List[Dyn] => s
+        _ => ["ok"]
+    }
+    let step = match script[k.min(script.length) - 1] {
+        s: Str => s
+        _ => "ok"
+    }
+    if step == "hang" {
+        await sleep(1000000.hours)  // never finishes by itself; ended by timeout or cancellation
+    }
+    await workUntil(clock, a, a.start + cfgInt(m, "latencyMs", 10))
+    if rank > 0 {
+        await sleep(rank.nanos)
+    }
+    return match step {
+        "ok" => m.getOrDefault("value", null)
+        "retryable" => {
+            throw fail("retryable", "provider reported a temporary failure on attempt {k}")
+        }
+        _ => {
+            throw fail("permanent", "provider rejected the request on attempt {k}")
+        }
+    }
+}
+
+// --------------------------------------------------------------------- transform (§4.3)
+// The job's scratch workspace: a marker file that exists exactly while an attempt runs.
+resource fn workspace(marker: Str, failCleanup: Bool) yields Str throws JobFailed, CleanupFailed {
+    try fs.writeText(marker, "")
+        catch category IO => {
+            throw fail("io", "cannot create workspace {marker}")
+        }
+    let exit = yield marker
+    try fs.remove(marker) catch category IO => ()
+    if failCleanup {
+        throw CleanupFailed(marker: marker)
+    }
+}
+
+async fn transform(id: Str, c: Map[Str, Dyn], ctx: Context, a: Attempt) -> Dyn throws JobFailed {
+    let input = fs.join(ctx.baseDir, cfgStr(c, "input"))
+    let output = cfgStr(c, "output")
+    let scratch = fs.join(ctx.outDir, ".scratch")
+    try fs.makeDirs(scratch)
+        catch category IO => {
+            throw fail("io", "cannot create {scratch}")
+        }
+    let latency = cfgInt(c, "latencyMs", 0)
+    let size = try use out = try fs.openAtomicWrite(fs.join(ctx.outDir, output)) {
+        use ws = try workspace(fs.join(scratch, id), cfgBool(c, "failCleanup")) {
+            let text = try fs.readText(input)
+                catch category IO => {
+                    throw fail("io", "cannot read {cfgStr(c, "input")}")
+                }
+            let result = try transformText(cfgStr(c, "op"), text)
+            try out.write(result)
+            if latency > 0 {
+                await workUntil(ctx.clock, a, a.start + latency)
+            }
+            if cfgBool(c, "failAfterWrite") {
+                throw fail("transform", "transformation failed after writing")
+            }
+            result.length
+        }
+    }
+        catch AggregateException as agg => {
+            throw primaryWithCleanup(agg)
+        }
+        catch CleanupFailed => {
+            throw fail("cleanup", "workspace cleanup failed")
+        }
+        catch category IO => {
+            throw fail("io", "cannot write {output}")
+        }
+    return {"file": output, "bytes": size}
+}
+
+// Body failure plus release failure: keep the body's class, note the cleanup (§4.3).
+fn primaryWithCleanup(agg: AggregateException) -> JobFailed {
+    let body = agg.entries.find(fn(e) => match e.error {
+            f: JobFailed => true
+            _ => false
+        })
+    let cleanup = agg.entries.any(fn(e) => match e.error {
+            c: CleanupFailed => true
+            _ => false
+        })
+    let primary = match body {
+        Some(entry) => match entry.error {
+            f: JobFailed => f
+            _ => fail("io", "unexpected failure")
+        }
+        None => fail("io", "unexpected failure")
+    }
+    return if cleanup { primary with { details: primary.details.appended("cleanup") } } else { primary }
+}
+
+fn transformText(op: Str, text: Str) -> Str throws JobFailed {
+    if op == "upper" {
+        return text.toUpper()
+    }
+    if op == "number" {
+        let trailing = text.endsWith("\n")
+        let lines = text.split("\n")
+        let body = if trailing { lines.take(lines.length - 1) } else { lines }
+        let numbered = body.enumerate().map(fn(p) => "{p.0 + 1}: {p.1}")
+        return numbered.join("\n") + if trailing { "\n" } else { "" }
+    }
+    // csvSum
+    let rows = text.split("\n").filter(fn(r) => r != "")
+    if rows.isEmpty() {
+        throw fail("bad-input", "empty CSV")
+    }
+    let header = rows[0].split(",")
+    let sums = MutableList[Int]()
+    for h in header {
+        sums.push(0)
+    }
+    for row in rows.drop(1) {
+        let cells = row.split(",")
+        if cells.length != header.length {
+            throw fail("bad-input", "row has {cells.length} cells, header has {header.length}")
+        }
+        for (i, cell) in cells.enumerate() {
+            match cell.trim().toInt() {
+                Some(v) => sums.set(i, sums[i] + v)
+                None => {
+                    throw fail("bad-input", "not an integer: {cell}")
+                }
+            }
+        }
+    }
+    let lines = header.enumerate().map(fn(p) => "{p.1},{sums[p.0]}\n")
+    return "column,sum\n" + lines.join("")
+}
+
+// --------------------------------------------------------------------- map (§4.4)
+async fn mapItems(c: Map[Str, Dyn], inputs: Map[Str, Dyn], clock: Clock, a: Attempt) -> Dyn throws JobFailed {
+    let source = if c.containsKey("items") {
+        c.getOrDefault("items", null)
+    } else {
+        inputs.getOrDefault(cfgStr(c, "from"), null)
+    }
+    let items = match intList(source) {
+        Some(xs) => xs
+        None => {
+            throw fail("bad-input", "map input is not a list of integers")
+        }
+    }
+    let failOn = intList(c.getOrDefault("failOn", [])).unwrapOr([])
+    let parallelism = cfgInt(c, "parallelism", 4)
+    let latency = cfgInt(c, "itemLatencyMs", 0)
+    let op = cfgStr(c, "op")
+    let results = MutableList[Dyn]()
+    let failed = MutableList[Int]()
+    let start = 0
+    let batchEnd = a.start
+    while start < items.length {
+        let batch = items.slice(start, (start + parallelism).min(items.length))
+        batchEnd = batchEnd + latency
+        // the items of a batch are independent: collect every outcome
+        let report = parallel collect {
+            for x in batch {
+                spawn mapItem(op, x, failOn, clock, a, batchEnd)
+            }
+        }
+        for (i, outcome) in report.outcomes.enumerate() {
+            match outcome {
+                TaskOutcome.Succeeded(path, v) => results.push(v)
+                _ => {
+                    results.push(null)
+                    failed.push(start + i)
+                }
+            }
+        }
+        start = start + parallelism
+    }
+    let out: Map[Str, Dyn] = {"results": results.freeze(), "failed": failed.freeze()}
+    if !failed.isEmpty() && !cfgBool(c, "allowPartial") {
+        throw JobFailed(class: "partial", message: "{failed.length} of {items.length} items failed", output: out)
+    }
+    return out
+}
+
+async fn mapItem(op: Str, x: Int, failOn: List[Int], clock: Clock, a: Attempt, endMs: Int) -> Int throws ItemFailed {
+    await workUntil(clock, a, endMs)
+    if failOn.contains(x) {
+        throw ItemFailed(item: x)
+    }
+    return if op == "square" { x * x } else { x + 1 }
+}
+
+// --------------------------------------------------------------------- reduce (§4.5)
+fn reduce(c: Map[Str, Dyn], deps: List[Str], inputs: Map[Str, Dyn]) -> Dyn throws JobFailed {
+    let values = deps.filter(fn(d) => inputs.containsKey(d)).map(fn(d) => inputs.getOrDefault(d, null))
+    let op = cfgStr(c, "op")
+    if op == "count" {
+        return values.length
+    }
+    if op == "concat" {
+        let out = MutableList[Dyn]()
+        for v in values {
+            match v {
+                xs: List[Dyn] => out.extend(xs)
+                _ => {
+                    throw fail("bad-input", "concat needs list inputs")
+                }
+            }
+        }
+        return out.freeze()
+    }
+    let flat = MutableList[Int]()
+    for v in values {
+        match v {
+            n: Int => flat.push(n)
+            _ => match intList(v) {
+                Some(xs) => flat.extend(xs)
+                None => {
+                    throw fail("bad-input", "{op} needs integer inputs")
+                }
+            }
+        }
+    }
+    if op == "sum" {
+        return flat.sum()
+    }
+    return match flat.max() {
+        Some(m) => m
+        None => {
+            throw fail("bad-input", "max of no values")
+        }
+    }
+}
+
+// --------------------------------------------------------------------- check (§4.6)
+fn check(c: Map[Str, Dyn], inputs: Map[Str, Dyn]) -> Dyn throws JobFailed {
+    let v = match inputs.getOrDefault(cfgStr(c, "input"), null) {
+        n: Int => n
+        _ => {
+            throw fail("bad-input", "check input is not an integer")
+        }
+    }
+    let target = cfgInt(c, "value", 0)
+    return match cfgStr(c, "op") {
+        "gt" => v > target
+        "lt" => v < target
+        _ => v == target
+    }
+}
+
+// --------------------------------------------------------------------- subworkflow (§4.7)
+async fn subworkflow(job: Job, c: Map[Str, Dyn], ctx: Context, p: Progress, a: Attempt) -> Dyn throws JobFailed {
+    let name = cfgStr(c, "workflow")
+    let wf = match ctx.workflows.get(name) {
+        Some(w) => w
+        None => {
+            throw fail("subworkflow", "unknown sub-workflow {name}")
+        }
+    }
+    // the nested run's logical time starts at this attempt, on the parent's grid; its
+    // barrier is shorter than the parent's, so its completion falls inside the
+    // parent's barrier window
+    let clock = Clock(t0: ctx.clock.t0 + a.start.millis, barrierNs: ctx.clock.barrierNs.div(8))
+    let nested = Context(
+        baseDir: ctx.baseDir,
+        outDir: fs.join(ctx.outDir, job.id),
+        workflows: ctx.workflows,
+        clock: clock,
+    )
+    try fs.makeDirs(nested.outDir)
+        catch category IO => {
+            throw fail("io", "cannot create {nested.outDir}")
+        }
+    let result = await engine.run(wf, nested, null, p)
+    if result.status != "SUCCEEDED" {
+        throw fail("subworkflow", "sub-workflow {name} finished {result.status}")
+    }
+    return result.outputs
+}

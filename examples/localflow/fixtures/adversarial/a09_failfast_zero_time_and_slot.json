@@ -1,0 +1,36 @@
+{
+  "workflow": "a09",
+  "onFailure": "failFast",
+  "maxConcurrency": 1,
+  "jobs": [
+    {
+      "id": "bad",
+      "kind": "check",
+      "deps": [
+        "s"
+      ],
+      "config": {
+        "input": "s",
+        "op": "gt",
+        "value": 1
+      }
+    },
+    {
+      "id": "s",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "value": "not-an-int"
+      }
+    },
+    {
+      "id": "never",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 1,
+        "costMs": 1
+      }
+    }
+  ]
+}

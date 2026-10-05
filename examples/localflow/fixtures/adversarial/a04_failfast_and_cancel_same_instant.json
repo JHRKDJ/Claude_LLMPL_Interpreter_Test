@@ -1,0 +1,24 @@
+{
+  "workflow": "a04",
+  "onFailure": "failFast",
+  "cancelAfterMs": 5,
+  "jobs": [
+    {
+      "id": "bad",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "long",
+      "kind": "external",
+      "config": {
+        "latencyMs": 50
+      }
+    }
+  ]
+}

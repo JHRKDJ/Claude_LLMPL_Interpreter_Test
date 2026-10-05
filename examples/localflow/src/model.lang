@@ -1,0 +1,157 @@
+// LocalFlow domain model: immutable workflow definitions, job outcomes and the
+// closed set of job states (PROGRAM_SPEC §2, §5.1).
+
+pub enum Kind {
+    Compute
+    External
+    Transform
+    Map
+    Reduce
+    Check
+    Subworkflow
+}
+
+pub fn kindName(k: Kind) -> Str {
+    return match k {
+        Kind.Compute => "compute"
+        Kind.External => "external"
+        Kind.Transform => "transform"
+        Kind.Map => "map"
+        Kind.Reduce => "reduce"
+        Kind.Check => "check"
+        Kind.Subworkflow => "subworkflow"
+    }
+}
+
+pub enum Status {
+    Pending
+    Ready
+    Running
+    Succeeded
+    Failed
+    Cancelled
+    Blocked
+    Skipped
+    NotRun
+}
+
+pub fn statusName(s: Status) -> Str {
+    return match s {
+        Status.Pending => "PENDING"
+        Status.Ready => "READY"
+        Status.Running => "RUNNING"
+        Status.Succeeded => "SUCCEEDED"
+        Status.Failed => "FAILED"
+        Status.Cancelled => "CANCELLED"
+        Status.Blocked => "BLOCKED"
+        Status.Skipped => "SKIPPED"
+        Status.NotRun => "NOT_RUN"
+    }
+}
+
+pub fn isFinal(s: Status) -> Bool {
+    return match s {
+        Status.Pending | Status.Ready | Status.Running => false
+        _ => true
+    }
+}
+
+// A dependency in one of these states makes its dependents BLOCKED (§5.2).
+pub fn isBad(s: Status) -> Bool {
+    return match s {
+        Status.Failed | Status.Blocked | Status.Cancelled | Status.NotRun => true
+        _ => false
+    }
+}
+
+pub record Retry {
+    maxAttempts: Int
+    backoffMs: Int
+    multiplier: Int
+}
+
+pub record When {
+    job: Str
+    equals: Bool
+}
+
+pub record Job {
+    id: Str
+    kind: Kind
+    deps: List[Str]
+    when: When?
+    group: Str?
+    retry: Retry
+    timeoutMs: Int?
+    config: Map[Str, Dyn]
+}
+
+pub record Workflow {
+    name: Str
+    jobs: List[Job]
+    maxConcurrency: Int
+    groups: Map[Str, Int]
+    failFast: Bool
+    cancelAfterMs: Int?
+    workflows: Map[Str, Workflow]
+}
+
+// A validation problem (§3).
+pub record Problem {
+    code: Str
+    job: Str?
+    workflow: Str?
+    jobs: List[Str]?
+    message: Str
+}
+
+// Recoverable job failure. `class` is the report's failure class (§5.3, §6).
+pub category JobFault
+
+pub error JobFailed category JobFault {
+    class: Str
+    message: Str
+    details: List[Str] = []
+    output: Dyn = null
+}
+
+pub fn isRetryable(e: JobFailed) -> Bool {
+    return e.class == "retryable" || e.class == "timeout"
+}
+
+// What a job's runner reports back to the engine.
+pub record Completion {
+    id: Str
+    ok: Bool
+    attempts: Int
+    output: Dyn
+    error: JobFailed?
+    subreport: Dyn
+}
+
+pub enum Event {
+    Done(c: Completion)
+    Cancelled(id: Str, attempts: Int, subreport: Dyn)
+    Busy  // a nested run is still settling the current instant (heartbeat to its parent)
+}
+
+// Logical time of one (possibly nested) run (PROGRAM_SPEC §1, §5.2). Every job
+// duration ends exactly on the run's millisecond grid `t0 + n ms`; after waking, the
+// engine waits `barrierNs` so that everything due at that instant has happened
+// before it records the step, whatever order the scheduler runs ready tasks in.
+pub record Clock {
+    t0: Instant
+    barrierNs: Int
+}
+
+pub fn nowMs(clock: Clock) -> Int {
+    return time.now().since(clock.t0).millis
+}
+
+// Run-wide context for the jobs of one (possibly nested) workflow run.
+pub record Context {
+    baseDir: Str
+    outDir: Str
+    workflows: Map[Str, Workflow]
+    clock: Clock
+}

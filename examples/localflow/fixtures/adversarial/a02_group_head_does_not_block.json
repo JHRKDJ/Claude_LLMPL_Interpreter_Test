@@ -1,0 +1,43 @@
+{
+  "workflow": "a02",
+  "maxConcurrency": 3,
+  "groups": {
+    "g": 1
+  },
+  "jobs": [
+    {
+      "id": "g1",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "group": "g"
+    },
+    {
+      "id": "g2",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "group": "g"
+    },
+    {
+      "id": "free1",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 3
+      }
+    },
+    {
+      "id": "free2",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 6,
+        "costMs": 3
+      }
+    }
+  ]
+}

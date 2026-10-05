@@ -1,0 +1,32 @@
+{
+  "workflow": "a03",
+  "cancelAfterMs": 6,
+  "jobs": [
+    {
+      "id": "flaky",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 10
+      }
+    },
+    {
+      "id": "after",
+      "kind": "compute",
+      "deps": [
+        "flaky"
+      ],
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": 0
+      }
+    }
+  ]
+}

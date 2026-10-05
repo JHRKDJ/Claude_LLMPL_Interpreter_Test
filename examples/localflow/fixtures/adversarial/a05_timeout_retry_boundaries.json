@@ -1,0 +1,33 @@
+{
+  "workflow": "a05",
+  "jobs": [
+    {
+      "id": "t",
+      "kind": "external",
+      "config": {
+        "latencyMs": 7,
+        "script": [
+          "hang",
+          "hang",
+          "ok"
+        ]
+      },
+      "timeoutMs": 7,
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 0
+      }
+    },
+    {
+      "id": "u",
+      "kind": "external",
+      "config": {
+        "latencyMs": 6,
+        "script": [
+          "ok"
+        ]
+      },
+      "timeoutMs": 7
+    }
+  ]
+}

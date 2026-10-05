@@ -1,0 +1,151 @@
+// The execution report (PROGRAM_SPEC §6) and the workflow status (§5.6).
+
+import model.{Workflow, Problem, Status, JobFailed, kindName, statusName}
+import engine.{RunState}
+
+const ORDER = ["SUCCEEDED", "FAILED", "CANCELLED", "BLOCKED", "SKIPPED", "NOT_RUN"]
+
+pub fn statusOf(st: RunState) -> Str {
+    if st.cancelled {
+        return "CANCELLED"
+    }
+    let ok = st.jobs.all(fn(j) => match st.get(j.id) {
+            Status.Succeeded | Status.Skipped => true
+            _ => false
+        })
+    return if ok { "SUCCEEDED" } else { "FAILED" }
+}
+
+fn errorJson(e: JobFailed) -> Map[Str, Dyn] {
+    return {"class": e.class, "message": e.message, "details": e.details}
+}
+
+fn summary(statuses: List[Str]) -> Map[Str, Dyn] {
+    let m = MutableMap[Str, Dyn]()
+    for s in ORDER {
+        m.set(s, statuses.count(fn(x) => x == s))
+    }
+    return m.freeze()
+}
+
+pub fn build(wf: Workflow, st: RunState) -> Map[Str, Dyn] {
+    let jobs = MutableList[Dyn]()
+    let names = MutableList[Str]()
+    for j in wf.jobs {
+        let js = st.of(j.id)
+        let name = statusName(js.status)
+        names.push(name)
+        let output: Dyn = match js.status {
+            Status.Succeeded | Status.Failed => js.output
+            _ => null
+        }
+        let err: Dyn = match js.error {
+            Some(e) => errorJson(e)
+            None => null
+        }
+        let entry = MutableMap[Str, Dyn]()
+        entry.set("id", j.id)
+        entry.set("kind", kindName(j.kind))
+        entry.set("status", name)
+        entry.set("attempts", js.attempts)
+        entry.set("start", js.start)
+        entry.set("end", js.end)
+        entry.set("output", output)
+        entry.set("error", err)
+        entry.set("blockedBy", js.blockedBy)
+        entry.set("rootCause", js.rootCause)
+        entry.set("skipReason", js.skipReason)
+        entry.set("subreport", js.subreport)
+        jobs.push(entry.freeze())
+    }
+    let rep = MutableMap[Str, Dyn]()
+    rep.set("workflow", wf.name)
+    rep.set("status", statusOf(st))
+    rep.set("durationMs", st.now)
+    rep.set("cancelled", st.cancelled)
+    rep.set("errors", [])
+    rep.set("summary", summary(names.freeze()))
+    rep.set("jobs", jobs.freeze())
+    return rep.freeze()
+}
+
+fn problemJson(p: Problem) -> Map[Str, Dyn] {
+    let m = MutableMap[Str, Dyn]()
+    m.set("code", p.code)
+    m.set("job", p.job)
+    m.set("workflow", p.workflow)
+    m.set("message", p.message)
+    match p.jobs {
+        Some(js) => m.set("jobs", js)
+        None => ()
+    }
+    return m.freeze()
+}
+
+fn idOk(s: Str) -> Bool {
+    return !s.isEmpty() && s.chars().all(fn(c) => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-".contains(c))
+}
+
+const KINDS = ["compute", "external", "transform", "map", "reduce", "check", "subworkflow"]
+
+// The report of an INVALID workflow: every job with a valid id is NOT_RUN (§6).
+pub fn invalid(doc: Dyn, problems: List[Problem]) -> Map[Str, Dyn] {
+    let jobs = MutableList[Dyn]()
+    let name: Dyn = null
+    match doc {
+        m: Map[Str, Dyn] => {
+            name = match m.getOrDefault("workflow", null) {
+                s: Str => s
+                _ => null
+            }
+            match m.getOrDefault("jobs", null) {
+                xs: List[Dyn] => {
+                    for x in xs {
+                        match x {
+                            jm: Map[Str, Dyn] => match jm.getOrDefault("id", null) {
+                                id: Str if idOk(id) => {
+                                    let kind: Dyn = match jm.getOrDefault("kind", null) {
+                                        k: Str if KINDS.contains(k) => k
+                                        _ => null
+                                    }
+                                    let e = MutableMap[Str, Dyn]()
+                                    e.set("id", id)
+                                    e.set("kind", kind)
+                                    e.set("status", "NOT_RUN")
+                                    e.set("attempts", 0)
+                                    for key in [
+                                        "start",
+                                        "end",
+                                        "output",
+                                        "error",
+                                        "blockedBy",
+                                        "rootCause",
+                                        "skipReason",
+                                        "subreport",
+                                    ] {
+                                        e.set(key, null)
+                                    }
+                                    jobs.push(e.freeze())
+                                }
+                                _ => ()
+                            }
+                            _ => ()
+                        }
+                    }
+                }
+                _ => ()
+            }
+        }
+        _ => ()
+    }
+    let statuses = jobs.map(fn(j) => "NOT_RUN")
+    let rep = MutableMap[Str, Dyn]()
+    rep.set("workflow", name)
+    rep.set("status", "INVALID")
+    rep.set("durationMs", 0)
+    rep.set("cancelled", false)
+    rep.set("errors", problems.map(fn(p) => problemJson(p)))
+    rep.set("summary", summary(statuses.freeze()))
+    rep.set("jobs", jobs.freeze())
+    return rep.freeze()
+}
