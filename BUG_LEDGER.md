@@ -294,7 +294,7 @@ Regression test failed before fix: yes (all 4)
 Fix: the runtime lifts the digit limit; Int/Int overflow abandons with
   A.NUMERIC.INVALID_CONVERSION; format width/precision above 1000 abandons with
   A.RUNTIME.INVALID_ARGUMENT (lang/runtime/__init__.py, interp/exprs.py).
-Commit: PENDING
+Commit: 5d3cef8
 Status: fixed
 
 BUG-0020
@@ -306,7 +306,7 @@ Symptom: `lang_eq` short-circuited on Python identity, so `a == a` was true but
 Minimal reproduction: tests/regressions/test_bug_0020_nan_identity_equality.py
 Regression test failed before fix: yes
 Fix: no identity shortcut for frozen containers (lang/runtime/equality.py).
-Commit: PENDING
+Commit: 5d3cef8
 Status: fixed
 
 BUG-0021
@@ -319,7 +319,7 @@ Regression test failed before fix: yes (2 of 3 initial; closure case added with 
 Fix: the frozen scan rejects reject-policy capabilities and also scans frozen closure
   captures; scanning is enabled once any port or handle exists (lang/runtime/isolation.py,
   interp/conc.py).
-Commit: PENDING
+Commit: 5d3cef8
 Status: fixed
 
 BUG-0022
@@ -332,7 +332,7 @@ Minimal reproduction: tests/regressions/test_bug_0022_release_masking.py
 Regression test failed before fix: yes
 Fix: release always runs masked; pending cancellation is redelivered after it
   (lang/runtime/interp/res.py).
-Commit: PENDING
+Commit: 5d3cef8
 Status: fixed
 
 BUG-0023
@@ -347,5 +347,5 @@ Fix: firstSuccess aggregates failures whenever any exist (cancellation pending);
   collect returns its report when children failed (cancellation pending); a throwing
   collect body aggregates unobserved child failures before the body's exception
   (lang/runtime/interp/conc.py).
-Commit: PENDING
+Commit: 5d3cef8
 Status: fixed
