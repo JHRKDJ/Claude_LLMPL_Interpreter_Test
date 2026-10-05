@@ -782,5 +782,5 @@ Regression test failed before fix: yes (all 3)
 Fix: one `compareTo` for every ordered primitive, defined as the `<` operator's
   ordering (NaN and mixed Int/Float abandon) (lang/runtime/builtins/numbers.py;
   the Str-only version removed from strings.py).
-Commit: pending
+Commit: 28ac571
 Status: fixed
