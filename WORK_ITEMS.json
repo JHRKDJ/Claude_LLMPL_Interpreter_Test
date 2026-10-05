@@ -1,1163 +1,1356 @@
 {
- "note": "Dynamic queue; see tools/workitems.py. States: TODO IN_PROGRESS BLOCKED IMPLEMENTED VERIFYING DONE",
+ "note": "Dynamic queue; see tools/workitems.py. States: TODO IN_PROGRESS BLOCKED IMPLEMENTED VERIFYING DONE Evidence: FEATURE_MATRIX.md (validated by tests/unit/test_feature_matrix.py).",
  "items": [
   {
    "id": "SRC-001",
    "title": "Source files, spans, line/column mapping",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-001",
    "title": "Structured diagnostic model (code, severity, labels, notes, provenance fields)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-002",
    "title": "Text renderer with multi-span source snippets",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-003",
    "title": "JSON renderer exposing outcome/domain/reason/stable_code",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-004",
    "title": "Hierarchical stable code registry",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-005",
    "title": "Bounded, cycle-safe, redacting local value capture (V3 7.13.4)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-006",
    "title": "Abandonment reports with frames and bounded locals",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-007",
    "title": "Concurrent failure tree (stack cactus) + flattened leaves (V3 7.13.6)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-008",
    "title": "Resource provenance in diagnostics (acquisition/owning scope)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-009",
    "title": "Channel/select provenance (ids, sequence, ready sets, cursor)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-010",
    "title": "Output modes default/quiet/deep/JSON",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-011",
    "title": "Render budget and explicit truncation markers",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "render_text.RenderBudget + capture budgets"
   },
   {
    "id": "DIAG-012",
    "title": "Parser/checker cascade marking (root cause prominent)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DIAG-013",
    "title": "State-horizon advisories (provisional V3 7.3.5)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-LEX-001",
    "title": "Lexer: tokens, keywords, numbers, operators",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-LEX-002",
    "title": "String literals: escapes, interpolation, triple-quoted",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-LEX-003",
    "title": "Comment/blank-line trivia retention for formatter",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-001",
    "title": "Declarations: fn/record/enum/error/category/protocol/predicate/const/import/test",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-002",
    "title": "Statements: let/const/assign/return/break/continue/throw/defer/assert/while/for",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-003",
    "title": "Expressions: precedence, postfix, literals, lambdas, with-update",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-004",
    "title": "Newline continuation rules and leading-operator diagnostic (V3 7.1.2)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-005",
    "title": "Patterns: literal, binding, variant, record, tuple, type, or, guards",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-006",
    "title": "Types: generics, T?, fn types with throws, tuples, borrow",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-007",
    "title": "Concurrency syntax: parallel modes, spawn, within, select forms",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-008",
    "title": "Resource syntax: resource fn, yields, use, yield, onAbandon, defer",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FRONTEND-PARSE-009",
    "title": "Error recovery: multiple errors, synchronisation, cascade suppression",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FORMAT-001",
    "title": "Canonical formatter printing for all constructs",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FORMAT-002",
    "title": "Comment and blank-line preservation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FORMAT-003",
    "title": "Formatter idempotence + parse/format/parse property tests",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FORMAT-004",
    "title": "format --check/--diff patches",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "NAME-RESOLVE-001",
    "title": "Lexical scopes, bindings, duplicate/shadowing rules",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "NAME-RESOLVE-002",
    "title": "Use-before-initialisation / definite assignment",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "NAME-RESOLVE-003",
    "title": "Closure captures and nonlocal reassignment marker",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "NAME-RESOLVE-004",
    "title": "Unresolved-name diagnostics with import candidates",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-001",
    "title": "Manifest (lang.toml), lockfile, project root",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-002",
    "title": "Module loading, absolute paths, directory modules",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-003",
    "title": "Exports (pub) and module-private visibility",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-004",
    "title": "Module constant init-cycle detection with full trace",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-005",
    "title": "Mutable module globals prohibited; constants frozen",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-006",
    "title": "Auto-import as visible source patch from known modules only",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "MODULE-007",
    "title": "Runtime module loading and explicit reload (REPL)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-001",
    "title": "Primitives Int/Float/Bool/Str/Unit, arithmetic, no coercion",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-002",
    "title": "NaN policy implementation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-003",
    "title": "String API and interpolation runtime (safe display only)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-004",
    "title": "Frozen records: construction, defaults, equality, with-update",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-005",
    "title": "Mutable records: identity, field assignment",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-006",
    "title": "Frozen collections List/Map/Set API",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-007",
    "title": "Mutable collections API + modification-during-iteration check",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-008",
    "title": "freeze()/mutableCopy() snapshot isolation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-009",
    "title": "Tuples and ranges",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VALUE-010",
    "title": "Equality, typed hashing, ordering, display without Python leakage",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VARIANT-001",
    "title": "Enums: declaration, qualified construction, methods",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VARIANT-002",
    "title": "Pattern matching: all pattern kinds, guards, is-expressions with bindings",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "VARIANT-003",
    "title": "Runtime non-exhaustive match abandonment",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "OPTION-001",
    "title": "Option/T?/null and API",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FN-001",
    "title": "Functions: params, defaults, named args, return",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FN-002",
    "title": "Methods with explicit self, associated functions",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FN-003",
    "title": "Lambdas and closures",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FN-004",
    "title": "Control flow and expression-valued blocks",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "FN-005",
    "title": "Left-to-right evaluation order",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "BIND-001",
    "title": "let/const/assignment runtime semantics, uninitialised bindings",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-001",
    "title": "Type terms and annotation conversion",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-002",
    "title": "Runtime boundary checks: params, returns, let, fields, collections",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-003",
    "title": "Transient nested checks inserted at typed uses",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-004",
    "title": "Dynamic mismatch diagnostics: boundary, annotation, origin",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-005",
    "title": "Generics for functions/records/enums with static instantiation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-006",
    "title": "Static expression type checking (verified errors, draft warnings)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-007",
    "title": "as-narrowing and type patterns",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-008",
    "title": "Dynamic callable narrowing before verified invocation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TYPE-009",
    "title": "Exported-interface annotation requirements (verified)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "PROTOCOL-001",
    "title": "Protocol declarations",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "PROTOCOL-002",
    "title": "Structural conformance table (arity, effects, no added preconditions)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "PROTOCOL-003",
    "title": "Protocol-annotated boundary shallow shape/effect check",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "PROTOCOL-004",
    "title": "satisfies declaration static check",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "PROTOCOL-005",
    "title": "Inherited protocol contracts on every invocation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "PROTOCOL-006",
    "title": "Implementation postconditions supplement inherited ones",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-001",
    "title": "error / category / error enum declarations",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-002",
    "title": "throw and try propagation with propagation chain",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-003",
    "title": "catch by type/category; no catch-all",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-004",
    "title": "else fallback legality (one known concrete type)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-005",
    "title": "Runtime enforcement of written throws clauses (AMB-005)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-006",
    "title": "Top-level unhandled recoverable exception behaviour and exit status",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-007",
    "title": "AggregateException with provenance",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-008",
    "title": "Static effect checking: missing try, undeclared throws",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-009",
    "title": "Effect variables, unions, forwarding through callbacks",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-010",
    "title": "Abandonment non-catchable; diagnostics with stack",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ERR-011",
    "title": "Hard termination escalation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESULT-001",
    "title": "Result type and API",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESULT-002",
    "title": "capture / orThrow / propagate conversions",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESULT-003",
    "title": "Reject functions both throwing and returning Result",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESULT-004",
    "title": "Err provenance: creation span, chain, task lineage, context",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-001",
    "title": "requires/ensures runtime checking",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-002",
    "title": "result binding and old() snapshot legality",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-003",
    "title": "Restricted contract language static validation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-004",
    "title": "predicate declarations (non-recursive, predicates-only calls)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-005",
    "title": "Invariants on frozen and mutable records; field control",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-006",
    "title": "Invariant checks at exits with outermost-call rule",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-007",
    "title": "Exit ordering: cleanup before postconditions; invariant failure supersedes",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CONTRACT-008",
    "title": "Violation diagnostics with sub-expression values and blame",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-001",
    "title": "resource fn providers, exactly one yield (static + runtime)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-002",
    "title": "use scopes, expression-valued, ScopeExit to provider",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-003",
    "title": "borrow parameters",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-004",
    "title": "Runtime no-escape enforcement",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-005",
    "title": "Static no-escape checking",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-006",
    "title": "Normal release on return/exception/cancellation without suppression",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-007",
    "title": "onAbandon restricted abandonment-safe release",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-008",
    "title": "Cleanup/release failure combination table (all rows)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-009",
    "title": "defer: block-scoped LIFO, not on abandonment, async under masking",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "RESOURCE-010",
    "title": "Scope-width advisories (provisional)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "callcheck.scope_width_advice; tests/conformance/test_runtime_diagnostics.py"
   },
   {
    "id": "RESOURCE-011",
    "title": "Built-in fs providers (read/write/atomic write/temp dir)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SCHED-001",
    "title": "Baton-passing coroutine primitive",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SCHED-002",
    "title": "Deterministic FIFO scheduler",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SCHED-003",
    "title": "Seeded random scheduling mode",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SCHED-004",
    "title": "Clock (real/virtual), sleep, Instant/Duration",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SCHED-005",
    "title": "Deadlock detection diagnostic",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ASYNC-001",
    "title": "async fn / await runtime semantics",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ASYNC-002",
    "title": "Static async rules: await only in async, missing await, sync->async calls",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-001",
    "title": "parallel fail-fast",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-002",
    "title": "parallel collect -> TaskGroupReport",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-003",
    "title": "parallel race",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-004",
    "title": "parallel firstSuccess",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-005",
    "title": "spawn forms, handles, await, observation (AMB-002)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-006",
    "title": "Child abandonment dominance, TaskGroupFailure",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-007",
    "title": "Stable task paths and task-tree reports",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-008",
    "title": "External cancellation coinciding with group failure",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TASK-009",
    "title": "Quiescence before structured exit",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CANCEL-001",
    "title": "Cancellation requests, delivery points, cancel.check()",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CANCEL-002",
    "title": "Cancellation not catchable/capturable",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CANCEL-003",
    "title": "Cleanup masking and redelivery",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CANCEL-004",
    "title": "within deadline -> DeadlineExceeded",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CANCEL-005",
    "title": "Stuck-cleanup diagnostic, SIGINT and double-SIGINT escalation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/conformance/test_runtime_diagnostics.py (stuck cleanup, SIGINT x2)"
   },
   {
    "id": "CANCEL-006",
    "title": "Verified warning for async loops lacking cancellation points",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ISOLATION-001",
    "title": "Static sendability classification",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ISOLATION-002",
    "title": "Runtime graph inspection for dynamic values",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ISOLATION-003",
    "title": "Graph copy preserving cycles/aliases",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ISOLATION-004",
    "title": "Closure capture sendability (mutable captures rejected)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ISOLATION-005",
    "title": "Reject resources/borrows/controllers/unsafe capabilities",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "ISOLATION-006",
    "title": "Large-copy advisories",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-001",
    "title": "Controller/ports and capacity construction",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-002",
    "title": "Blocking send/receive and rendezvous matching",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-003",
    "title": "Buffered and unbounded channels",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-004",
    "title": "Closure, holder tracking, NoReceivers/NoSenders/ControllerClosed",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-005",
    "title": "Nonblocking trySend/tryReceive outcomes",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-006",
    "title": "Cancellation commit atomicity for channel ops",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-007",
    "title": "Ordering and commit sequence numbers",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-008",
    "title": "Mutable messages copied after reservation, before commit",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-009",
    "title": "FIFO waiter queues; cancellation removes waiter",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-010",
    "title": "Closure diagnostics and bounded event history",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-011",
    "title": "Broadcast (frozen-only)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-012",
    "title": "for await receive loop",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CHANNEL-013",
    "title": "Unbounded growth advisory",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-001",
    "title": "Static select syntax and branch kinds",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-002",
    "title": "Atomic one-winner commit; losers have no effect",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-003",
    "title": "Rotating fairness cursor per site/activation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-004",
    "title": "select priority + starvation warning",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-005",
    "title": "select now with none ready",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-006",
    "title": "Deadlines: at / after",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-007",
    "title": "Guards (precomputed frozen booleans)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-008",
    "title": "Closed-channel outcomes",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-009",
    "title": "Task completion branch",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-010",
    "title": "Pure branch setup static check",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-011",
    "title": "Select cancellation semantics",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-012",
    "title": "Random tie-breaking in stress mode",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-013",
    "title": "Selection event ring buffer diagnostics",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-014",
    "title": "selectReceive / selectTask dynamic homogeneous helpers",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "SELECT-015",
    "title": "Loop diagnostics: deadline reset, closed loop, busy poll",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DRAFT-VERIFY-001",
    "title": "Mode plumbing: manifest default + CLI override",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DRAFT-VERIFY-002",
    "title": "Severity policy for obligations by mode",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DRAFT-VERIFY-003",
    "title": "Draft runtime meaning identical to verified",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "DRAFT-VERIFY-004",
    "title": "Release requires verified acceptance",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CLI-001",
    "title": "lang run",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CLI-002",
    "title": "lang check",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CLI-003",
    "title": "lang format",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CLI-004",
    "title": "lang test runner",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CLI-005",
    "title": "lang repl",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "CLI-006",
    "title": "Exit status conventions",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-001",
    "title": "Core builtins (print, min, max, abs, ...)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-002",
    "title": "math module",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-003",
    "title": "json module",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-004",
    "title": "fs module helpers",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-005",
    "title": "time module",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-006",
    "title": "Standard concrete errors and categories",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "STD-007",
    "title": "String utilities and regex",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "strings.py + std.regex (IMPL-007)"
   },
   {
    "id": "STD-008",
    "title": "Channel helpers in language stdlib (fan-in, receive-until-closed)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "lang/stdlib/chan.lang; tests/conformance/test_stdlib.py"
   },
   {
    "id": "STD-009",
    "title": "Ordinary protocols Comparable/Hashable/Iterable",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "lang/stdlib/order.lang; tests/conformance/test_stdlib.py"
   },
   {
    "id": "TEST-INFRA-001",
    "title": "Conformance harness (expected stdout/exit/diagnostic codes)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TEST-INFRA-002",
    "title": "Architecture dependency test",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TEST-FUZZ-001",
    "title": "Parser malformed-input robustness fuzz",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TEST-FUZZ-002",
    "title": "Formatter idempotence fuzz",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "TEST-FUZZ-003",
    "title": "Scheduling interleaving fuzz (seeded)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/fuzz/test_schedule_fuzz.py (6 programs x 20 seeds)"
   },
   {
    "id": "TEST-FUZZ-004",
    "title": "Graph copy property tests",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/fuzz/test_graph_copy_property.py (150 random graphs)"
   },
   {
    "id": "TEST-FUZZ-005",
    "title": "Exhaustiveness combinatorics",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/fuzz/test_exhaustiveness_property.py (80 programs vs brute force)"
   },
   {
    "id": "TEST-FUZZ-006",
    "title": "Diagnostic span consistency",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "tests/fuzz/test_parser_fuzz.py check_diags (spans within file)"
   },
   {
    "id": "TEST-INT-001",
@@ -1372,80 +1565,93 @@
   {
    "id": "APP-SPEC-001",
    "title": "LocalFlow PROGRAM_SPEC.md",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-SPEC-002",
    "title": "LocalFlow TEST_PLAN.md",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-FIX-001",
    "title": "LocalFlow fixtures incl. generated large DAGs",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-ORACLE-001",
    "title": "Python reference model (oracle)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-BB-001",
    "title": "Black-box acceptance harness comparing oracle vs LocalFlow",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-IMPL-001",
    "title": "LocalFlow: workflow parsing and validation",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-IMPL-002",
    "title": "LocalFlow: DAG analysis (duplicates, missing deps, cycles)",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-IMPL-003",
    "title": "LocalFlow: scheduler with bounded concurrency",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-IMPL-004",
    "title": "LocalFlow: job kinds",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-IMPL-005",
    "title": "LocalFlow: retry/timeout/failure policies",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-IMPL-006",
    "title": "LocalFlow: reporting",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "APP-ADV-001",
    "title": "LocalFlow adversarial acceptance cases",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "see FEATURE_MATRIX.md row(s) for implementation/tests"
   },
   {
    "id": "AUDIT-001",
    "title": "First full V3 coverage reread after apparent completion",
-   "state": "TODO",
-   "deps": []
+   "state": "DONE",
+   "deps": [],
+   "evidence": "first V3 reread complete; gaps closed (stdlib, BUG-0011..0015, diag coverage, render budget, fuzz/property suites); FEATURE_MATRIX filled and validated by tests/unit/test_feature_matrix.py"
   },
   {
    "id": "AUDIT-002",

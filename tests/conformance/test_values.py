@@ -216,3 +216,16 @@ def test_durations():
     r = ok("""fn main() { let d = 1500.millis
  print(d, 2.seconds + 250.millis, d.millis) }""")
     assert r.lines == ["1500ms 2250ms 1500"]
+
+
+def test_string_normalisation_is_explicit():
+    """V3 7.3.3 / SPEC-009: no implicit normalisation; equality compares code points;
+    `normalized(form)` is explicit."""
+    r = ok("""
+fn main() {
+    let composed = "\\u{e9}"
+    let decomposed = "e\\u{301}"
+    print(composed == decomposed, composed.length, decomposed.length)
+    print(composed == decomposed.normalized("NFC"), composed.normalized("NFD") == decomposed)
+}""")
+    assert r.lines == ["false 1 2", "true true"]

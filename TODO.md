@@ -35,6 +35,7 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
 - [x] docs/LANGUAGE_GUIDE.md (examples executed by tests/unit/test_language_guide.py)
 
 ## Tests
+- [x] Property/fuzz: schedule interleavings, graph copy, exhaustiveness vs brute force
 - [x] Unit (lexer, parser, architecture, docs consistency, runtime annotations)
 - [x] Conformance, negative, mode interactions, regressions, fuzz (formatter, parser)
 - [x] Interaction suite TEST-INT-001..030 (tests/interactions/test_interactions_{a,b,c}.py)
@@ -48,11 +49,10 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
 - [x] Verified-mode clean (after BUG-0015); manifest selects verified
 
 ## Audits / final
-- [ ] First V3 coverage sweep (in progress: Part V-VII reread done for 5.x/6.x/7.1-7.7;
-      gaps closed so far: stdlib, diagnostic-code coverage, render budget, waiter FIFO,
-      after-commit cancellation, BUG-0011..0015)
+- [x] First V3 coverage sweep (complete; see PROGRESS.md for the gaps it closed)
 - [ ] Second independent audit; LocalFlow adversarial review
-- [ ] WORK_ITEMS.json / FEATURE_MATRIX.md status reconciliation
+- [x] WORK_ITEMS.json / FEATURE_MATRIX.md status reconciliation (matrix references
+      validated by tests/unit/test_feature_matrix.py)
 - [ ] FINAL_REPORT.md; final green run
 
 ## Known limitations (recorded, not hidden)
