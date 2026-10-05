@@ -147,6 +147,11 @@ async fn attemptWithTimeout(
     p: Progress,
     a: Attempt,
 ) -> Dyn throws JobFailed {
+    // a sub-workflow's timeout is a cancellation request on its nested run (§4.7), which
+    // records the nested completions due at that instant first (§5.5; LF-004)
+    if job.kind == Kind.Subworkflow {
+        return try await attempt(job, k, inputs, ctx, p, a)
+    }
     return match a.deadline {
         Some(d) => try within ctx.clock.t0 + d.millis {
             try await attempt(job, k, inputs, ctx, p, a)
@@ -556,7 +561,11 @@ async fn subworkflow(
         catch category IO => {
             throw fail("io", "cannot create {nested.outDir}")
         }
-    let result = await engine.run(wf, nested, null, p)
+    let cancelAt = a.deadline.map(fn(d) => d - a.start)
+    let result = await engine.run(wf, nested, cancelAt, p)
+    if cancelAt.isSome() && result.status == "CANCELLED" {
+        throw fail("timeout", "sub-workflow {name} did not finish within {cancelAt.unwrapOr(0)} ms")
+    }
     if result.status != "SUCCEEDED" {
         throw fail("subworkflow", "sub-workflow {name} finished {result.status}")
     }

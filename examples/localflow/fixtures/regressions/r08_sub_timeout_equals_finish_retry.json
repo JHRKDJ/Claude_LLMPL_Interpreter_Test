@@ -1,0 +1,43 @@
+{
+  "workflow": "g08",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 10,
+            "value": 1
+          }
+        },
+        {
+          "id": "y",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 0
+          },
+          "deps": [
+            "x"
+          ]
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "timeoutMs": 10,
+      "retry": {
+        "maxAttempts": 2
+      },
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

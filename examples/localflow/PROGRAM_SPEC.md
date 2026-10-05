@@ -182,7 +182,11 @@ starting at the moment the job starts (its own `maxConcurrency`, `groups` and
 `onFailure` apply inside it; it does not consume extra parent slots). Its transform
 outputs go to `OUTDIR/JOBID/`. The `subreport` uses times relative to the nested
 run's start. A timeout of the job acts on the nested run as a cancellation request at
-`timeoutMs` (the subreport then has status `CANCELLED`); a retry runs the nested
+`timeoutMs` (the subreport then has status `CANCELLED`). That request follows §5.5:
+nested completions due at `timeoutMs` are recorded first, and if every nested job is
+then final the request has no effect and the attempt ends with the nested run's own
+result (so for `subworkflow` jobs this replaces the §5.3 rule that finishing exactly at
+`timeoutMs` is a timeout); otherwise the attempt fails with class `timeout`. A retry runs the nested
 workflow again and `subreport` describes the last attempt. Output: object mapping each nested job id that
 succeeded to its output. Fails with class `subworkflow` unless the nested workflow
 succeeded. The nested report appears as the job's `subreport`. Cancellation of the

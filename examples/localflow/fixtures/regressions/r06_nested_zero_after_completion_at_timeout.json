@@ -1,0 +1,39 @@
+{
+  "workflow": "h06",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 10,
+            "value": 1
+          }
+        },
+        {
+          "id": "z",
+          "kind": "compute",
+          "deps": [
+            "x"
+          ],
+          "config": {
+            "op": "fib",
+            "n": 3
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "timeoutMs": 10,
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}
