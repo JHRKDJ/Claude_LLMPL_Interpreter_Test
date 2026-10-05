@@ -361,7 +361,7 @@ Regression test failed before fix: yes (2 of 3)
 Fix: boundary checks compare runtime element-type metadata; the checker marks calls on
   annotation-typed mutable collections so Dyn arguments are checked before the call
   (lang/runtime/rtypes.py, lang/check/callcheck.py, lang/runtime/interp/calls.py).
-Commit: PENDING
+Commit: 3fd2815
 Status: fixed
 
 BUG-0025
@@ -374,7 +374,7 @@ Regression test failed before fix: yes (2 of 3)
 Fix: explicit type arguments are checked at construction; T-typed field reads through
   an annotated instantiation get a transient check (lang/check/expr.py,
   lang/runtime/interp/calls.py, exprs.py).
-Commit: PENDING
+Commit: 3fd2815
 Status: fixed
 
 BUG-0026
@@ -388,7 +388,7 @@ Regression test failed before fix: yes (3 of 4, verified by stashing the fix)
 Fix: typed calls carry argument/result/effect checks naming the relied-upon annotation;
   `as` counts as an annotation origin (lang/check/callcheck.py, expr.py,
   lang/runtime/interp/calls.py).
-Commit: PENDING
+Commit: 3fd2815
 Status: fixed
 
 BUG-0027
@@ -401,7 +401,7 @@ Regression test failed before fix: yes
 Fix: E is bound per call from the effects of the callable arguments whose annotation
   mentions it; unknown callback effects stay permissive (lang/runtime/interp/calls.py;
   IMPL-005 corrected).
-Commit: PENDING
+Commit: 3fd2815
 Status: fixed
 
 BUG-0028
@@ -417,5 +417,5 @@ Fix: access to a mutable-valued invariant field is restricted to the record's ow
   methods and contracts, statically (S.CONTRACT.INVARIANT_FIELD_ACCESS) and at run time
   (A.CONTRACT.INVARIANT_FIELD_ACCESS); SPEC-014 amended (lang/check/expr.py,
   lang/runtime/interp/exprs.py).
-Commit: PENDING
+Commit: 3fd2815
 Status: fixed
