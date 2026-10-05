@@ -132,6 +132,8 @@ CODES: dict[str, str] = {
     "A.TYPE.FROZEN_MUTATION": "attempt to mutate a frozen value",
     "A.TYPE.NOT_ITERABLE": "value is not iterable",
     "A.TYPE.MISSING_FIELD": "record construction lacks a required field",
+    "A.MODULE.INIT_CYCLE": "module constant initialisation cycle detected while linking",
+    "A.MODULE.MUTABLE_GLOBAL": "module constant evaluated to a mutable value while linking",
     "A.CONTRACT.INVARIANT_FIELD_ACCESS": "mutable invariant field accessed outside the record's methods",
     "A.CONTRACT.INVARIANT_FIELD_WRITE": "invariant-relevant field assigned outside the record's own methods",
     "A.BINDING.UNINITIALISED": "binding read before initialisation",

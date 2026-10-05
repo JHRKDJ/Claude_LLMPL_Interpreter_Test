@@ -167,6 +167,10 @@ class Resolver:
         self.module_exports: dict[str, dict[str, A.Decl]] = {}
         self.module_decls: dict[str, dict[str, A.Decl]] = {}
         self.capture_sites: list = []  # (Lambda/Spawn node, captured bindings), finalised in run()
+        # declaration-level reference graph for initialisation-cycle detection (BUG-0042)
+        self.ref_owner = None
+        self.ref_edges: dict[int, list] = {}
+        self.decl_module: dict[int, str] = {}
 
     # ------------------------------------------------------------------ diagnostics
     def err(self, stable: str, msg: str, span: Span, label: str = "", help: Optional[str] = None,
@@ -225,10 +229,12 @@ class Resolver:
         # been resolved: a later `x = ...` in the parent also makes the capture live (BUG-0018).
         for node, caps in self.capture_sites:
             node.ann["captures"] = [(n, b.assigned) for n, b in caps.items()]
+        self.check_init_cycles()
         return self.diags
 
     def resolve_module(self, mname: str, ms) -> None:
         mod: A.Module = ms.ast
+        self.cur_module_name = mname
         prelude = Scope(None, 0, "prelude")
         for n in PRELUDE_VALUES:
             prelude.names[n] = Binding(n, "prelude", None, None, 0, is_const=True, module_level=True)
@@ -287,6 +293,60 @@ class Resolver:
 
     # ------------------------------------------------------------------ declarations
     def resolve_decl(self, d, mscope: Scope) -> None:
+        saved = self.ref_owner
+        if isinstance(d, (A.FnDecl, A.ConstDecl)):
+            self.ref_owner = d
+            self.decl_module[id(d)] = getattr(self, "cur_module_name", None)
+        try:
+            self._resolve_decl(d, mscope)
+        finally:
+            self.ref_owner = saved
+
+    def _note_ref(self, target) -> None:
+        """Record that the declaration being resolved reads a module constant or function."""
+        if self.ref_owner is not None and isinstance(target, (A.FnDecl, A.ConstDecl)):
+            self.ref_edges.setdefault(id(self.ref_owner), []).append(target)
+
+    def check_init_cycles(self) -> None:
+        """Module constants whose initialisers reach themselves (directly, through called
+        functions, or across modules) are rejected statically (V3 6.11; BUG-0042)."""
+        consts = [d for decls in self.module_decls.values() for d in decls.values() if isinstance(d, A.ConstDecl)]
+        reported = set()
+        for c in consts:
+            path = self._cycle_from(c)
+            if path is None:
+                continue
+            members = frozenset(id(x) for x in path if isinstance(x, A.ConstDecl))
+            if members in reported:
+                continue
+            reported.add(members)
+            names = " -> ".join(f"{self.decl_module.get(id(x)) or '?'}.{x.name}" for x in path + [c])
+            via_fn = any(isinstance(x, A.FnDecl) for x in path)
+            msg = (f"module constant initialisation cycle: {names}" if not via_fn else
+                   f"module constant initialisation may be cyclic (through a function): {names}")
+            sec = [Label(getattr(x, "name_span", None) or x.span, f"`{x.name}` reads the next item") for x in path[1:]]
+            if via_fn:
+                self.obligation("S.MODULE.INIT_CYCLE", msg, getattr(c, "name_span", None) or c.span,
+                                label="cycle starts here", secondary=sec,
+                                help="break the cycle by computing one constant without reading the other")
+            else:
+                self.err("S.MODULE.INIT_CYCLE", msg, getattr(c, "name_span", None) or c.span, "cycle starts here",
+                         secondary=sec, help="break the cycle by computing one constant without reading the other")
+
+    def _cycle_from(self, start):
+        stack = [(start, [start])]
+        seen = set()
+        while stack:
+            node, path = stack.pop()
+            for t in self.ref_edges.get(id(node), []):
+                if t is start:
+                    return path
+                if id(t) not in seen:
+                    seen.add(id(t))
+                    stack.append((t, path + [t]))
+        return None
+
+    def _resolve_decl(self, d, mscope: Scope) -> None:
         if isinstance(d, A.FnDecl):
             self.resolve_fn(d, mscope, set(d.type_params))
         elif isinstance(d, A.RecordDecl):
@@ -434,6 +494,7 @@ class Resolver:
             self.resolve_type(t.inner, scope, tps)
 
     def check_module_member(self, module: str, member: str, span) -> None:
+        self._note_ref(self.module_decls.get(module, {}).get(member))
         exports = self.module_exports.get(module)
         if exports is None or member in exports:
             return
@@ -656,6 +717,8 @@ class Resolver:
             self.unresolved(name, node.span, scope)
             return
         b.used = True
+        if b.module_level and b.kind in ("fn", "const", "import"):
+            self._note_ref(b.node)
         node.ann["binding"] = b
         if b.init_span is not None:
             node.ann["init_span"] = b.init_span

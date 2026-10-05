@@ -587,3 +587,32 @@ Fix: placement is no longer part of the equivalence check (comment text and orde
   comments inside a single-line list still move after the list (text and order kept).
 Commit: ed88c5f
 Status: fixed
+
+BUG-0041
+Origin: second independent audit (types auditor, T10)
+Subsystems: protocol conformance (built-in receivers)
+Symptom: built-in values conformed to a protocol by method name only: a `List` passed
+  `protocol Getter { fn get(self) -> Int }` (List.get takes one argument) in verified
+  mode and at the runtime boundary; the failure surfaced inside typed code.
+Minimal reproduction: tests/regressions/test_bug_0041_builtin_protocol_arity.py
+Regression test failed before fix: yes (2 of 3)
+Fix: built-in methods conform by arity range, async-ness and effect, statically and at
+  the boundary (lang/runtime/rtypes.py, lang/check/typecheck.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0042
+Origin: second independent audit (types auditor, T11)
+Subsystems: modules (initialisation cycles) × diagnostics consistency
+Symptom: `check --mode=verified` accepted cyclic module-constant initialisation (direct,
+  through a function, across modules); it surfaced only at link time with a static code
+  but abandonment exit status 3.
+Minimal reproduction: tests/regressions/test_bug_0042_static_init_cycles.py
+Regression test failed before fix: yes (4 of 5)
+Fix: the resolver builds a declaration reference graph and reports cycles statically
+  (error for direct constant cycles, verified obligation through functions); link-time
+  detection uses A.MODULE.INIT_CYCLE / A.MODULE.MUTABLE_GLOBAL. Two conformance
+  assertions that pinned the old link-time S codes were updated to the stricter
+  behaviour (lang/check/resolve.py, lang/runtime/interp/link.py).
+Commit: PENDING
+Status: fixed

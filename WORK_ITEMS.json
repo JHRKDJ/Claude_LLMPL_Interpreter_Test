@@ -1856,14 +1856,14 @@
   {
    "id": "AUD2-T10",
    "title": "Protocol shape check skips arity for builtin receivers",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T11",
    "title": "check misses const init cycles / mutable-global init; exit code inconsistency",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

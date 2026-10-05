@@ -464,9 +464,15 @@ class Checker(WalkMixin, CallMixin, SelectCheckMixin, ExprMixin):
         k = kind_of_type(src)
         if k is not None:
             table = METHODS.get(k, {})
-            for mname in pt.methods:
-                if mname not in table:
+            for mname, psig in pt.methods.items():
+                b = table.get(mname)
+                if b is None:
                     return f"missing method `{mname}`"
+                n = len(psig.params)
+                if n < b.min_args or (b.max_args is not None and n > b.max_args):  # BUG-0041
+                    return f"method `{mname}` takes {b.min_args} argument(s) but the protocol requires {n}"
+                if bool(b.is_async) != bool(psig.is_async):
+                    return f"method `{mname}` differs in async-ness"
             return None
         return True
 

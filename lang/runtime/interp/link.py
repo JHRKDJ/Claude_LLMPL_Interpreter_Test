@@ -324,7 +324,7 @@ class LinkMixin:
             cycle = [t.decl for t in self.const_stack[self.const_stack.index(thunk):]] + [thunk.decl]
             names = " -> ".join(f"{t.module.name}.{t.decl.name}" for t in
                                 self.const_stack[self.const_stack.index(thunk):]) + f" -> {thunk.module.name}.{thunk.decl.name}"
-            d = Diagnostic(code("S.MODULE.INIT_CYCLE"),
+            d = Diagnostic(code("A.MODULE.INIT_CYCLE"),  # runtime backstop of the static check
                            f"module constant initialisation cycle: {names}",
                            primary=Label(thunk.decl.span, "cycle starts here"))
             for c in cycle[1:-1]:
@@ -340,7 +340,7 @@ class LinkMixin:
         from ..frozen import is_frozen
         if not is_frozen(v):
             thunk.state = "pending"
-            d = Diagnostic(code("S.MODULE.MUTABLE_GLOBAL"),
+            d = Diagnostic(code("A.MODULE.MUTABLE_GLOBAL"),
                            f"module constant `{thunk.decl.name}` must be a frozen value",
                            primary=Label(thunk.decl.value.span, "this value is mutable"))
             d.help.append("module-level state must be frozen; create mutable state in `main` and pass it explicitly")

@@ -23,9 +23,12 @@ If this file conflicts with V3, V3 wins.
   candidates; `--diff` prints the patch instead.
 - Unknown top-level package: `S.MODULE.UNKNOWN_DEPENDENCY` (help points at
   `lang.toml`); unknown module in a known root: `S.MODULE.NOT_FOUND`.
-- Module constants are lazily initialised thunks; a dependency cycle among them is
-  `S.MODULE.INIT_CYCLE` with the cycle path; a mutable value is
-  `S.MODULE.MUTABLE_GLOBAL` (statically when the type is known, at link time otherwise).
+- Module constants are lazily initialised thunks. Initialisation cycles are found
+  statically from the declaration reference graph (`S.MODULE.INIT_CYCLE`: an error for
+  direct constant cycles, a verified obligation for cycles through function bodies,
+  across modules too); link time is the backstop (`A.MODULE.INIT_CYCLE`). A mutable
+  value is `S.MODULE.MUTABLE_GLOBAL` when the type is statically known,
+  `A.MODULE.MUTABLE_GLOBAL` when only discovered at link time.
 
 ## 3. Specification-stage choices
 SPEC-020 (modules, `pub`, manifest, lockfile), AMB-010 (unresolved names block in draft).

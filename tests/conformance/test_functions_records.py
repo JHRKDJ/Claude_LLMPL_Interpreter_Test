@@ -321,11 +321,12 @@ fn main() { print(LIMIT, NAMES) }""")
     r = run("""const STATE = MutableList.of(1)
 fn main() { print(1) }""")
     assert r.check_errors == ["S.MODULE.MUTABLE_GLOBAL"]
-    # Dyn initialiser: rejected when the constant is initialised at link time
+    # Dyn initialiser: rejected when the constant is initialised at link time (an
+    # abandonment-class backstop, so it carries an A.* code; BUG-0042)
     r = run("""fn mk() { return MutableList.of(1) }
 const STATE = mk()
 fn main() { print(1) }""")
-    assert r.codes == ["S.MODULE.MUTABLE_GLOBAL"]
+    assert r.codes == ["A.MODULE.MUTABLE_GLOBAL"]
 
 
 def test_module_level_let_rejected():
@@ -363,8 +364,11 @@ def test_const_init_cycle_detected():
     r = run("""const A = B + 1
 const B = A + 1
 fn main() { print(A) }""")
-    assert r.codes == ["S.MODULE.INIT_CYCLE"]
-    assert "A" in r.diag.message and "B" in r.diag.message
+    # detected statically, before the program runs (BUG-0042); link-time detection is
+    # the backstop (A.MODULE.INIT_CYCLE, tests/regressions/test_bug_0042_static_init_cycles.py)
+    assert r.check_errors == ["S.MODULE.INIT_CYCLE"] and r.exit_code is None
+    d = r.check[0]
+    assert "A" in d.message and "B" in d.message
 
 
 def test_directory_module():

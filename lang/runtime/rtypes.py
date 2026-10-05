@@ -243,6 +243,18 @@ def method_conforms(pdecl, m) -> Optional[str]:
                 return f"may throw {', '.join(sorted(x.rsplit('.', 1)[-1] for x in extra))}, which the protocol does not declare"
         return None
     if type(m) is Builtin:
+        # built-in methods conform by arity range, async-ness and effect (BUG-0041)
+        n = len(p_params)
+        if n < m.min_args or (m.max_args is not None and n > m.max_args):
+            want = str(m.min_args) if m.min_args == m.max_args else f"{m.min_args}..{m.max_args}"
+            return f"takes {want} argument(s) but the protocol requires {n}"
+        if bool(m.is_async) != bool(pdecl.is_async):
+            return "differs in async-ness from the protocol"
+        p_eff = getattr(pdecl, "_effect_names", None)
+        if m.effect and p_eff is not None:
+            extra = {e for e in m.effect if e not in p_eff}
+            if extra:
+                return f"may throw {', '.join(sorted(x.rsplit('.', 1)[-1] for x in extra))}, which the protocol does not declare"
         return None
     return "is not a method"
 
