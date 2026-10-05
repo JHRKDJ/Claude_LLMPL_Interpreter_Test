@@ -177,7 +177,3 @@ def _to_str(interp, recv, args, span):
     return recv
 
 
-@method("Str", "compareTo", 1, sig="fn(Str) -> Int", contract_safe=True)
-def _cmp(interp, recv, args, span):
-    o = want_str(args[0])
-    return -1 if recv < o else (1 if recv > o else 0)

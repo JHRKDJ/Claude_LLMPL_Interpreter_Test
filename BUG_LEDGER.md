@@ -770,3 +770,17 @@ Fix: with external cancellation pending and a cancelled child, firstSuccess prop
   the BUG-0023 firstSuccess expectation was corrected to match.
 Commit: 9939a56
 Status: fixed
+
+BUG-0053
+Origin: final green run (verifying the `lang test` CLI with a small test file)
+Subsystems: standard library (builtin methods × std.order protocols)
+Symptom: `Str` had `compareTo`, so strings satisfied `std.order.Comparable`, but `Int`,
+  `Float`, `Duration` and `Instant` did not: `order.sort([3, 1, 2])` was a static
+  mismatch (an error in verified mode) and abandoned at run time.
+Minimal reproduction: tests/regressions/test_bug_0053_primitive_compare_to.py
+Regression test failed before fix: yes (all 3)
+Fix: one `compareTo` for every ordered primitive, defined as the `<` operator's
+  ordering (NaN and mixed Int/Float abandon) (lang/runtime/builtins/numbers.py;
+  the Str-only version removed from strings.py).
+Commit: pending
+Status: fixed

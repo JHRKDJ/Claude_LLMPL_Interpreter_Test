@@ -5,7 +5,7 @@ import math
 from decimal import ROUND_HALF_UP, Decimal
 
 from ..core_types import NONE, some
-from ..equality import float_repr
+from ..equality import compare, float_repr
 from ..signals import Fault
 from ..values import Duration, Instant
 from .common import want_float, want_int
@@ -15,6 +15,13 @@ NS = 1_000_000_000
 
 
 # ---------------------------------------------------------------- Int
+# One ordering for every ordered primitive, identical to `<` (NaN and mixed Int/Float
+# abandon), so they structurally satisfy std.order.Comparable (BUG-0053).
+@method(("Int", "Float", "Str", "Duration", "Instant"), "compareTo", 1, sig="fn(Self) -> Int", contract_safe=True)
+def _compare_to(interp, recv, args, span):
+    return compare(recv, args[0])
+
+
 @method("Int", "toFloat", 0, sig="fn() -> Float", contract_safe=True)
 def _i_to_float(interp, recv, args, span):
     try:
