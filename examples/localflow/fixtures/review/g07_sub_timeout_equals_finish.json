@@ -1,0 +1,28 @@
+{
+  "workflow": "g07",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 10,
+            "value": 1
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "timeoutMs": 10,
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

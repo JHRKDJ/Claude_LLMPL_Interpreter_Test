@@ -1,0 +1,22 @@
+{
+  "workflow": "f11",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "retryable",
+          "retryable",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 2,
+        "multiplier": 1.5
+      }
+    }
+  ]
+}

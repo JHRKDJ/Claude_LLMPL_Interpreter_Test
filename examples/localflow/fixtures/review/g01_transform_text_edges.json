@@ -1,0 +1,41 @@
+{
+  "workflow": "g01",
+  "jobs": [
+    {
+      "id": "nl_num",
+      "kind": "transform",
+      "config": {
+        "input": "data/nl.txt",
+        "output": "nl_num.txt",
+        "op": "number"
+      }
+    },
+    {
+      "id": "nl_up",
+      "kind": "transform",
+      "config": {
+        "input": "data/nl.txt",
+        "output": "nl_up.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "crlf_num",
+      "kind": "transform",
+      "config": {
+        "input": "data/crlf.txt",
+        "output": "crlf_num.txt",
+        "op": "number"
+      }
+    },
+    {
+      "id": "empty_num",
+      "kind": "transform",
+      "config": {
+        "input": "data/empty.txt",
+        "output": "e.txt",
+        "op": "number"
+      }
+    }
+  ]
+}

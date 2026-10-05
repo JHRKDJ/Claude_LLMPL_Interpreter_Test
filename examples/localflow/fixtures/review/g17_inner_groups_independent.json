@@ -1,0 +1,60 @@
+{
+  "workflow": "g17",
+  "maxConcurrency": 1,
+  "groups": {
+    "g": 1
+  },
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "maxConcurrency": 3,
+      "groups": {
+        "g": 2
+      },
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 4
+          },
+          "group": "g"
+        },
+        {
+          "id": "y",
+          "kind": "external",
+          "config": {
+            "latencyMs": 4
+          },
+          "group": "g"
+        },
+        {
+          "id": "z",
+          "kind": "external",
+          "config": {
+            "latencyMs": 4
+          },
+          "group": "g"
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "group": "g",
+      "config": {
+        "workflow": "w"
+      }
+    },
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1
+      },
+      "group": "g"
+    }
+  ]
+}

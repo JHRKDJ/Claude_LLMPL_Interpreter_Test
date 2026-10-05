@@ -1,0 +1,42 @@
+{
+  "workflow": "f49",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "t",
+          "kind": "transform",
+          "config": {
+            "input": "data/words.txt",
+            "output": "o.txt",
+            "op": "upper"
+          }
+        },
+        {
+          "id": "r",
+          "kind": "external",
+          "config": {
+            "latencyMs": 5,
+            "script": [
+              "permanent"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 1
+      },
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

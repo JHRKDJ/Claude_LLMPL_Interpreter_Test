@@ -1,0 +1,48 @@
+{
+  "workflow": "f33",
+  "jobs": [
+    {
+      "id": "t",
+      "kind": "transform",
+      "timeoutMs": 10,
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 3
+      },
+      "config": {
+        "input": "data/words.txt",
+        "output": "t.txt",
+        "op": "upper",
+        "latencyMs": 10,
+        "failCleanup": true
+      }
+    },
+    {
+      "id": "u",
+      "kind": "transform",
+      "timeoutMs": 11,
+      "config": {
+        "input": "data/words.txt",
+        "output": "u.txt",
+        "op": "number",
+        "latencyMs": 10,
+        "failCleanup": true
+      }
+    },
+    {
+      "id": "v",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "v.txt",
+        "op": "number",
+        "latencyMs": 4,
+        "failAfterWrite": true,
+        "failCleanup": true
+      },
+      "retry": {
+        "maxAttempts": 3
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "workflow": "g21",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "onFailure": "failFast",
+      "jobs": [
+        {
+          "id": "p",
+          "kind": "external",
+          "config": {
+            "latencyMs": 2,
+            "script": [
+              "permanent"
+            ]
+          }
+        },
+        {
+          "id": "q",
+          "kind": "external",
+          "config": {
+            "latencyMs": 5
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "w"
+      }
+    },
+    {
+      "id": "other",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "dep",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "s"
+      ]
+    }
+  ]
+}

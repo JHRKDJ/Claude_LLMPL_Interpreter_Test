@@ -1,0 +1,28 @@
+{
+  "workflow": "f24",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3.0
+      }
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3.5
+      }
+    },
+    {
+      "id": "c",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2.0
+      }
+    }
+  ]
+}

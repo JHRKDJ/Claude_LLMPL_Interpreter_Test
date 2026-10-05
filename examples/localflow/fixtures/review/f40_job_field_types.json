@@ -1,0 +1,139 @@
+{
+  "workflow": "f40",
+  "groups": {
+    "g": 1
+  },
+  "jobs": [
+    {
+      "id": "nokind",
+      "config": {}
+    },
+    {
+      "id": 5,
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "depsstr",
+      "kind": "compute",
+      "deps": "a",
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "depsint",
+      "kind": "compute",
+      "deps": [
+        1
+      ],
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "grpint",
+      "kind": "compute",
+      "group": 1,
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "cfgarr",
+      "kind": "compute",
+      "config": []
+    },
+    {
+      "id": "whenstr",
+      "kind": "compute",
+      "when": "x",
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "badop",
+      "kind": "compute",
+      "config": {
+        "op": "fact",
+        "n": 1
+      }
+    },
+    {
+      "id": "negn",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": -1
+      }
+    },
+    {
+      "id": "assertmiss",
+      "kind": "compute",
+      "config": {
+        "op": "assert",
+        "value": 1
+      }
+    },
+    {
+      "id": "scriptempty",
+      "kind": "external",
+      "config": {
+        "script": []
+      }
+    },
+    {
+      "id": "scriptbad",
+      "kind": "external",
+      "config": {
+        "script": [
+          "ok",
+          "maybe"
+        ]
+      }
+    },
+    {
+      "id": "mirrorsempty",
+      "kind": "external",
+      "config": {
+        "mirrors": []
+      }
+    },
+    {
+      "id": "trmiss",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "redbad",
+      "kind": "reduce",
+      "config": {
+        "op": "avg"
+      }
+    },
+    {
+      "id": "chkmiss",
+      "kind": "check",
+      "config": {
+        "op": "gt",
+        "value": 1
+      }
+    },
+    {
+      "id": "subnocfg",
+      "kind": "subworkflow"
+    },
+    "notanobject"
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "workflow": "f01",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "a"
+      ]
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "c"
+      ]
+    },
+    {
+      "id": "c",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "b"
+      ]
+    },
+    {
+      "id": "free",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "d",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "e"
+      ]
+    },
+    {
+      "id": "e",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "f"
+      ]
+    },
+    {
+      "id": "f",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "g"
+      ]
+    },
+    {
+      "id": "g",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "d"
+      ]
+    },
+    {
+      "id": "tail",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "d",
+        "free"
+      ]
+    },
+    {
+      "id": "x",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "y"
+      ]
+    },
+    {
+      "id": "y",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "x",
+        "a"
+      ]
+    }
+  ]
+}

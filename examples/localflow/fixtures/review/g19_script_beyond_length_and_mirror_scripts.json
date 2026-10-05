@@ -1,0 +1,47 @@
+{
+  "workflow": "g19",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "retryable"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 4,
+        "backoffMs": 1,
+        "multiplier": 2
+      }
+    },
+    {
+      "id": "m",
+      "kind": "external",
+      "retry": {
+        "maxAttempts": 3
+      },
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 2,
+            "script": [
+              "retryable",
+              "retryable",
+              "ok"
+            ],
+            "value": "A"
+          },
+          {
+            "latencyMs": 1,
+            "script": [
+              "retryable"
+            ],
+            "value": "B"
+          }
+        ]
+      }
+    }
+  ]
+}

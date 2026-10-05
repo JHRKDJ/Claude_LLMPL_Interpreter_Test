@@ -64,7 +64,8 @@ Job object:
 | `timeoutMs` | integer ≥ 1 | absent | per-attempt timeout (§5.3) |
 | `config` | object | `{}` | kind-specific configuration (§4) |
 
-Unknown fields are ignored.
+Unknown fields are ignored. An *integer* is a JSON number written without a fraction
+or exponent (`3.0` and `3e0` are not integers; `true`/`false` are not integers).
 
 ## 3. Validation
 
@@ -79,7 +80,10 @@ Validation happens before any job runs. If any error is found, the workflow is
    `config` fields and their types (§4) → `malformed` with that job's id (or `null`
    if the id itself is invalid); a job whose `id` repeats an earlier job's id →
    `duplicate-id` with that id; each `deps` entry naming no job →
-   `missing-dependency` (job = the referencing job); `when` naming a job that is not
+   `missing-dependency` (job = the referencing job) — a `deps` entry may name any job
+   in the file, even one whose own `id` is invalid, and a job whose `deps` field is
+   itself malformed (wrong type or a repeated entry) gets that one `malformed` error
+   and its entries are not checked further; `when` naming a job that is not
    in `deps` or is not a `check` job → `malformed`; unknown `group` → `malformed`;
    a `hang` script step (§4.2) in a job with neither `timeoutMs` nor a workflow
    `cancelAfterMs` → `malformed`; a `subworkflow` naming an unknown workflow →
@@ -123,8 +127,10 @@ moment, cancelling the others. If every mirror fails, the attempt fails when the
 mirror fails: permanently if all mirrors failed permanently, otherwise retryably.
 
 ### 4.3 `transform` — local file transformation (resource-backed)
-`config`: `input` (path, relative to the workflow file's directory), `output` (file
-name, relative to `OUTDIR`), `op` ∈ `upper`, `number`, `csvSum`; `latencyMs` ≥ 0
+`config`: `input` (path, relative to the workflow file's directory; an absolute path
+is used as given), `output` (path relative to `OUTDIR`: `/`-separated segments that are
+non-empty and not `.` or `..`, not `report.json` and not inside `.scratch`, otherwise
+`malformed`; missing subdirectories are created), `op` ∈ `upper`, `number`, `csvSum`; `latencyMs` ≥ 0
 (default 0); `failAfterWrite` Bool (default false); `failCleanup` Bool (default false).
 An attempt:
 1. creates the scratch marker file `OUTDIR/.scratch/JOBID` (the job's workspace);
@@ -175,7 +181,8 @@ false, the job fails with class `partial` (the output is still reported).
 
 ### 4.5 `reduce` — aggregation
 `config`: `op` ∈ `sum`, `max`, `concat`, `count`. Inputs are the outputs of the job's
-`deps` in `deps` order, excluding skipped dependencies. `sum`/`max` accept integers
+`deps` in `deps` order (a reduce never runs with a skipped dependency: it is then
+`SKIPPED` itself, §5.2). `sum`/`max` accept integers
 and arrays of integers (arrays are flattened) and produce an integer (`max` of no
 values → class `bad-input`); `concat` accepts arrays and produces their
 concatenation; `count` produces the number of inputs. Any other input → `bad-input`.
@@ -200,7 +207,10 @@ result (so for `subworkflow` jobs this replaces the §5.3 rule that finishing ex
 workflow again and `subreport` describes the last attempt. Output: object mapping each nested job id that
 succeeded to its output. Fails with class `subworkflow` unless the nested workflow
 succeeded. The nested report appears as the job's `subreport`. Cancellation of the
-parent job cancels the nested workflow.
+parent job cancels the nested workflow. Output files are committed per nested job
+(§4.3): a nested transform that succeeded keeps its file under `OUTDIR/JOBID/` even
+if the `subworkflow` job later fails or is cancelled (its subreport lists it as
+`SUCCEEDED`).
 
 ## 5. Execution
 
@@ -250,6 +260,10 @@ A started job makes attempts. `attempts` in the report counts attempts started.
   `retryable`), or the kind's own class (`io`, `bad-input`, `transform`, `partial`,
   `subworkflow`, `cleanup`). Non-retryable classes end the job after one attempt
   (a timeout of a non-external job is retryable like any timeout).
+- A backoff that ends at T starts the next attempt at T as part of step 1 of §5.2
+  (it continues a running job; it is not a new start). If a cancellation request
+  or a fail-fast abort then ends the run at T, that attempt counts in `attempts` and
+  is cancelled with the job.
 
 ### 5.4 Failure policy
 - `continue`: a failed job only affects its dependents (`BLOCKED`); independent jobs

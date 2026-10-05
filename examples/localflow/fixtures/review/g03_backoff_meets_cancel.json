@@ -1,0 +1,28 @@
+{
+  "workflow": "g03",
+  "cancelAfterMs": 6,
+  "jobs": [
+    {
+      "id": "r",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 4
+      }
+    },
+    {
+      "id": "long",
+      "kind": "external",
+      "config": {
+        "latencyMs": 100
+      }
+    }
+  ]
+}

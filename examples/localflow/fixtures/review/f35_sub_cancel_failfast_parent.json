@@ -1,0 +1,58 @@
+{
+  "workflow": "f35",
+  "onFailure": "failFast",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "a",
+          "kind": "external",
+          "config": {
+            "latencyMs": 3,
+            "value": 1
+          }
+        },
+        {
+          "id": "b",
+          "kind": "external",
+          "config": {
+            "latencyMs": 30
+          },
+          "deps": [
+            "a"
+          ]
+        },
+        {
+          "id": "tr",
+          "kind": "transform",
+          "config": {
+            "input": "data/words.txt",
+            "output": "o.txt",
+            "op": "upper",
+            "latencyMs": 20
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "w"
+      }
+    },
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 7,
+        "script": [
+          "permanent"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "workflow": "h04",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "t",
+          "kind": "transform",
+          "config": {
+            "input": "data/words.txt",
+            "output": "o.txt",
+            "op": "upper",
+            "latencyMs": 10
+          }
+        },
+        {
+          "id": "y",
+          "kind": "external",
+          "config": {
+            "latencyMs": 30
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "timeoutMs": 10,
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

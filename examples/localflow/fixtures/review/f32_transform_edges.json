@@ -1,0 +1,83 @@
+{
+  "workflow": "f32",
+  "jobs": [
+    {
+      "id": "uni",
+      "kind": "transform",
+      "config": {
+        "input": "data/uni.txt",
+        "output": "uni.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "empty_up",
+      "kind": "transform",
+      "config": {
+        "input": "data/empty.txt",
+        "output": "e1.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "empty_num",
+      "kind": "transform",
+      "config": {
+        "input": "data/empty.txt",
+        "output": "e2.txt",
+        "op": "number"
+      }
+    },
+    {
+      "id": "nonl",
+      "kind": "transform",
+      "config": {
+        "input": "data/nonl.txt",
+        "output": "n.txt",
+        "op": "number"
+      }
+    },
+    {
+      "id": "neg",
+      "kind": "transform",
+      "config": {
+        "input": "data/neg.csv",
+        "output": "neg.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "hdr",
+      "kind": "transform",
+      "config": {
+        "input": "data/headeronly.csv",
+        "output": "h.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "badcsv_fc",
+      "kind": "transform",
+      "config": {
+        "input": "data/bad.csv",
+        "output": "b.csv",
+        "op": "csvSum",
+        "failCleanup": true,
+        "latencyMs": 50
+      }
+    },
+    {
+      "id": "missing",
+      "kind": "transform",
+      "retry": {
+        "maxAttempts": 3
+      },
+      "config": {
+        "input": "data/nope.txt",
+        "output": "m.txt",
+        "op": "upper",
+        "latencyMs": 5
+      }
+    }
+  ]
+}

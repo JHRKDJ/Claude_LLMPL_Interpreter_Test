@@ -1,0 +1,68 @@
+{
+  "workflow": "g02",
+  "jobs": [
+    {
+      "id": "crlf",
+      "kind": "transform",
+      "config": {
+        "input": "data/crlf.csv",
+        "output": "crlf.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "spaces",
+      "kind": "transform",
+      "config": {
+        "input": "data/spaces.csv",
+        "output": "spaces.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "emptycell",
+      "kind": "transform",
+      "config": {
+        "input": "data/emptycell.csv",
+        "output": "ec.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "ragged",
+      "kind": "transform",
+      "config": {
+        "input": "data/ragged.csv",
+        "output": "rg.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "dupcol",
+      "kind": "transform",
+      "config": {
+        "input": "data/dupcol.csv",
+        "output": "dc.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "blankmid",
+      "kind": "transform",
+      "config": {
+        "input": "data/blankmid.csv",
+        "output": "bm.csv",
+        "op": "csvSum"
+      }
+    },
+    {
+      "id": "emptyfile",
+      "kind": "transform",
+      "config": {
+        "input": "data/empty.txt",
+        "output": "ef.csv",
+        "op": "csvSum"
+      }
+    }
+  ]
+}

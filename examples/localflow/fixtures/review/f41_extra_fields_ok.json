@@ -1,0 +1,42 @@
+{
+  "workflow": "f41",
+  "extra": {
+    "x": 1
+  },
+  "$schema": "y",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "comment": "hi",
+      "config": {
+        "op": "fib",
+        "n": 4,
+        "costMs": 1,
+        "junk": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "deps": [
+        "a"
+      ],
+      "retry": {
+        "maxAttempts": 1,
+        "extra": 2
+      },
+      "config": {
+        "latencyMs": 2,
+        "value": {
+          "a": [
+            1,
+            2
+          ]
+        }
+      }
+    }
+  ]
+}

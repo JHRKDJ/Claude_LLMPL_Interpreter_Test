@@ -1,0 +1,21 @@
+{
+  "workflow": 5,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    }
+  ],
+  "maxConcurrency": "4",
+  "groups": {
+    "g": 0
+  },
+  "onFailure": "FailFast",
+  "cancelAfterMs": -1,
+  "workflows": []
+}

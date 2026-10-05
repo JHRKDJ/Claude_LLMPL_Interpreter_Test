@@ -1,0 +1,121 @@
+{
+  "workflow": "f06",
+  "jobs": [
+    {
+      "id": "src",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 2
+      }
+    },
+    {
+      "id": "left",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "script": [
+          "permanent"
+        ]
+      },
+      "deps": [
+        "src"
+      ]
+    },
+    {
+      "id": "right",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 5
+      },
+      "deps": [
+        "src"
+      ]
+    },
+    {
+      "id": "join",
+      "kind": "reduce",
+      "deps": [
+        "right",
+        "left"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "leaf",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "join"
+      ]
+    },
+    {
+      "id": "leaf2",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "leaf",
+        "right"
+      ]
+    },
+    {
+      "id": "b1",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "b2",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "script": [
+          "retryable"
+        ]
+      }
+    },
+    {
+      "id": "j",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "b2",
+        "b1"
+      ]
+    },
+    {
+      "id": "k",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "j",
+        "leaf2"
+      ]
+    }
+  ]
+}

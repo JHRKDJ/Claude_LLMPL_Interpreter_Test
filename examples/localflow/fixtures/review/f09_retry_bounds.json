@@ -1,0 +1,86 @@
+{
+  "workflow": "f09",
+  "jobs": [
+    {
+      "id": "one",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "backoffMs": 100,
+        "multiplier": 5
+      }
+    },
+    {
+      "id": "mult",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable",
+          "retryable",
+          "retryable",
+          "ok"
+        ],
+        "value": 1
+      },
+      "retry": {
+        "maxAttempts": 4,
+        "backoffMs": 5,
+        "multiplier": 3
+      }
+    },
+    {
+      "id": "partial_retry",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "retryable",
+          "ok"
+        ],
+        "value": 2
+      },
+      "retry": {
+        "maxAttempts": 2
+      }
+    },
+    {
+      "id": "zeroall",
+      "kind": "external",
+      "config": {
+        "latencyMs": 0,
+        "script": [
+          "retryable"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 5,
+        "backoffMs": 0,
+        "multiplier": 7
+      }
+    },
+    {
+      "id": "permlater",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "retryable",
+          "permanent",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 5,
+        "backoffMs": 1,
+        "multiplier": 1
+      }
+    }
+  ]
+}

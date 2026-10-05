@@ -1,0 +1,13 @@
+{
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    }
+  ]
+}

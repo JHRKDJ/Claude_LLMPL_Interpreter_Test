@@ -1,0 +1,73 @@
+{
+  "workflow": "f27",
+  "jobs": [
+    {
+      "id": "x",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": [
+          1
+        ]
+      }
+    },
+    {
+      "id": "m1",
+      "kind": "map",
+      "config": {
+        "from": "x",
+        "op": "inc"
+      }
+    },
+    {
+      "id": "m2",
+      "kind": "map",
+      "deps": [
+        "x"
+      ],
+      "config": {
+        "items": [
+          1
+        ],
+        "from": "x",
+        "op": "inc"
+      }
+    },
+    {
+      "id": "m3",
+      "kind": "map",
+      "config": {
+        "op": "inc"
+      }
+    },
+    {
+      "id": "m4",
+      "kind": "map",
+      "config": {
+        "items": [
+          1
+        ],
+        "op": "cube"
+      }
+    },
+    {
+      "id": "m5",
+      "kind": "map",
+      "config": {
+        "items": [
+          1
+        ],
+        "op": "inc",
+        "parallelism": 0
+      }
+    },
+    {
+      "id": "m6",
+      "kind": "map",
+      "config": {
+        "items": "1",
+        "op": "inc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "workflow": "f08",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "timeoutMs": 0
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "timeoutMs": -1
+    },
+    {
+      "id": "c",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "timeoutMs": "5"
+    },
+    {
+      "id": "d",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "timeoutMs": null
+    }
+  ]
+}

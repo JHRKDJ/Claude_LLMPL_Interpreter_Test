@@ -1,0 +1,25 @@
+{
+  "workflow": "g15",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "same.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "b",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "same.txt",
+        "op": "number",
+        "latencyMs": 3,
+        "failAfterWrite": true
+      }
+    }
+  ]
+}

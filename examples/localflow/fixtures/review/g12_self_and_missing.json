@@ -1,0 +1,34 @@
+{
+  "workflow": "g12",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "a",
+        "zz"
+      ]
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "b"
+      ],
+      "when": {
+        "job": "b",
+        "equals": true
+      }
+    }
+  ]
+}

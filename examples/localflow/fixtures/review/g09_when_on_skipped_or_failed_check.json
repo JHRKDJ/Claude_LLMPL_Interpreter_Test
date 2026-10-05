@@ -1,0 +1,95 @@
+{
+  "workflow": "g09",
+  "jobs": [
+    {
+      "id": "v",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      }
+    },
+    {
+      "id": "c0",
+      "kind": "check",
+      "deps": [
+        "v"
+      ],
+      "config": {
+        "input": "v",
+        "op": "lt",
+        "value": 0
+      }
+    },
+    {
+      "id": "c1",
+      "kind": "check",
+      "deps": [
+        "v",
+        "c0"
+      ],
+      "when": {
+        "job": "c0",
+        "equals": true
+      },
+      "config": {
+        "input": "v",
+        "op": "gt",
+        "value": 0
+      }
+    },
+    {
+      "id": "w1",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "c1"
+      ],
+      "when": {
+        "job": "c1",
+        "equals": false
+      }
+    },
+    {
+      "id": "s",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": "x"
+      }
+    },
+    {
+      "id": "cf",
+      "kind": "check",
+      "deps": [
+        "s"
+      ],
+      "config": {
+        "input": "s",
+        "op": "gt",
+        "value": 0
+      }
+    },
+    {
+      "id": "w2",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "cf"
+      ],
+      "when": {
+        "job": "cf",
+        "equals": false
+      }
+    }
+  ]
+}

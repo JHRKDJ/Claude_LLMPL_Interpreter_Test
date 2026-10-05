@@ -1,0 +1,51 @@
+{
+  "workflow": "g10",
+  "jobs": [
+    {
+      "id": "m",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          2
+        ],
+        "op": "inc",
+        "failOn": [
+          2
+        ],
+        "allowPartial": true
+      }
+    },
+    {
+      "id": "r",
+      "kind": "reduce",
+      "deps": [
+        "m"
+      ],
+      "config": {
+        "op": "count"
+      }
+    },
+    {
+      "id": "r2",
+      "kind": "reduce",
+      "deps": [
+        "m"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "m2",
+      "kind": "map",
+      "deps": [
+        "m"
+      ],
+      "config": {
+        "from": "m",
+        "op": "inc"
+      }
+    }
+  ]
+}

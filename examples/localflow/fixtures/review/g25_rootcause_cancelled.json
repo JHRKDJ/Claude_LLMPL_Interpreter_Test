@@ -1,0 +1,37 @@
+{
+  "workflow": "g25",
+  "cancelAfterMs": 4,
+  "workflows": {},
+  "jobs": [
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "slow",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "x",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "slow",
+        "p"
+      ]
+    }
+  ]
+}

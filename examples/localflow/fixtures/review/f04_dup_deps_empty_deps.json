@@ -1,0 +1,43 @@
+{
+  "workflow": "f04",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": []
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "a",
+        "a"
+      ]
+    },
+    {
+      "id": "c",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "a",
+        "b",
+        "zz",
+        "zz"
+      ]
+    }
+  ]
+}

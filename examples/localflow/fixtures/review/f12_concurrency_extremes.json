@@ -1,0 +1,47 @@
+{
+  "workflow": "f12",
+  "maxConcurrency": 1,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5
+      }
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "config": {
+        "latencyMs": 0
+      }
+    },
+    {
+      "id": "c",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "b"
+      ]
+    },
+    {
+      "id": "d",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "script": [
+          "retryable",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 4
+      }
+    }
+  ]
+}

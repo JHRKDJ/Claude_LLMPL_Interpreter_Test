@@ -196,6 +196,8 @@ def check_config(kind, c, deps, subs):
     elif kind == "transform":
         if not isinstance(c.get("input"), str) or not isinstance(c.get("output"), str) or not c.get("output"):
             return "transform needs input and output"
+        if not output_path_ok(c["output"]):
+            return "output must be a relative path inside OUTDIR"
         if c.get("op") not in ("upper", "number", "csvSum"):
             return "unknown transform op"
         if not nat("latencyMs", 0):
@@ -705,6 +707,14 @@ class Run:
         summary = {s: sum(1 for j in self.order if self.st[j] == s) for s in STATUSES}
         return {"workflow": self.wf["workflow"], "status": self.status(), "durationMs": self.T,
                 "cancelled": self.cancelled, "errors": [], "summary": summary, "jobs": jobs}
+
+
+def output_path_ok(o):
+    """§4.3: a relative path of non-empty segments other than `.`/`..`, not the report
+    and not inside the scratch area (SPEC-LF-003)."""
+    segs = o.split("/")
+    return (not o.startswith("/") and all(x not in ("", ".", "..") for x in segs)
+            and segs[0] != ".scratch" and o != "report.json")
 
 
 def apply_effect(eff):

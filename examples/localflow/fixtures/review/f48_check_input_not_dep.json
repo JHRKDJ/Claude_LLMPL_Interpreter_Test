@@ -1,0 +1,35 @@
+{
+  "workflow": "f48",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "ck",
+      "kind": "check",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "input": "b",
+        "op": "gt",
+        "value": 0
+      }
+    }
+  ]
+}

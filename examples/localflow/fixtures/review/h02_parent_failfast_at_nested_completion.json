@@ -1,0 +1,45 @@
+{
+  "workflow": "h02",
+  "onFailure": "failFast",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 10,
+            "value": 1
+          }
+        },
+        {
+          "id": "y",
+          "kind": "external",
+          "config": {
+            "latencyMs": 30
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "w"
+      }
+    },
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10,
+        "script": [
+          "permanent"
+        ]
+      }
+    }
+  ]
+}

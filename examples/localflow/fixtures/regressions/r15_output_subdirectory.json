@@ -1,0 +1,5 @@
+{"workflow": "r15", "jobs": [
+  {"id": "a", "kind": "transform", "config": {"input": "data/words.txt", "output": "d/x.txt", "op": "upper"}},
+  {"id": "b", "kind": "transform", "config": {"input": "data/words.txt", "output": "d/e/f/y.txt", "op": "number"}},
+  {"id": "c", "kind": "transform", "config": {"input": "data/missing.txt", "output": "g/z.txt", "op": "upper"}}
+]}

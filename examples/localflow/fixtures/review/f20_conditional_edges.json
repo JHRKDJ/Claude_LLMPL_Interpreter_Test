@@ -1,0 +1,158 @@
+{
+  "workflow": "f20",
+  "jobs": [
+    {
+      "id": "v",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": 5
+      }
+    },
+    {
+      "id": "gt5",
+      "kind": "check",
+      "deps": [
+        "v"
+      ],
+      "config": {
+        "input": "v",
+        "op": "gt",
+        "value": 5
+      }
+    },
+    {
+      "id": "lt5",
+      "kind": "check",
+      "deps": [
+        "v"
+      ],
+      "config": {
+        "input": "v",
+        "op": "lt",
+        "value": 5
+      }
+    },
+    {
+      "id": "eq5",
+      "kind": "check",
+      "deps": [
+        "v"
+      ],
+      "config": {
+        "input": "v",
+        "op": "eq",
+        "value": 5
+      }
+    },
+    {
+      "id": "onF",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "gt5"
+      ],
+      "when": {
+        "job": "gt5",
+        "equals": false
+      }
+    },
+    {
+      "id": "onT",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "gt5"
+      ],
+      "when": {
+        "job": "gt5",
+        "equals": true
+      }
+    },
+    {
+      "id": "down",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "onT",
+        "onF"
+      ]
+    },
+    {
+      "id": "red",
+      "kind": "reduce",
+      "deps": [
+        "onF",
+        "onT"
+      ],
+      "config": {
+        "op": "count"
+      }
+    },
+    {
+      "id": "eqT",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "eq5",
+        "lt5"
+      ],
+      "when": {
+        "job": "eq5",
+        "equals": true
+      }
+    },
+    {
+      "id": "bad",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": "str"
+      }
+    },
+    {
+      "id": "chkbad",
+      "kind": "check",
+      "deps": [
+        "bad"
+      ],
+      "config": {
+        "input": "bad",
+        "op": "eq",
+        "value": 0
+      }
+    },
+    {
+      "id": "afterbad",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "chkbad"
+      ],
+      "when": {
+        "job": "chkbad",
+        "equals": true
+      }
+    }
+  ]
+}

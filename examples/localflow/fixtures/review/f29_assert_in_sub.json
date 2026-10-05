@@ -1,0 +1,36 @@
+{
+  "workflow": "f29",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "boom",
+          "kind": "compute",
+          "config": {
+            "op": "assert",
+            "value": 1,
+            "expect": 2,
+            "costMs": 3
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "x",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1
+      }
+    },
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

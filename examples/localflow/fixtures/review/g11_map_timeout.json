@@ -1,0 +1,38 @@
+{
+  "workflow": "g11",
+  "jobs": [
+    {
+      "id": "m",
+      "kind": "map",
+      "timeoutMs": 6,
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      },
+      "config": {
+        "items": [
+          1,
+          2,
+          3
+        ],
+        "op": "inc",
+        "itemLatencyMs": 3,
+        "parallelism": 1
+      }
+    },
+    {
+      "id": "m6",
+      "kind": "map",
+      "timeoutMs": 6,
+      "config": {
+        "items": [
+          1,
+          2
+        ],
+        "op": "inc",
+        "itemLatencyMs": 3,
+        "parallelism": 1
+      }
+    }
+  ]
+}

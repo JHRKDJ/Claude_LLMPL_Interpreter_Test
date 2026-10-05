@@ -1,0 +1,129 @@
+{
+  "workflow": "f42",
+  "jobs": [
+    {
+      "id": "hangok",
+      "kind": "external",
+      "timeoutMs": 100,
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 1,
+            "script": [
+              "hang"
+            ]
+          },
+          {
+            "latencyMs": 5,
+            "value": "B"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixfail",
+      "kind": "external",
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      },
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 2,
+            "script": [
+              "permanent"
+            ]
+          },
+          {
+            "latencyMs": 4,
+            "script": [
+              "retryable",
+              "ok"
+            ],
+            "value": "R"
+          }
+        ]
+      }
+    },
+    {
+      "id": "allperm",
+      "kind": "external",
+      "retry": {
+        "maxAttempts": 3
+      },
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 2,
+            "script": [
+              "permanent"
+            ]
+          },
+          {
+            "latencyMs": 1,
+            "script": [
+              "permanent"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "tie",
+      "kind": "external",
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 3,
+            "script": [
+              "retryable"
+            ]
+          },
+          {
+            "latencyMs": 3,
+            "value": "second"
+          },
+          {
+            "latencyMs": 3,
+            "value": "third"
+          }
+        ]
+      }
+    },
+    {
+      "id": "defaults",
+      "kind": "external",
+      "config": {
+        "mirrors": [
+          {},
+          {
+            "latencyMs": 9,
+            "value": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "hangfail",
+      "kind": "external",
+      "timeoutMs": 6,
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 1,
+            "script": [
+              "hang"
+            ]
+          },
+          {
+            "latencyMs": 2,
+            "script": [
+              "permanent"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

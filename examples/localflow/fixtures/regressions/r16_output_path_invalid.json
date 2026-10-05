@@ -1,0 +1,9 @@
+{"workflow": "r16", "jobs": [
+  {"id": "up", "kind": "transform", "config": {"input": "data/words.txt", "output": "../escape.txt", "op": "upper"}},
+  {"id": "abs", "kind": "transform", "config": {"input": "data/words.txt", "output": "/tmp/abs.txt", "op": "upper"}},
+  {"id": "empty", "kind": "transform", "config": {"input": "data/words.txt", "output": "a//b.txt", "op": "upper"}},
+  {"id": "dot", "kind": "transform", "config": {"input": "data/words.txt", "output": "./x.txt", "op": "upper"}},
+  {"id": "scr", "kind": "transform", "config": {"input": "data/words.txt", "output": ".scratch/x.txt", "op": "upper"}},
+  {"id": "rep", "kind": "transform", "config": {"input": "data/words.txt", "output": "report.json", "op": "upper"}},
+  {"id": "ok", "kind": "transform", "config": {"input": "data/words.txt", "output": "fine/x.txt", "op": "upper"}}
+]}

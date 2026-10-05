@@ -1,0 +1,31 @@
+{
+  "workflow": "g04",
+  "onFailure": "failFast",
+  "jobs": [
+    {
+      "id": "r",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 4
+      }
+    },
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 6,
+        "script": [
+          "permanent"
+        ]
+      }
+    }
+  ]
+}

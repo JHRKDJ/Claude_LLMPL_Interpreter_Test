@@ -1,0 +1,31 @@
+{
+  "workflow": "g16",
+  "groups": {
+    "g": 1
+  },
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 1
+          },
+          "group": "g"
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "group": "g",
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

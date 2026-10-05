@@ -1,0 +1,127 @@
+{
+  "workflow": "f25",
+  "jobs": [
+    {
+      "id": "s0",
+      "kind": "reduce",
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "m0",
+      "kind": "reduce",
+      "config": {
+        "op": "max"
+      }
+    },
+    {
+      "id": "c0",
+      "kind": "reduce",
+      "config": {
+        "op": "concat"
+      }
+    },
+    {
+      "id": "n0",
+      "kind": "reduce",
+      "config": {
+        "op": "count"
+      }
+    },
+    {
+      "id": "neg",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": [
+          -7,
+          -2,
+          []
+        ]
+      }
+    },
+    {
+      "id": "nested",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": [
+          [
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": "nul",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1
+      }
+    },
+    {
+      "id": "mneg",
+      "kind": "reduce",
+      "deps": [
+        "neg"
+      ],
+      "config": {
+        "op": "max"
+      }
+    },
+    {
+      "id": "snest",
+      "kind": "reduce",
+      "deps": [
+        "nested"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "cnest",
+      "kind": "reduce",
+      "deps": [
+        "nested",
+        "neg"
+      ],
+      "config": {
+        "op": "concat"
+      }
+    },
+    {
+      "id": "cnul",
+      "kind": "reduce",
+      "deps": [
+        "nul"
+      ],
+      "config": {
+        "op": "count"
+      }
+    },
+    {
+      "id": "snul",
+      "kind": "reduce",
+      "deps": [
+        "nul"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "mapempty",
+      "kind": "map",
+      "deps": [
+        "c0"
+      ],
+      "config": {
+        "from": "c0",
+        "op": "square",
+        "itemLatencyMs": 50
+      }
+    }
+  ]
+}

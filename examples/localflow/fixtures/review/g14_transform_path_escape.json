@@ -1,0 +1,32 @@
+{
+  "workflow": "g14",
+  "jobs": [
+    {
+      "id": "esc",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "../escape_g14.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "sub",
+      "kind": "transform",
+      "config": {
+        "input": "data/words.txt",
+        "output": "d/x.txt",
+        "op": "upper"
+      }
+    },
+    {
+      "id": "abs",
+      "kind": "transform",
+      "config": {
+        "input": "/etc/hostname",
+        "output": "h.txt",
+        "op": "upper"
+      }
+    }
+  ]
+}

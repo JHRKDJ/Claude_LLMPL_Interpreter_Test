@@ -1,0 +1,111 @@
+{
+  "workflow": "f26",
+  "jobs": [
+    {
+      "id": "e",
+      "kind": "map",
+      "config": {
+        "items": [],
+        "op": "inc",
+        "itemLatencyMs": 9
+      }
+    },
+    {
+      "id": "big",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "op": "square",
+        "itemLatencyMs": 3,
+        "parallelism": 2,
+        "failOn": [
+          2,
+          5
+        ]
+      }
+    },
+    {
+      "id": "par",
+      "kind": "map",
+      "config": {
+        "items": [
+          3,
+          3,
+          -4
+        ],
+        "op": "square",
+        "itemLatencyMs": 3,
+        "parallelism": 100,
+        "failOn": [
+          3
+        ],
+        "allowPartial": true
+      }
+    },
+    {
+      "id": "nofrom",
+      "kind": "map",
+      "deps": [
+        "big"
+      ],
+      "config": {
+        "from": "big",
+        "op": "inc"
+      }
+    },
+    {
+      "id": "fromobj",
+      "kind": "map",
+      "deps": [
+        "e"
+      ],
+      "config": {
+        "from": "e",
+        "op": "inc"
+      }
+    },
+    {
+      "id": "fromlist",
+      "kind": "map",
+      "deps": [
+        "lst"
+      ],
+      "config": {
+        "from": "lst",
+        "op": "inc",
+        "failOn": [
+          0
+        ]
+      }
+    },
+    {
+      "id": "lst",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "value": [
+          0,
+          -1,
+          100000000000000000000
+        ]
+      }
+    },
+    {
+      "id": "fm",
+      "kind": "map",
+      "config": {
+        "items": [
+          10000000000,
+          3037000500
+        ],
+        "op": "square"
+      }
+    }
+  ]
+}

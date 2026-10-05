@@ -1,0 +1,26 @@
+{
+  "workflow": "f31",
+  "onFailure": "failFast",
+  "jobs": [
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 3,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "late",
+      "kind": "compute",
+      "config": {
+        "op": "assert",
+        "value": 1,
+        "expect": 2,
+        "costMs": 3
+      }
+    }
+  ]
+}

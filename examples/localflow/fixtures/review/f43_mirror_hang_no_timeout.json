@@ -1,0 +1,22 @@
+{
+  "workflow": "f43",
+  "jobs": [
+    {
+      "id": "m",
+      "kind": "external",
+      "config": {
+        "mirrors": [
+          {
+            "latencyMs": 1,
+            "script": [
+              "hang"
+            ]
+          },
+          {
+            "latencyMs": 2
+          }
+        ]
+      }
+    }
+  ]
+}

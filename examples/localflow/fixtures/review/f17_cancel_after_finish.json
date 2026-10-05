@@ -1,0 +1,23 @@
+{
+  "workflow": "f17",
+  "cancelAfterMs": 1000,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5
+      }
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "config": {
+        "latencyMs": 0
+      },
+      "deps": [
+        "a"
+      ]
+    }
+  ]
+}

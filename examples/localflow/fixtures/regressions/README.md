@@ -16,6 +16,9 @@ by `blackbox_tests/test_regressions.py`.
 | r12_crlf_text | ORACLE-003 + SPEC-LF-002: the oracle's `read_text` translated CRLF to LF, so it and LocalFlow read different texts; both now read exactly and csvSum accepts CRLF rows |
 | r13_csv_plus_sign | SPEC-LF-002 pin: an integer cell is `-?[0-9]+` with surrounding whitespace (`+5` is `bad-input`) |
 | r14_undecodable_input | ORACLE-003: input that is not valid UTF-8 crashed the oracle (`UnicodeDecodeError`); it is an `io` failure (LocalFlow already did this) |
+| r15_output_subdirectory | LF-007: an output in a subdirectory failed with `io` (SPEC-LF-003) |
+| r16_output_path_invalid | SPEC-LF-003: `..`, absolute, empty-segment, `.`, `.scratch` and `report.json` outputs are `malformed` (both sides previously wrote `../escape.txt` outside OUTDIR) |
+| r17_integers_and_deps | SPEC-LF-004 pin: `3e0`/`3.0`/`true` are not integers; a repeated `deps` entry is one `malformed` and dangling entries of such a job are not checked further |
 | (all fixtures; harness now compares bytes, directories and modes) | LF-006 (empty `.scratch` / nested output directories left behind) and interpreter BUG-0051 (atomic writes committed mode 0600) |
 | (all fixtures, `test_schedule_independence.py`) | LF-002: the engine's same-instant barrier (`sleep(0)` then drain) relied on FIFO task order; under `--schedule=random` a batch of completions at one instant could be split, letting a job start in a slot the spec assigns differently (s21 seed 1, s28 seed 2) |
 

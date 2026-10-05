@@ -1,0 +1,85 @@
+{
+  "workflow": "f22",
+  "jobs": [
+    {
+      "id": "bt",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": true
+      }
+    },
+    {
+      "id": "bl",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": [
+          1,
+          true
+        ]
+      }
+    },
+    {
+      "id": "chk",
+      "kind": "check",
+      "deps": [
+        "bt"
+      ],
+      "config": {
+        "input": "bt",
+        "op": "gt",
+        "value": 0
+      }
+    },
+    {
+      "id": "sm",
+      "kind": "reduce",
+      "deps": [
+        "bl"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "mx",
+      "kind": "reduce",
+      "deps": [
+        "bt"
+      ],
+      "config": {
+        "op": "max"
+      }
+    },
+    {
+      "id": "mp",
+      "kind": "map",
+      "deps": [
+        "bl"
+      ],
+      "config": {
+        "from": "bl",
+        "op": "inc"
+      }
+    },
+    {
+      "id": "fl",
+      "kind": "reduce",
+      "deps": [
+        "fv"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    },
+    {
+      "id": "fv",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "value": 2.5
+      }
+    }
+  ]
+}

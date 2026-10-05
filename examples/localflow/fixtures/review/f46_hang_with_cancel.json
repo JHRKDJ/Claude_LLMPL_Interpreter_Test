@@ -1,0 +1,36 @@
+{
+  "workflow": "f46",
+  "cancelAfterMs": 50,
+  "jobs": [
+    {
+      "id": "h",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "hang"
+        ]
+      }
+    },
+    {
+      "id": "ok",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2
+      }
+    },
+    {
+      "id": "tr",
+      "kind": "transform",
+      "deps": [
+        "ok"
+      ],
+      "config": {
+        "input": "data/words.txt",
+        "output": "t.txt",
+        "op": "upper",
+        "latencyMs": 100
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "workflow": "g22",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": []
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "w"
+      }
+    },
+    {
+      "id": "r",
+      "kind": "reduce",
+      "deps": [
+        "s"
+      ],
+      "config": {
+        "op": "concat"
+      }
+    }
+  ]
+}

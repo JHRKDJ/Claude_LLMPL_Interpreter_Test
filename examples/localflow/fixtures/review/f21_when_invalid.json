@@ -1,0 +1,107 @@
+{
+  "workflow": "f21",
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "ck",
+      "kind": "check",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "input": "a",
+        "op": "gt",
+        "value": 0
+      }
+    },
+    {
+      "id": "w1",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "a"
+      ],
+      "when": {
+        "job": "a",
+        "equals": true
+      }
+    },
+    {
+      "id": "w2",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "when": {
+        "job": "ck",
+        "equals": true
+      }
+    },
+    {
+      "id": "w3",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "ck"
+      ],
+      "when": {
+        "job": "ck",
+        "equals": 1
+      }
+    },
+    {
+      "id": "w4",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "ck"
+      ],
+      "when": {
+        "job": "ck"
+      }
+    },
+    {
+      "id": "ck2",
+      "kind": "check",
+      "config": {
+        "input": "a",
+        "op": "gt",
+        "value": 0
+      }
+    },
+    {
+      "id": "ck3",
+      "kind": "check",
+      "deps": [
+        "a"
+      ],
+      "config": {
+        "input": "a",
+        "op": "ge",
+        "value": 0
+      }
+    }
+  ]
+}

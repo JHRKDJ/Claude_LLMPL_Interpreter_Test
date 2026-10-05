@@ -317,6 +317,15 @@ async fn transform(id: Str, c: Map[Str, Dyn], ctx: Context, a: Attempt) -> Dyn t
         catch category IO => {
             throw fail("io", "cannot create {scratch}")
         }
+    // an output may name a subdirectory of OUTDIR; it is created as needed (§4.3)
+    let parts = output.split("/")
+    if parts.length > 1 {
+        let parent = fs.join(ctx.outDir, parts.take(parts.length - 1).join("/"))
+        try fs.makeDirs(parent)
+            catch category IO => {
+                throw fail("io", "cannot create {parent}")
+            }
+    }
     let latency = cfgInt(c, "latencyMs", 0)
     let size = try use out = try fs.openAtomicWrite(fs.join(ctx.outDir, output)) {
         use ws = try workspace(fs.join(scratch, id), cfgBool(c, "failCleanup")) {
@@ -565,10 +574,7 @@ async fn subworkflow(
         workflows: ctx.workflows,
         clock: clock,
     )
-    try fs.makeDirs(nested.outDir)
-        catch category IO => {
-            throw fail("io", "cannot create {nested.outDir}")
-        }
+    // the nested output directory is created by the nested transforms that write into it
     let cancelAt = a.deadline.map(fn(d) => d - a.start)
     let result = await engine.run(wf, nested, cancelAt, p)
     if cancelAt.isSome() && result.status == "CANCELLED" {

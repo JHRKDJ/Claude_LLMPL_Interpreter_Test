@@ -1,0 +1,59 @@
+{
+  "workflow": "f23",
+  "maxConcurrency": true,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": true
+      }
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 3,
+        "costMs": false
+      }
+    },
+    {
+      "id": "c",
+      "kind": "external",
+      "config": {
+        "latencyMs": true
+      }
+    },
+    {
+      "id": "d",
+      "kind": "compute",
+      "timeoutMs": true,
+      "config": {
+        "op": "fib",
+        "n": 3
+      }
+    },
+    {
+      "id": "e",
+      "kind": "map",
+      "config": {
+        "items": [
+          1,
+          true
+        ],
+        "op": "inc"
+      }
+    },
+    {
+      "id": "f",
+      "kind": "compute",
+      "config": {
+        "op": "assert",
+        "value": true,
+        "expect": 1
+      }
+    }
+  ]
+}

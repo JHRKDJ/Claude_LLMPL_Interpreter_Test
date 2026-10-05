@@ -1,0 +1,96 @@
+{
+  "workflow": "f36",
+  "workflows": {
+    "bad1": {
+      "workflow": "bad1",
+      "cancelAfterMs": 3,
+      "jobs": [
+        {
+          "id": "a",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 1
+          }
+        }
+      ]
+    },
+    "bad2": {
+      "workflow": "bad2",
+      "jobs": [
+        {
+          "id": "s",
+          "kind": "subworkflow",
+          "config": {
+            "workflow": "bad1"
+          }
+        },
+        {
+          "id": "a",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 1
+          },
+          "deps": [
+            "a"
+          ]
+        },
+        {
+          "id": "a",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 1
+          }
+        }
+      ]
+    },
+    "bad3": {
+      "workflow": "bad3",
+      "jobs": [
+        {
+          "id": "h",
+          "kind": "external",
+          "config": {
+            "latencyMs": 10,
+            "script": [
+              "hang"
+            ]
+          }
+        }
+      ],
+      "workflows": {}
+    },
+    "unused": {
+      "workflow": "unused",
+      "jobs": [
+        {
+          "id": "q",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 1
+          },
+          "deps": [
+            "missing"
+          ]
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "timeoutMs": 5,
+      "config": {
+        "workflow": "bad3"
+      }
+    }
+  ]
+}

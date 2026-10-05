@@ -95,7 +95,10 @@ Symptom: LocalFlow left an empty `OUTDIR/.scratch` (and empty nested output
 Fixture: every fixture with a transform (harness `tree` comparison), e.g. r01, r11
 Failed before fix: yes (once the harness compared directories)
 Fix: main.lang prunes empty directories after the run; the spec states that OUTDIR
-  holds only the report, succeeded outputs and their directories.
+  holds only the report, succeeded outputs and their directories. A sub-workflow's
+  output directory is now created only by the nested transforms that write into it,
+  so an internal-defect stop (exit 3, no pruning) leaves no empty `OUTDIR/JOBID`
+  (review fixture f29).
 Interpreter involved: no
 
 SPEC-LF-002
@@ -126,4 +129,38 @@ Fixture: r11, r12, r14
 Failed before fix: yes
 Fix: exact reads/writes (`newline=""`), empty text special case, `UnicodeDecodeError`
   is `io`.
+Interpreter involved: no
+
+LF-007
+Origin: final adversarial review (D7, fixture g14)
+Symptom: an `output` naming a subdirectory (`d/x.txt`) failed with class `io` in
+  LocalFlow (the atomic write needs an existing directory) while the oracle created it.
+Fixture: fixtures/regressions/r15_output_subdirectory.json
+Failed before fix: yes
+Fix: transform creates the output's parent directories (jobs.lang); SPEC-LF-003.
+Interpreter involved: no
+
+SPEC-LF-003
+Origin: final adversarial review (D7, D8, fixture g14)
+Symptom: `output: "../escape.txt"` wrote outside OUTDIR in *both* implementations (and
+  an absolute output would have too); the spec said only "file name, relative to
+  OUTDIR". Subdirectories were unspecified.
+Fixture: fixtures/regressions/r16_output_path_invalid.json, r15
+Failed before fix: r15 yes; r16 no (both sides agreed on the unsafe behaviour; it pins
+  the new rule)
+Fix: §4.3: `output` is `/`-separated non-empty segments, none `.` or `..`, not
+  `report.json`, not inside `.scratch`, else `malformed`; subdirectories are created.
+  `input` may be absolute or use `..` (reading is the author's choice).
+Interpreter involved: no
+
+SPEC-LF-004
+Origin: final adversarial review (D9-D12; both implementations already agreed)
+Symptom: unclear spec text — whether a backoff ending at the cancellation instant
+  starts an attempt (D9); duplicate or dangling deps and `3.0` as an integer (D10); a
+  dead "excluding skipped dependencies" clause in reduce (D11); whether nested outputs
+  survive a failed/cancelled sub-workflow job (D12).
+Fixture: review fixtures g03, g04, f15, f18 (D9); f03, f04, f24 and
+  regressions/r17_integers_and_deps (D10); f20, f47 (D11); f34, f49, g13 (D12)
+Failed before fix: no (agreed behaviour, documented and pinned)
+Fix: spec text states the agreed behaviour (§2 integers, §3 deps, §4.5, §4.7, §5.3).
 Interpreter involved: no

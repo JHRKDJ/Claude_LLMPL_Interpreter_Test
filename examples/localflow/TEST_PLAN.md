@@ -69,3 +69,13 @@ After the suite is green, `blackbox_tests/test_adversarial.py` adds cases writte
 by reviewing the spec for behaviours a plausible-but-wrong implementation could get
 wrong (ordering of same-instant events, slot release on retry, group limits with
 blocked heads, cancellation during backoff, etc.).
+
+## Final independent review (AUDIT-003)
+An independent reviewer wrote 86 boundary and composition fixtures
+(`fixtures/review/`, `blackbox_tests/test_review.py`: FIFO and seed 5). Their
+findings are in `APP_BUG_LEDGER.md` (LF-004..007, ORACLE-002/003, SPEC-LF-001..004)
+and interpreter `BUG_LEDGER.md` (BUG-0051 atomic-write mode, BUG-0052 firstSuccess
+under cancellation). The harness was tightened at the same time: every comparison
+now covers exact file bytes, stdout without newline translation, every leftover
+directory with permission bits, and the raw report layout (key order, indentation)
+with only `message` values masked.

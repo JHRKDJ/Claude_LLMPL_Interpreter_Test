@@ -1,0 +1,41 @@
+{
+  "workflow": "f19",
+  "onFailure": "failFast",
+  "jobs": [
+    {
+      "id": "r",
+      "kind": "external",
+      "config": {
+        "latencyMs": 2,
+        "script": [
+          "retryable",
+          "retryable",
+          "retryable"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 3
+      }
+    },
+    {
+      "id": "slow",
+      "kind": "external",
+      "config": {
+        "latencyMs": 100
+      }
+    },
+    {
+      "id": "after",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "slow"
+      ]
+    }
+  ]
+}

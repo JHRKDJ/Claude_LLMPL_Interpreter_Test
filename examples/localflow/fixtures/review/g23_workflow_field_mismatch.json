@@ -1,0 +1,28 @@
+{
+  "workflow": "g23",
+  "workflows": {
+    "key": {
+      "workflow": "different",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 0
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "key"
+      }
+    }
+  ]
+}

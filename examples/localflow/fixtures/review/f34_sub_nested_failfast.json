@@ -1,0 +1,112 @@
+{
+  "workflow": "f34",
+  "workflows": {
+    "ff": {
+      "workflow": "ff",
+      "onFailure": "failFast",
+      "maxConcurrency": 1,
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 2,
+            "script": [
+              "permanent"
+            ]
+          }
+        },
+        {
+          "id": "y",
+          "kind": "external",
+          "config": {
+            "latencyMs": 5
+          }
+        },
+        {
+          "id": "tr",
+          "kind": "transform",
+          "config": {
+            "input": "data/words.txt",
+            "output": "o.txt",
+            "op": "upper"
+          }
+        }
+      ]
+    },
+    "slow": {
+      "workflow": "slow",
+      "jobs": [
+        {
+          "id": "tr",
+          "kind": "transform",
+          "config": {
+            "input": "data/words.txt",
+            "output": "o.txt",
+            "op": "upper",
+            "latencyMs": 1
+          }
+        },
+        {
+          "id": "z",
+          "kind": "external",
+          "config": {
+            "latencyMs": 20,
+            "value": 3
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s1",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "ff"
+      }
+    },
+    {
+      "id": "s2",
+      "kind": "subworkflow",
+      "timeoutMs": 10,
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 1
+      },
+      "config": {
+        "workflow": "slow"
+      }
+    },
+    {
+      "id": "s3",
+      "kind": "subworkflow",
+      "timeoutMs": 21,
+      "config": {
+        "workflow": "slow"
+      }
+    },
+    {
+      "id": "use",
+      "kind": "reduce",
+      "deps": [
+        "s3"
+      ],
+      "config": {
+        "op": "count"
+      }
+    },
+    {
+      "id": "after",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "s1"
+      ]
+    }
+  ]
+}

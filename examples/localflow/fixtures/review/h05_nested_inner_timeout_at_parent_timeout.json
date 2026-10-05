@@ -1,0 +1,35 @@
+{
+  "workflow": "h05",
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "x",
+          "kind": "external",
+          "config": {
+            "latencyMs": 50
+          },
+          "timeoutMs": 10
+        },
+        {
+          "id": "y",
+          "kind": "external",
+          "config": {
+            "latencyMs": 30
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "timeoutMs": 10,
+      "config": {
+        "workflow": "w"
+      }
+    }
+  ]
+}

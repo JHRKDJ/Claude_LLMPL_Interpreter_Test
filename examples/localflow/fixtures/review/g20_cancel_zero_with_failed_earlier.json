@@ -1,0 +1,48 @@
+{
+  "workflow": "g20",
+  "cancelAfterMs": 5,
+  "onFailure": "continue",
+  "jobs": [
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "blk",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "p"
+      ]
+    },
+    {
+      "id": "run",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "nr",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "run"
+      ]
+    }
+  ]
+}

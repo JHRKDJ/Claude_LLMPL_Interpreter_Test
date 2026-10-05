@@ -125,6 +125,14 @@ fn scriptHangs(m: Map[Str, Dyn]) -> Bool {
     return script.any(fn(s) => asStr(s) == Some("hang"))
 }
 
+// §4.3: a relative path of non-empty segments other than `.`/`..`, not the report and
+// not inside the scratch area (SPEC-LF-003)
+fn outputPathOk(o: Str) -> Bool {
+    let segs = o.split("/")
+    let plain = segs.all(fn(x) => x != "" && x != "." && x != "..")
+    return plain && !o.startsWith("/") && segs[0] != ".scratch" && o != "report.json"
+}
+
 // Kind-specific configuration checks (§4); returns a problem message or None.
 fn configProblem(
     kind: Kind,
@@ -176,6 +184,9 @@ fn configProblem(
             let output = asStr(c.getOrDefault("output", null))
             if input.isNone() || output.isNone() || output == Some("") {
                 return Some("transform needs input and output")
+            }
+            if !outputPathOk(output.unwrapOr("")) {
+                return Some("output must be a relative path inside OUTDIR")
             }
             if !["upper", "number", "csvSum"].contains(asStr(c.getOrDefault("op", null)).unwrapOr("")) {
                 return Some("unknown transform op")

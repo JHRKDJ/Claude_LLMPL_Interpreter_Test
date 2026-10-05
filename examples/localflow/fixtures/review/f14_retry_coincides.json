@@ -1,0 +1,55 @@
+{
+  "workflow": "f14",
+  "maxConcurrency": 2,
+  "jobs": [
+    {
+      "id": "A",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "retryable",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": 5
+      }
+    },
+    {
+      "id": "B",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "C",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1
+      },
+      "deps": [
+        "B"
+      ]
+    },
+    {
+      "id": "D",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1
+      }
+    },
+    {
+      "id": "F",
+      "kind": "external",
+      "config": {
+        "latencyMs": 0
+      },
+      "deps": [
+        "A"
+      ]
+    }
+  ]
+}

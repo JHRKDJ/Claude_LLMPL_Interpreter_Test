@@ -1,0 +1,21 @@
+{
+  "workflow": "g05",
+  "cancelAfterMs": 10,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 20
+      },
+      "timeoutMs": 10
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "config": {
+        "latencyMs": 30
+      }
+    }
+  ]
+}

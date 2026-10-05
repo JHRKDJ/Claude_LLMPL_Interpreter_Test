@@ -1,0 +1,23 @@
+{
+  "workflow": "f16",
+  "cancelAfterMs": 10,
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "b",
+      "kind": "external",
+      "config": {
+        "latencyMs": 4,
+        "script": [
+          "permanent"
+        ]
+      }
+    }
+  ]
+}

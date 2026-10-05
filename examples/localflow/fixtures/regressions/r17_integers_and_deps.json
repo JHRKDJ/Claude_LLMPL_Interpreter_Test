@@ -1,0 +1,1 @@
+{"workflow": "r17", "maxConcurrency": 3e0, "jobs": [{"id": "a", "kind": "compute", "config": {"op": "sumTo", "n": 3.0}}, {"id": "b", "kind": "compute", "deps": ["a", "a", "zz"]}, {"id": "c", "kind": "compute", "config": {"op": "fib", "n": true}}]}

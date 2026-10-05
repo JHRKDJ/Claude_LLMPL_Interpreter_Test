@@ -1,0 +1,119 @@
+{
+  "workflow": "f28",
+  "jobs": [
+    {
+      "id": "f0",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 0
+      }
+    },
+    {
+      "id": "f1",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 1
+      }
+    },
+    {
+      "id": "f93",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 93
+      }
+    },
+    {
+      "id": "f150",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 150
+      }
+    },
+    {
+      "id": "s0",
+      "kind": "compute",
+      "config": {
+        "op": "sumTo",
+        "n": 0
+      }
+    },
+    {
+      "id": "sbig",
+      "kind": "compute",
+      "config": {
+        "op": "sumTo",
+        "n": 10000000000
+      }
+    },
+    {
+      "id": "p0",
+      "kind": "compute",
+      "config": {
+        "op": "primeCount",
+        "n": 0
+      }
+    },
+    {
+      "id": "p1",
+      "kind": "compute",
+      "config": {
+        "op": "primeCount",
+        "n": 1
+      }
+    },
+    {
+      "id": "p2",
+      "kind": "compute",
+      "config": {
+        "op": "primeCount",
+        "n": 2
+      }
+    },
+    {
+      "id": "p1000",
+      "kind": "compute",
+      "config": {
+        "op": "primeCount",
+        "n": 1000
+      }
+    },
+    {
+      "id": "as",
+      "kind": "compute",
+      "config": {
+        "op": "assert",
+        "value": 7,
+        "expect": 7
+      }
+    },
+    {
+      "id": "sq",
+      "kind": "map",
+      "deps": [
+        "f150"
+      ],
+      "config": {
+        "items": [
+          1
+        ],
+        "op": "square"
+      }
+    },
+    {
+      "id": "tot",
+      "kind": "reduce",
+      "deps": [
+        "f93",
+        "f150",
+        "sbig"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    }
+  ]
+}

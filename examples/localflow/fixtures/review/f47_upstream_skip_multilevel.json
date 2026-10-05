@@ -1,0 +1,101 @@
+{
+  "workflow": "f47",
+  "jobs": [
+    {
+      "id": "v",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "ck",
+      "kind": "check",
+      "deps": [
+        "v"
+      ],
+      "config": {
+        "input": "v",
+        "op": "eq",
+        "value": 999
+      }
+    },
+    {
+      "id": "s1",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "ck"
+      ],
+      "when": {
+        "job": "ck",
+        "equals": true
+      }
+    },
+    {
+      "id": "s2",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "s1"
+      ]
+    },
+    {
+      "id": "f",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "mix",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "s2",
+        "f"
+      ]
+    },
+    {
+      "id": "mix2",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "f",
+        "s2"
+      ]
+    },
+    {
+      "id": "red",
+      "kind": "reduce",
+      "deps": [
+        "v",
+        "s1"
+      ],
+      "config": {
+        "op": "sum"
+      }
+    }
+  ]
+}

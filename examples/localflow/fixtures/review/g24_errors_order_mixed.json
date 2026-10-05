@@ -1,0 +1,78 @@
+{
+  "workflow": "g24",
+  "groups": {
+    "g": 1
+  },
+  "workflows": {
+    "w": {
+      "workflow": "w",
+      "jobs": [
+        {
+          "id": "i",
+          "kind": "compute",
+          "config": {
+            "op": "fib",
+            "n": 5,
+            "costMs": 1
+          },
+          "deps": [
+            "i"
+          ]
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "b"
+      ]
+    },
+    {
+      "id": "b",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "a",
+        "nope"
+      ]
+    },
+    {
+      "id": "a",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      }
+    },
+    {
+      "id": "s",
+      "kind": "subworkflow",
+      "config": {
+        "workflow": "zz"
+      }
+    },
+    {
+      "id": "g",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "group": "h"
+    }
+  ]
+}

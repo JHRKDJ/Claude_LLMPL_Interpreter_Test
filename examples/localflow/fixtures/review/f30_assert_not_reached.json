@@ -1,0 +1,38 @@
+{
+  "workflow": "f30",
+  "cancelAfterMs": 5,
+  "jobs": [
+    {
+      "id": "late",
+      "kind": "compute",
+      "config": {
+        "op": "assert",
+        "value": 1,
+        "expect": 2,
+        "costMs": 10
+      }
+    },
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "blk",
+      "kind": "compute",
+      "deps": [
+        "p"
+      ],
+      "config": {
+        "op": "assert",
+        "value": 1,
+        "expect": 2
+      }
+    }
+  ]
+}

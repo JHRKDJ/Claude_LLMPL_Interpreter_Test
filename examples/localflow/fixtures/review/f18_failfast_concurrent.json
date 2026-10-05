@@ -1,0 +1,79 @@
+{
+  "workflow": "f18",
+  "onFailure": "failFast",
+  "maxConcurrency": 10,
+  "jobs": [
+    {
+      "id": "p",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "script": [
+          "permanent"
+        ]
+      }
+    },
+    {
+      "id": "t",
+      "kind": "external",
+      "config": {
+        "latencyMs": 50
+      },
+      "timeoutMs": 5
+    },
+    {
+      "id": "ok5",
+      "kind": "external",
+      "config": {
+        "latencyMs": 5,
+        "value": 1
+      }
+    },
+    {
+      "id": "long",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      }
+    },
+    {
+      "id": "dep_p",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 1
+      },
+      "deps": [
+        "p"
+      ]
+    },
+    {
+      "id": "dep_ok",
+      "kind": "compute",
+      "config": {
+        "op": "fib",
+        "n": 5,
+        "costMs": 0
+      },
+      "deps": [
+        "ok5"
+      ]
+    },
+    {
+      "id": "rt",
+      "kind": "external",
+      "config": {
+        "latencyMs": 1,
+        "script": [
+          "retryable",
+          "ok"
+        ]
+      },
+      "retry": {
+        "maxAttempts": 3,
+        "backoffMs": 4
+      }
+    }
+  ]
+}

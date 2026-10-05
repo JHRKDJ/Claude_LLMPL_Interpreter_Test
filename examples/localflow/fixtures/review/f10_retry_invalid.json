@@ -1,0 +1,55 @@
+{
+  "workflow": "f10",
+  "jobs": [
+    {
+      "id": "m0",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "retry": {
+        "maxAttempts": 0
+      }
+    },
+    {
+      "id": "bneg",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "backoffMs": -1
+      }
+    },
+    {
+      "id": "mul0",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "multiplier": 0
+      }
+    },
+    {
+      "id": "rstr",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "retry": "x"
+    },
+    {
+      "id": "rnull",
+      "kind": "external",
+      "config": {
+        "latencyMs": 10
+      },
+      "retry": {
+        "maxAttempts": null
+      }
+    }
+  ]
+}

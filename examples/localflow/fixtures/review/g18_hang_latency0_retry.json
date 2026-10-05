@@ -1,0 +1,22 @@
+{
+  "workflow": "g18",
+  "jobs": [
+    {
+      "id": "h",
+      "kind": "external",
+      "config": {
+        "latencyMs": 0,
+        "script": [
+          "hang",
+          "hang",
+          "ok"
+        ],
+        "value": 9
+      },
+      "timeoutMs": 1,
+      "retry": {
+        "maxAttempts": 3
+      }
+    }
+  ]
+}
