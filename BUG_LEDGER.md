@@ -585,5 +585,5 @@ Fix: placement is no longer part of the equivalence check (comment text and orde
   parameter lists over the width wrap one per line with a trailing comma; std and
   LocalFlow sources reformatted (lang/format/__init__.py, equiv.py). Inline block
   comments inside a single-line list still move after the list (text and order kept).
-Commit: PENDING
+Commit: ed88c5f
 Status: fixed
