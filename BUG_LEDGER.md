@@ -450,3 +450,29 @@ Fix: borrows passed to any record/variant constructor (including generic `Some`)
   expr.py, walk.py).
 Commit: 56c8b45
 Status: fixed
+
+BUG-0031
+Origin: second independent audit (concurrency auditor, F9)
+Subsystems: static checker (provider yield count)
+Symptom: the yield-count check missed `if flag { return }` before the yield (return
+  treated like throw), a match arm without a yield and a yield inside one branch of an
+  `if` initialiser; it rejected a yield in every match arm ("found 2") and
+  `while true { yield v; break }`.
+Minimal reproduction: tests/regressions/test_bug_0031_yield_count_paths.py
+Regression test failed before fix: yes (5 of 11)
+Fix: a path analysis over capped yield counts (fall-through/return/break/continue,
+  throws dropped, loop fixpoint) replaces the syntactic count (lang/check/yieldflow.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0032
+Origin: second independent audit (concurrency auditor, F10)
+Subsystems: static checker (cleanup effects)
+Symptom: one throwing `defer` in a block whose other statements cannot throw made the
+  checker require `AggregateException`; verified mode rejected a correct program.
+Minimal reproduction: tests/regressions/test_bug_0032_defer_effect_aggregate.py
+Regression test failed before fix: yes
+Fix: aggregate only when the body can fail or more than one cleanup can fail
+  (V3 5.6 table) (lang/check/walk.py).
+Commit: PENDING
+Status: fixed

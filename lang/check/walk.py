@@ -165,43 +165,14 @@ class WalkMixin:
                        help=f"add `{short(n)}` to the throws clause or handle it with `try ... catch {short(n)} => ...`")
 
     def check_yield_count(self, d: A.FnDecl) -> None:
-        def count(stmts) -> Optional[int]:
-            """Yields on the straight-line path; None if paths disagree/loop."""
-            total = 0
-            for st in stmts:
-                c = _stmt_yields(st)
-                if c is None:
-                    return None
-                total += c
-            return total
-
-        def _stmt_yields(st) -> Optional[int]:
-            if isinstance(st, (A.WhileStmt, A.ForStmt)):
-                return None if any(isinstance(n, A.Yield) for n in A.walk(st)) else 0
-            if isinstance(st, A.ExprStmt) and isinstance(st.expr, A.If):
-                return _if_yields(st.expr)
-            if isinstance(st, A.ExprStmt) and isinstance(st.expr, A.Use):
-                return count(st.expr.body.stmts)
-            return sum(1 for n in A.walk(st) if isinstance(n, A.Yield))
-
-        def _if_yields(e: A.If) -> Optional[int]:
-            a = count(e.then.stmts)
-            if e.else_ is None:
-                b = 0
-            elif isinstance(e.else_, A.If):
-                b = _if_yields(e.else_)
-            else:
-                b = count(e.else_.stmts)
-            if a is None or b is None or a != b:
-                # a branch that ends with throw/return may legitimately skip the yield
-                return None if not (_ends_abruptly(e.then) or _ends_abruptly(e.else_)) else max(a or 0, b or 0)
-            return a
-
-        n = count(d.body.stmts)
-        if n != 1:
+        from .yieldflow import provider_exit_counts
+        counts = provider_exit_counts(d.body)
+        if counts != {1}:
+            found = ("no" if counts <= {0} else "two or more" if counts <= {2}
+                     else "a path-dependent number of")
             self.oblig("S.RESOURCE.YIELD_COUNT",
-                       f"provider `{d.name}` must yield exactly once on every path (found "
-                       f"{'a path-dependent number of' if n is None else n} yield(s))", d.name_span or d.span,
+                       f"provider `{d.name}` must yield exactly once on every path that completes normally "
+                       f"(found {found} yield(s))", d.name_span or d.span,
                        help="acquire, `yield` the resource once, then release; signal acquisition failure by throwing")
 
     def check_cancel_points(self, d: A.FnDecl) -> None:
@@ -225,6 +196,7 @@ class WalkMixin:
         sc = Scope(scope) if new_scope else scope
         result = T.UNIT
         defer_throw = 0
+        defer_effects = []
         body_coll = Collector()
         self.eff_stack.append(body_coll)
         try:
@@ -234,7 +206,7 @@ class WalkMixin:
                                                                else self.expr(st.body, sc)))
                     if not dc.empty:
                         defer_throw += 1
-                        self.raise_eff(list(dc.names), dc.unknown, st.span)
+                        defer_effects.append((list(dc.names), dc.unknown, st.span))
                     result = T.UNIT
                     continue
                 if isinstance(st, A.ExprStmt):
@@ -248,7 +220,12 @@ class WalkMixin:
                                                         A.ThrowStmt)) else T.UNIT
         finally:
             self.eff_stack.pop()
-        if defer_throw and (defer_throw > 1 or len(body_coll.names) > 0):
+        # V3 5.6: a cleanup failure after normal completion is thrown as is; only a body
+        # failure (or another cleanup failure) plus a cleanup failure aggregates (BUG-0032)
+        body_can_throw = bool(body_coll.names) or body_coll.unknown
+        for names, unknown, span in defer_effects:
+            body_coll.add(names, unknown, span)
+        if defer_throw and (defer_throw > 1 or body_can_throw):
             body_coll.add([AGG], False, b.span)
         for n, s in body_coll.names.items():
             self.raise_eff([n], False, s)

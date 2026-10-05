@@ -1730,14 +1730,14 @@
   {
    "id": "AUD2-C09",
    "title": "F9 provider yield-count checker false positives/negatives",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C10",
    "title": "F10 throwing defer makes checker demand AggregateException",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
