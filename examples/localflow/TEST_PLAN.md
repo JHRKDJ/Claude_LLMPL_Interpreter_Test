@@ -60,7 +60,7 @@ spec by oracle and implementation is less likely to pass unnoticed.
 
 ## Regression corpus
 Every LocalFlow defect found while testing gets a fixture under
-`fixtures/regressions/` and an entry in the table above before it is fixed
+`fixtures/regressions/` and an entry in `APP_BUG_LEDGER.md` before it is fixed
 (application regressions are kept separate from interpreter regressions in
 `tests/regressions/`).
 

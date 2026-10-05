@@ -1656,13 +1656,13 @@
   {
    "id": "AUDIT-002",
    "title": "Second independent coverage/correctness audit",
-   "state": "TODO",
+   "state": "DONE",
    "deps": []
   },
   {
    "id": "AUDIT-003",
    "title": "LocalFlow final adversarial acceptance review",
-   "state": "TODO",
+   "state": "DONE",
    "deps": []
   },
   {
@@ -1933,98 +1933,98 @@
   {
    "id": "AUD3-L01",
    "title": "LocalFlow: subworkflow timeout drops nested completions at the same instant (D1)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L02",
    "title": "Spec: nested run finishing exactly at subworkflow timeoutMs (D2)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L03",
    "title": "number on empty file (D3, both wrong)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L04",
    "title": "csvSum integer syntax: '+5', whitespace (D4)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L05",
    "title": "Line endings CRLF (D5)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L06",
    "title": "Oracle accepts NaN/Infinity JSON literals (D6)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L07",
    "title": "Transform output in subdirectory (D7)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L08",
    "title": "Path traversal / absolute paths (D8)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L09",
    "title": "attempts count when backoff expires at cancel/fail-fast instant (D9)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L10",
    "title": "Validation completeness: duplicate deps, invalid-id deps, 3.0 (D10)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L11",
    "title": "reduce excluding skipped deps is dead spec text (D11)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L12",
    "title": "Outputs of failed/cancelled subworkflow jobs remain (D12)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L13",
    "title": "Harness: compare bytes; leftover dirs; file modes",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   },
   {
    "id": "AUD3-L14",
    "title": "Add the reviewer's passing candidate fixtures to the permanent suite",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "LocalFlow adversarial review"
   }
