@@ -616,3 +616,34 @@ Fix: the resolver builds a declaration reference graph and reports cycles static
   behaviour (lang/check/resolve.py, lang/runtime/interp/link.py).
 Commit: 9252948
 Status: fixed
+
+BUG-0043
+Origin: second independent audit (types auditor, T12)
+Subsystems: static checker (category catch bindings)
+Symptom: `catch category IOish as e => e.path` typed `e` as Dyn, so field access passed
+  verified mode and abandoned when the concrete error lacked the field (V3 5.9.3).
+Minimal reproduction: tests/regressions/test_bug_0043_category_binding_fields.py
+Regression test failed before fix: yes (1 of 2)
+Fix: category bindings have a member-less category type; field access is
+  S.TYPE.UNKNOWN_FIELD with a hint to catch the concrete type or narrow
+  (lang/check/callcheck.py, expr.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0044
+Origin: second independent audit (types auditor, T13)
+Subsystems: diagnostics capture (privacy)
+Symptom: credentials inside strings (URL passwords, DB_PASSWORD=..., embedded tokens),
+  ("api_key", token) pairs, values copied out of sensitive fields, and secrets the
+  program interpolated into its own assert message were printed in full; JSON said
+  `"redacted": false` while showing `<redacted>`.
+Minimal reproduction: tests/regressions/test_bug_0044_secret_redaction.py
+Regression test failed before fix: yes (both behavioural tests, verified by stashing)
+Fix: text masking of known credential shapes; sensitive/credential-named field values
+  are remembered by value; messages are masked; tuple pairs keyed by credential names;
+  the redacted flag reflects content. The first masking patterns backtracked
+  quadratically on long inputs (the suite slowed past 2 minutes); they were bounded and
+  a performance guard added (lang/runtime/capture.py, interp/calls.py, interp/core.py,
+  lang/diagnostics/model.py, renderers).
+Commit: PENDING
+Status: fixed

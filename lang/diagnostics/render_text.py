@@ -181,7 +181,7 @@ def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: i
             lines.append(f"{' ' * gutter}     ... {len(d.frames) - len(frames)} more frames (use --deep)")
     if d.truncated:
         lines.append(f"{' ' * gutter} = note: diagnostic output was truncated to the render budget")
-    if d.redacted:
+    if d.is_redacted():
         lines.append(f"{' ' * gutter} = note: some values were redacted as sensitive")
     out = [indent + l for l in lines]
     for c in d.causes:

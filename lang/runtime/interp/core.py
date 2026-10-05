@@ -11,7 +11,7 @@ from typing import Any, Optional
 from ...diagnostics import (ChannelProvenance, Diagnostic, Frame as DFrame, Label, Note, ResourceProvenance,
                             TaskProvenance, code)
 from ...syntax import ast as A
-from ..capture import Budget, safe_repr
+from ..capture import Budget, mask_text, safe_repr
 from ..equality import type_name
 from ..signals import Abandoned, Cancelled, Fault, HardTermination, Signal, Thrown
 from ..tasks import Outcome, Task
@@ -143,7 +143,10 @@ class InterpCore:
     def make_diag(self, stable: str, message: str, span, env: Optional[Env] = None, label: str = "",
                   help: Optional[str] = None, notes=None, expected=None, found=None, secondary=None,
                   values=None, frames: bool = True) -> Diagnostic:
+        message, masked = mask_text(message)  # programs may interpolate secrets into messages (BUG-0044)
         d = Diagnostic(code(stable), message, primary=Label(span, label) if span is not None else None)
+        if masked:
+            d.redacted = True
         if help:
             d.help.append(help)
         for n in notes or []:

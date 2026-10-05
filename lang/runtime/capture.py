@@ -17,6 +17,37 @@ from .values import (UNIT, Closure, Duration, FrozenList, FrozenMap, FrozenRecor
 SECRET_NAME = re.compile(r"(pass(word|wd|phrase)?|secret|token|api_?key|credential|auth|private_?key|session)",
                          re.IGNORECASE)
 SECRET_VALUE = re.compile(r"^(sk-[A-Za-z0-9]{8,}|ghp_[A-Za-z0-9]{8,}|xox[bp]-[A-Za-z0-9-]{8,}|AKIA[0-9A-Z]{12,}|eyJ[A-Za-z0-9_-]{10,}\.)")
+# credentials embedded in longer text (BUG-0044): known token shapes, URL userinfo
+# passwords, and KEY=value / KEY: value where KEY looks like a credential name
+SECRET_TOKEN = re.compile(r"(sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{16,}|xox[bp]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{12,}"
+                          r"|eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_.-]+)")
+URL_PASSWORD = re.compile(r"(?P<pre>[A-Za-z][A-Za-z0-9+.-]{0,30}://[^:/@\s]{1,100}:)(?P<pw>[^@\s]{1,200})(?P<post>@)")
+# bounded quantifiers keep matching linear on long inputs
+KEY_VALUE = re.compile(r"(?P<key>(?:pass(?:word|wd|phrase)?|secret|token|api_?key|credential|private_?key)"
+                       r"[A-Za-z0-9_.-]{0,40})(?P<sep>\s{0,3}[=:]\s{0,3})(?P<val>[^\s,;&\"']{1,200})",
+                       re.IGNORECASE)
+
+# Values that came from `sensitive` (or credential-named) record fields, remembered by
+# value so copies into locals, parameters or messages are redacted too (BUG-0044).
+_SENSITIVE_VALUES: set = set()
+_SENSITIVE_LIMIT = 4096
+
+
+def register_sensitive(v) -> None:
+    if type(v) is str and len(v) >= 4 and len(_SENSITIVE_VALUES) < _SENSITIVE_LIMIT:
+        _SENSITIVE_VALUES.add(v)
+
+
+def mask_text(s: str) -> tuple[str, bool]:
+    """Redact credentials inside a string; returns (text, changed)."""
+    out = s
+    for secret in _SENSITIVE_VALUES:
+        if secret in out:
+            out = out.replace(secret, "<redacted>")
+    out = URL_PASSWORD.sub(lambda m: m.group("pre") + "<redacted>" + m.group("post"), out)
+    out = KEY_VALUE.sub(lambda m: m.group("key") + m.group("sep") + "<redacted>", out)
+    out = SECRET_TOKEN.sub("<redacted>", out)
+    return out, out != s
 
 MAX_DEPTH = 3
 MAX_ITEMS = 8
@@ -66,9 +97,16 @@ def _repr(v, budget: Budget, depth: int, seen) -> str:
     if t is float:
         return float_repr(v)
     if t is str:
-        if SECRET_VALUE.match(v):
+        if SECRET_VALUE.match(v) or v in _SENSITIVE_VALUES:
             budget.redacted = True
             return "<redacted>"
+        full = len(v)
+        v, changed = mask_text(v[:MAX_STR * 2])  # only the part that can be displayed
+        if changed:
+            budget.redacted = True
+        if full > MAX_STR:
+            budget.truncated = True
+            return quote_str(v[:MAX_STR]) + f"…({full} chars)"
         if len(v) > MAX_STR:
             budget.truncated = True
             return quote_str(v[:MAX_STR]) + f"…({len(v)} chars)"
@@ -112,6 +150,10 @@ def _repr(v, budget: Budget, depth: int, seen) -> str:
                 return "<cycle MutableList>"
             seen.add(v.id)
         shown = [_repr(x, budget, depth + 1, seen) for x in list(items)[:MAX_ITEMS]]
+        if t is TupleValue and len(items) == 2 and type(items[0]) is str and is_secret_name(items[0]) \
+                and shown[1] != "<redacted>":
+            budget.redacted = True  # ("api_key", value) pairs (BUG-0044)
+            shown[1] = "<redacted>"
         if len(items) > MAX_ITEMS:
             budget.truncated = True
             shown.append(f"… {len(items) - MAX_ITEMS} more (length {len(items)})")

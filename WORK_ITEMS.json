@@ -1870,14 +1870,14 @@
   {
    "id": "AUD2-T12",
    "title": "Field access on category-bound catch variable passes verified",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T13",
    "title": "Secret redaction incomplete; redacted flag wrong",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

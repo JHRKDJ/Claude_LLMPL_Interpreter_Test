@@ -44,7 +44,7 @@ def to_dict(d: Diagnostic) -> dict[str, Any]:
         "children": [to_dict(c) for c in d.children],
         "likely_cascade": d.likely_cascade,
         "truncated": d.truncated,
-        "redacted": d.redacted,
+        "redacted": d.is_redacted(),
         "extra": d.extra,
     }
     if d.task is not None:

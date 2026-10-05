@@ -414,6 +414,8 @@ class CallMixin:
                     bind_ty = T.TNominal(val, self.types[val].kind) if val in self.types else DYN
                 elif kind == "case":
                     bind_ty = T.TNominal(val[0], self.types[val[0]].kind) if val[0] in self.types else DYN
+                elif kind == "category":
+                    bind_ty = T.TNominal(val, "category")  # no fields or methods (V3 5.9.3; BUG-0043)
             if cl.binding:
                 hsc.vars[cl.binding] = (bind_ty, "catch", cl.span)
             ht = self.block(cl.handler, hsc, new_scope=False) if isinstance(cl.handler, A.Block) else self.expr(cl.handler, hsc)

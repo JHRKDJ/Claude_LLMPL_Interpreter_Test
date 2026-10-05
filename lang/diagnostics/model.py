@@ -137,6 +137,16 @@ class Diagnostic:
     blocking: bool = True
     truncated: bool = False
     redacted: bool = False
+
+    def is_redacted(self) -> bool:
+        """True if any rendered part carries a redaction (the producer's flag, or a
+        `<redacted>` placeholder in the message, values, notes or captured locals)."""
+        if self.redacted:
+            return True
+        texts = [self.message] + [str(v) for v in self.values.values()] + [n.message for n in self.notes]
+        for fr in self.frames:
+            texts.extend(str(v) for v in getattr(fr, "locals", {}).values())
+        return any("<redacted>" in t for t in texts if t)
     extra: dict[str, Any] = field(default_factory=dict)
 
     @property

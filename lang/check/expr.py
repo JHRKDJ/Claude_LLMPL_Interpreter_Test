@@ -398,6 +398,15 @@ class ExprMixin:
                    help=f"add a method on {ti.name} for the operation, or one that returns a frozen copy")
 
     def member_type(self, ot, e: A.Field, sc, for_call: bool = False):
+        if isinstance(ot, T.TNominal) and ot.kind == "category":
+            self.oblig("S.TYPE.UNKNOWN_FIELD", f"`{e.name}`: an error caught by category "
+                       f"`{ot.qualname.rsplit('.', 1)[-1]}` has no fields or methods of its own (categories "
+                       f"contribute none)", e.span,
+                       help="catch the concrete error type (`catch NotFound as e => e.path`) or narrow with `as`")
+            return DYN
+        return self._member_type(ot, e, sc, for_call)
+
+    def _member_type(self, ot, e: A.Field, sc, for_call: bool = False):
         name = e.name
         if isinstance(ot, T.TBorrow):
             ot = ot.inner

@@ -16,7 +16,7 @@ from ...syntax import ast as A
 from ... import typesys as T
 from ..builtins.common import kind_of
 from ..builtins.registry import METHODS
-from ..capture import Budget, safe_repr
+from ..capture import Budget, is_secret_name, register_sensitive, safe_repr
 from ..core_types import ERR_CASE, OPTION, RESULT
 from ..equality import type_name
 from ..frozen import is_frozen
@@ -433,6 +433,8 @@ class CallMixin:
             raise Abandoned(d)
 
     def check_field_value(self, rt: RecordType, f, v, span, env):
+        if f.sensitive or is_secret_name(f.name):
+            register_sensitive(v)  # redacted wherever it is copied later (BUG-0044)
         if type(v) is Borrow:
             raise self.abandon("A.RESOURCE.ESCAPE",
                                f"a resource borrow cannot be stored in field `{f.name}` of {rt.name}",
