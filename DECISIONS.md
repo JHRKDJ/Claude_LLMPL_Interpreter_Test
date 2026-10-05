@@ -121,6 +121,12 @@ decision with semantic consequences.
 - `==` is structural for frozen values and identity for identity-bearing (mutable)
   values (V3 5.1.1-2). Different runtime types compare unequal, except Int vs Float
   which abandons (silent `1 == 1.0` coercion is exactly what V3 forbids).
+- **Rounding, display and parsing (second audit, BUG-0045/0046):** rounding is half
+  away from zero on the exact binary value everywhere (`round`, `roundTo`, `{x:.N}`);
+  floats display with the shortest round-trip digits and exponents as `1e-5`/`1e16`;
+  a `0` before the width zero-pads numbers (`{5:07}`); `toInt` accepts exactly `-?digits`
+  and `toFloat` `-?digits[.digits][e[+-]digits]` (no whitespace, `+`, `_`, `nan`, `inf`).
+  Looking up an Int key among Float keys (or vice versa) in a map/set abandons like `==`.
 - **NaN policy (provisional, V3 7.3.3/9.2):** Float arithmetic follows IEEE-754
   (NaN/Inf propagate) because data workloads are in scope; NaN is made visible at
   boundaries where it would corrupt structure: NaN as a Map key/Set element abandons

@@ -647,3 +647,45 @@ Fix: text masking of known credential shapes; sensitive/credential-named field v
   lang/diagnostics/model.py, renderers).
 Commit: dd38667
 Status: fixed
+
+BUG-0045
+Origin: second independent audit (types auditor, T14) and LocalFlow review (D4)
+Subsystems: numerics × text formatting × parsing (Python leakage)
+Symptom: `round()` was floor(x+0.5) (-2.5 → -2, 0.49999999999999994 → 1) while
+  `roundTo`/format precision used banker's rounding; floats displayed `1e-05`/`1e+16`;
+  `{5:07}` ignored the zero flag; `toInt`/`toFloat` accepted whitespace and `+`
+  (Python int()/float()); NaN messages showed Python's `nan`.
+Minimal reproduction: tests/regressions/test_bug_0045_numeric_text_pythonisms.py
+Regression test failed before fix: yes (all 4)
+Fix: one rounding rule (half away from zero, exact binary value), language exponent
+  display, zero-padding, strict numeric grammars (SPEC-010 extended)
+  (lang/runtime/builtins/numbers.py, strings.py, equality.py, interp/exprs.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0046
+Origin: second independent audit (types auditor, T15)
+Subsystems: equality × collections × checker message
+Symptom: `Set.of(1).contains(1.0)` was false and `{1: "a"}.get(1.0)` None, while `==`
+  and List.contains abandon on Int/Float; the checker called nested Int/Float
+  comparisons "always false" although they abandon.
+Minimal reproduction: tests/regressions/test_bug_0046_int_float_consistency.py
+Regression test failed before fix: yes (2 of 3)
+Fix: map/set lookups abandon when only the other numeric kind's twin key is present;
+  nested Int/Float comparisons are S.TYPE.INVALID_OPERATOR (lang/runtime/builtins/colls.py,
+  lang/check/expr.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0047
+Origin: second independent audit (types auditor, T14)
+Subsystems: checker × runtime (literals and arguments)
+Symptom: duplicate keys in a map literal silently kept the last value; duplicate named
+  arguments passed verified mode.
+Minimal reproduction: tests/regressions/test_bug_0047_duplicate_keys_and_args.py
+Regression test failed before fix: yes (all 3)
+Fix: constant duplicate keys are S.NAME.DUPLICATE, run-time duplicates in a literal
+  abandon with A.MAP.DUPLICATE_KEY; duplicate named arguments are S.TYPE.ARITY
+  (lang/check/expr.py, callcheck.py, lang/runtime/interp/exprs.py).
+Commit: PENDING
+Status: fixed

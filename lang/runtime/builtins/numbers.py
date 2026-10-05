@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import math
+from decimal import ROUND_HALF_UP, Decimal
 
 from ..core_types import NONE, some
+from ..equality import float_repr
 from ..signals import Fault
 from ..values import Duration, Instant
 from .common import want_float, want_int
@@ -23,7 +25,7 @@ def _i_to_float(interp, recv, args, span):
 
 @method(["Int", "Float", "Bool"], "toStr", 0, sig="fn() -> Str", contract_safe=True)
 def _to_str(interp, recv, args, span):
-    from ..equality import display
+    from ..equality import float_repr, display
     return display(recv)
 
 
@@ -109,9 +111,14 @@ for _unit, _mult in (("nanos", 1), ("micros", 1000), ("millis", 1_000_000), ("se
 # ---------------------------------------------------------------- Float
 def _to_int_checked(f: float, how: str) -> int:
     if f != f or f in (math.inf, -math.inf):
-        raise Fault("A.NUMERIC.INVALID_CONVERSION", f"cannot convert {f!r} to Int ({how})",
+        raise Fault("A.NUMERIC.INVALID_CONVERSION", f"cannot convert {float_repr(f)} to Int ({how})",
                     help="check `isFinite()` first")
     return int(f)
+
+
+def round_half_away(f: float, digits: int = 0) -> Decimal:
+    """Round the exact binary value half away from zero (SPEC-010; BUG-0045)."""
+    return Decimal(f).quantize(Decimal(1).scaleb(-digits), rounding=ROUND_HALF_UP)
 
 
 @method("Float", "toInt", 0, sig="fn() -> Int", contract_safe=True)
@@ -123,7 +130,7 @@ def _f_to_int(interp, recv, args, span):
 def _f_round(interp, recv, args, span):
     if not math.isfinite(recv):
         _to_int_checked(recv, "round")
-    return int(math.floor(recv + 0.5))
+    return int(round_half_away(recv))
 
 
 @method("Float", "floor", 0, sig="fn() -> Int", contract_safe=True)
@@ -143,7 +150,9 @@ def _f_ceil(interp, recv, args, span):
 @method("Float", "roundTo", 1, sig="fn(Int) -> Float", contract_safe=True)
 def _f_round_to(interp, recv, args, span):
     d = want_int(args[0], "digits")
-    return round(recv, d)
+    if not math.isfinite(recv):
+        return recv
+    return float(round_half_away(recv, d))
 
 
 @method("Float", "abs", 0, sig="fn() -> Float", contract_safe=True)

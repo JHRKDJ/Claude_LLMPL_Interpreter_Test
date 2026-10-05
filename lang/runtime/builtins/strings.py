@@ -2,6 +2,8 @@
 normalisation). No Python negative indexing or truthiness leaks."""
 from __future__ import annotations
 
+import re
+
 import unicodedata
 
 from ..core_types import NONE, some
@@ -118,23 +120,23 @@ def _repeat(interp, recv, args, span):
     return recv * n
 
 
+_INT_TEXT = re.compile(r"-?[0-9]+")
+_FLOAT_TEXT = re.compile(r"-?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?")
+
+
 @method("Str", "toInt", 0, sig="fn() -> Int?")
 def _to_int(interp, recv, args, span):
-    s = recv.strip()
-    if not s or not (s.lstrip("+-").isdigit()) or s.count("-") + s.count("+") > 1:
+    # exactly `-?digits` (ASCII): no whitespace, `+` or `_` (Python int() accepts them; BUG-0045)
+    if not _INT_TEXT.fullmatch(recv):
         return NONE
-    if not s.lstrip("+-").isascii():
-        return NONE
-    return some(int(s))
+    return some(int(recv))
 
 
 @method("Str", "toFloat", 0, sig="fn() -> Float?")
 def _to_float(interp, recv, args, span):
-    s = recv.strip()
-    import re
-    if not re.fullmatch(r"[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?", s):
+    if not _FLOAT_TEXT.fullmatch(recv):
         return NONE
-    return some(float(s))
+    return some(float(recv))
 
 
 @method("Str", "padStart", 2, sig="fn(Int, Str) -> Str")

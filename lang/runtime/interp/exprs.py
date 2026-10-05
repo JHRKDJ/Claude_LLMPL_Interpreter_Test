@@ -6,6 +6,7 @@ import re
 
 from ...syntax import ast as A
 from ..builtins.colls import flist, fmap
+from ..builtins.numbers import round_half_away
 from ..builtins.common import kind_of, no_borrow, want_frozen_element
 from ..builtins.registry import METHODS, PROPS, STATICS
 from ..capture import Budget, safe_repr
@@ -24,7 +25,7 @@ from ... import typesys as T
 DYN_TYPE = TypeValue("prim", T.PRIMS["Dyn"], (), "Dyn")
 
 MAX_FORMAT_WIDTH = 1000
-_SPEC = re.compile(r"^([<>^])?(\d+)?(?:\.(\d+))?$")
+_SPEC = re.compile(r"^([<>^])?(0)?(\d+)?(?:\.(\d+))?$")
 
 
 class ConstThunk:
@@ -68,7 +69,9 @@ class ExprMixin:
         if not m:
             raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", f"invalid format spec `{spec}`", span, env,
                                help="format specs are `[<|>|^]width` and/or `.precision`, e.g. {x:>8.2}")
-        align, width, prec = m.groups()
+        align, zero, width, prec = m.groups()
+        if zero is not None and width is None:
+            width, zero = "0", None
         if (width is not None and int(width) > MAX_FORMAT_WIDTH) or (prec is not None and int(prec) > MAX_FORMAT_WIDTH):
             raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", f"format spec `{spec}` exceeds the maximum width/precision "
                                f"of {MAX_FORMAT_WIDTH}", span, env)
@@ -78,11 +81,14 @@ class ExprMixin:
                                    f"precision `.{prec}` applies to Float values, found {type_name(v)}", span, env,
                                    help="convert with `toFloat()` first")
             if math.isfinite(v):
-                s = f"{v:.{int(prec)}f}"
+                s = f"{round_half_away(v, int(prec)):f}"  # same rounding as roundTo (BUG-0045)
             else:
                 s = display(v)
         else:
             s = display(v)
+        if width is not None and zero is not None and type(v) in (int, float) and align is None:
+            sign = "-" if s.startswith("-") else ""
+            return sign + s[len(sign):].rjust(int(width) - len(sign), "0")  # `{5:07}` zero-pads
         if width is not None:
             w = int(width)
             if align == "<":
@@ -117,8 +123,15 @@ class ExprMixin:
 
     def eval_MapLit(self, node: A.MapLit, env: Env):
         pairs = []
+        seen = set()
         for k, v in node.entries:
-            pairs.append((self.eval(k, env), self.eval(v, env)))
+            kv = self.eval(k, env)
+            hk = hash_key(kv)
+            if hk in seen:  # a literal states distinct keys (BUG-0047)
+                raise self.abandon("A.MAP.DUPLICATE_KEY", f"map literal gives key {safe_repr(kv, Budget(80))} twice",
+                                   k.span, env)
+            seen.add(hk)
+            pairs.append((kv, self.eval(v, env)))
         return fmap(pairs)
 
     def eval_TupleLit(self, node: A.TupleLit, env: Env):

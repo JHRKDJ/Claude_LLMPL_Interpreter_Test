@@ -187,7 +187,12 @@ class CallMixin:
         if info.sig is not None and info.kind in ("fn", "method"):
             e.ann["_sig"] = info.sig
         arg_types = []
+        named_seen = set()
         for a in e.args:
+            if a.name is not None:
+                if a.name in named_seen:  # BUG-0047
+                    self.legal("S.TYPE.ARITY", f"argument `{a.name}` is given twice", a.span)
+                named_seen.add(a.name)
             at = self.expr(a.value, sc)
             arg_types.append((a, at))
         fs = self.fn_stack[-1] if self.fn_stack else None

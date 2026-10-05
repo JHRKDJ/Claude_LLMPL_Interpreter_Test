@@ -230,6 +230,9 @@ def float_repr(f: float) -> str:
     if f == -math.inf:
         return "-Infinity"
     r = repr(f)
+    if "e" in r:  # `1e-5` / `1e16`, not Python's `1e-05` / `1e+16` (BUG-0045)
+        mant, exp = r.split("e")
+        r = f"{mant}e{int(exp)}"
     return r
 
 

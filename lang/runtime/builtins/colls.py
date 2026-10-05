@@ -85,6 +85,28 @@ def _is_empty(interp, recv, args, span):
     return len(recv.items) == 0
 
 
+
+def lookup_key(data, k):
+    """hash_key(k) for a map/set lookup. Int and Float keys are distinct, and comparing
+    an Int with a Float abandons (SPEC-010), so looking up `1.0` where `1` is a key (or
+    vice versa) abandons instead of silently missing (BUG-0046)."""
+    hk = hash_key(k)
+    if hk in data:
+        return hk
+    twin = None
+    if type(k) is float and k == k and k not in (float("inf"), float("-inf")) and k.is_integer():
+        twin = hash_key(int(k))
+    elif type(k) is int:
+        try:
+            twin = hash_key(float(k))
+        except OverflowError:
+            twin = None
+    if twin is not None and twin in data:
+        raise Fault("A.TYPE.OPERAND_MISMATCH",
+                    f"cannot look up {type_name(k)} key {k!r} among {('Float' if type(k) is int else 'Int')} keys "
+                    f"(no implicit numeric coercion)", help="convert explicitly with toFloat()/toInt()")
+    return hk
+
 @method(LISTS, "get", 1, sig="fn(Int) -> T?", contract_safe=True)
 def _get(interp, recv, args, span):
     i = want_int(args[0], "index")
@@ -515,19 +537,19 @@ def _map_empty(interp, recv, args, span):
 
 @method(MAPS, "get", 1, sig="fn(K) -> V?", contract_safe=True)
 def _map_get(interp, recv, args, span):
-    e = recv.data.get(hash_key(args[0]))
+    e = recv.data.get(lookup_key(recv.data, args[0]))
     return NONE if e is None else some(e[1])
 
 
 @method(MAPS, "getOrDefault", 2, sig="fn(K, V) -> V", contract_safe=True)
 def _map_get_default(interp, recv, args, span):
-    e = recv.data.get(hash_key(args[0]))
+    e = recv.data.get(lookup_key(recv.data, args[0]))
     return args[1] if e is None else e[1]
 
 
 @method(MAPS, "containsKey", 1, sig="fn(K) -> Bool", contract_safe=True)
 def _map_contains(interp, recv, args, span):
-    return hash_key(args[0]) in recv.data
+    return lookup_key(recv.data, args[0]) in recv.data
 
 
 @method(MAPS, "keys", 0, sig="fn() -> List[K]", contract_safe=True)
@@ -612,7 +634,7 @@ def _mmap_set(interp, recv, args, span):
 
 @method("MutableMap", "remove", 1, sig="fn(K) -> V?")
 def _mmap_remove(interp, recv, args, span):
-    e = recv.data.pop(hash_key(args[0]), None)
+    e = recv.data.pop(lookup_key(recv.data, args[0]), None)
     if e is None:
         return NONE
     touch(recv)
@@ -652,7 +674,7 @@ def _set_empty(interp, recv, args, span):
 
 @method(SETS, "contains", 1, sig="fn(T) -> Bool", contract_safe=True)
 def _set_contains(interp, recv, args, span):
-    return hash_key(args[0]) in recv.data
+    return lookup_key(recv.data, args[0]) in recv.data
 
 
 @method(SETS, "toList", 0, sig="fn() -> List[T]")
@@ -729,7 +751,7 @@ def _mset_add(interp, recv, args, span):
 
 @method("MutableSet", "remove", 1, sig="fn(T) -> Bool")
 def _mset_remove(interp, recv, args, span):
-    if recv.data.pop(hash_key(args[0]), None) is None:
+    if recv.data.pop(lookup_key(recv.data, args[0]), None) is None:
         return False
     touch(recv)
     return True

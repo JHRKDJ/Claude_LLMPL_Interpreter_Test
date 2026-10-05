@@ -260,7 +260,15 @@ class ExprMixin:
 
     def x_MapLit(self, e, sc):
         kt = vt = T.NEVER
+        seen = {}
         for k, v in e.entries:
+            lit = _literal_key(k)
+            if lit is not None:
+                if lit in seen:  # BUG-0047: no silent last-wins
+                    self.legal("S.NAME.DUPLICATE", f"map key {k.span.text} appears twice in this literal", k.span,
+                               secondary=[Label(seen[lit], "first occurrence")])
+                else:
+                    seen[lit] = k.span
             kt = join(kt, self.expr(k, sc))
             vv = self.expr(v, sc)
             if is_mutable_type(vv):
@@ -310,7 +318,7 @@ class ExprMixin:
         if isinstance(b, T.TBorrow):
             b = b.inner
         if op in ("==", "!="):
-            if {a, b} == {T.INT, T.FLOAT}:
+            if _int_float_clash(a, b):  # also nested: Some(1) == Some(1.0) (BUG-0046)
                 self.oblig("S.TYPE.INVALID_OPERATOR", "comparing Int with Float abandons at runtime (no implicit "
                            "coercion)", e.span, help="convert explicitly with toFloat()/toInt()")
             elif a is not DYN and b is not DYN and not consistent(a, b) and not consistent(b, a) \
@@ -820,3 +828,23 @@ def _mentions_tvar(t) -> bool:
     if isinstance(t, T.TNominal):
         return any(_mentions_tvar(a) for a in t.args)
     return False
+
+
+def _int_float_clash(a, b) -> bool:
+    """True when comparing `a` with `b` would compare an Int with a Float somewhere."""
+    if {a, b} == {T.INT, T.FLOAT}:
+        return True
+    if isinstance(a, T.TCon) and isinstance(b, T.TCon) and a.name == b.name and len(a.args) == len(b.args):
+        return any(_int_float_clash(x, y) for x, y in zip(a.args, b.args))
+    if isinstance(a, T.TTuple) and isinstance(b, T.TTuple) and len(a.items) == len(b.items):
+        return any(_int_float_clash(x, y) for x, y in zip(a.items, b.items))
+    return False
+
+
+def _literal_key(k):
+    """A comparable identity for a constant map-literal key, or None."""
+    if isinstance(k, A.Literal):
+        return (k.kind, k.value)
+    if isinstance(k, A.StringLit) and all(isinstance(p, str) for p in k.parts):
+        return ("str", "".join(k.parts))
+    return None

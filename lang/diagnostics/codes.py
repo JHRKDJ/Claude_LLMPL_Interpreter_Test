@@ -132,6 +132,7 @@ CODES: dict[str, str] = {
     "A.TYPE.FROZEN_MUTATION": "attempt to mutate a frozen value",
     "A.TYPE.NOT_ITERABLE": "value is not iterable",
     "A.TYPE.MISSING_FIELD": "record construction lacks a required field",
+    "A.MAP.DUPLICATE_KEY": "a map literal produced the same key twice",
     "A.MODULE.INIT_CYCLE": "module constant initialisation cycle detected while linking",
     "A.MODULE.MUTABLE_GLOBAL": "module constant evaluated to a mutable value while linking",
     "A.CONTRACT.INVARIANT_FIELD_ACCESS": "mutable invariant field accessed outside the record's methods",
