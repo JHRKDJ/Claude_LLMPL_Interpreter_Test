@@ -50,10 +50,12 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
 
 ## Audits / final
 - [x] First V3 coverage sweep (complete; see PROGRESS.md for the gaps it closed)
-- [ ] Second independent audit; LocalFlow adversarial review
+- [x] Second independent audit (35 defects, BUG-0016..0050, all fixed); LocalFlow
+      final adversarial review (LF-004..007, ORACLE-002/003, SPEC-LF-001..004,
+      BUG-0051/0052; 87 review fixtures adopted)
 - [x] WORK_ITEMS.json / FEATURE_MATRIX.md status reconciliation (matrix references
       validated by tests/unit/test_feature_matrix.py)
-- [ ] FINAL_REPORT.md; final green run
+- [x] FINAL_REPORT.md; final green run
 
 ## Known limitations (recorded, not hidden)
 - Checker: disagreeing branch types (if/match arms, try handlers) join to `Dyn` (no
@@ -63,3 +65,12 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
   verified mode; narrowing with `as` is the remedy. This follows V3 5.3.10/7.7.6
   (dynamic callables must be narrowed before verified invocation). The 10 such
   errors once reported in LocalFlow were a checker defect (BUG-0015), not this rule.
+- Lambda parameters are not typed from the expected function type, so an
+  unannotated `fn(x) => x.method()` is `S.TYPE.DYNAMIC_CALL` in verified mode
+  (annotate the parameter). V3 7.1.6 does not require contextual typing.
+- Formatter wraps long declaration headers but not long expressions.
+- Performance: a Python-hosted tree-walker, about 125-280x slower than CPython on
+  CPU-bound code (FINAL_REPORT §13); call depth capped at 2,500 (IMPL-008).
+- Advisory precision: `W.CANCEL.NO_CANCELLATION_POINT` on bounded data loops and
+  `W.STATE.PASS_THROUGH` on deliberate sink threading are the 11 remaining LocalFlow
+  warnings (recorded, not silenced).

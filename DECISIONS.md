@@ -401,8 +401,6 @@ V3 2.4 and 5.15.2. **Resolution:** an unresolved name is a blocking static error
 both modes (`S.NAME.UNRESOLVED`, with import candidates and an optional visible
 patch) — executing it can never succeed and V3 makes the diagnostic the point.
 
----
-
 ### AMB-013 First-success under external cancellation after a tolerated failure
 V3 5.12.11/8.11 say external cancellation "coinciding with child failure preserves both;
 the group failure is reported or processed", while 7.10.7 says first-success *tolerates*

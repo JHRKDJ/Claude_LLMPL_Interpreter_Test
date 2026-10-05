@@ -71,7 +71,7 @@ wrong (ordering of same-instant events, slot release on retry, group limits with
 blocked heads, cancellation during backoff, etc.).
 
 ## Final independent review (AUDIT-003)
-An independent reviewer wrote 86 boundary and composition fixtures
+An independent reviewer wrote 87 boundary and composition fixtures
 (`fixtures/review/`, `blackbox_tests/test_review.py`: FIFO and seed 5). Their
 findings are in `APP_BUG_LEDGER.md` (LF-004..007, ORACLE-002/003, SPEC-LF-001..004)
 and interpreter `BUG_LEDGER.md` (BUG-0051 atomic-write mode, BUG-0052 firstSuccess

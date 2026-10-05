@@ -32,6 +32,12 @@ If this file conflicts with V3, V3 wins.
 - Exit codes: 0 ok, 1 unhandled recoverable error, 2 static errors, 3 abandonment,
   4 hard termination, 130 cancelled; an `Int` returned by `main` is the exit code.
 
+- Phase ordering (cascade control): name resolution runs on every file first. A file
+  with a resolution *error* (for example `S.NAME.UNRESOLVED`) is not type-checked, so
+  type errors in that file appear only after the names are fixed. This trades an extra
+  check round-trip for the absence of cascades from unknown names
+  (`lang/check/typecheck.py` `blocked_files`). Other files are still fully checked.
+
 ## 3. Specification-stage choices
 SPEC-022 (code display and JSON fields).
 

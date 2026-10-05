@@ -1,43 +1,60 @@
 # PROGRESS
 
 ## Current state
-- Phase: audits and final report. Implementation, LocalFlow and the first full V3
-  coverage reread (RUN0 §U) are complete.
-- Language suite: `python -m pytest tests -q` → 2115 passed (unit, conformance,
-  negative, interactions, regressions, fuzz/property, tooling).
-- LocalFlow: `python -m pytest examples/localflow -q` → 216 passed (30 acceptance
-  scenarios vs the Python oracle, FIFO + seeds 1-3, 12 adversarial cases, regressions,
-  source gates). LocalFlow passes `lang check --mode=verified` with zero errors and its
-  manifest selects verified mode.
-- Required-feature coverage: FEATURE_MATRIX.md — 178 rows COMPLETE, 6 DEFERRED (V3
-  9.4 or semantics-neutral optimisation TYP-14), 1 OUT_OF_SCOPE (STD-06, IMPL-007).
-  Evidence references are validated by tests/unit/test_feature_matrix.py.
-- Work items: 236/239 DONE (`python tools/workitems.py summary`); open: AUDIT-002,
-  AUDIT-003, FINAL-001.
-- Open regression bugs: 0 (BUG-0001..0015 fixed, each with a regression test that
-  failed first; LF-001..003 and ORACLE-001 in examples/localflow/regressions).
+- Phase: complete. All RUN0 phases are done: implementation, LocalFlow, first coverage
+  sweep (§U), second independent audit (§V), LocalFlow final adversarial review (§W),
+  final green run (§X), FINAL_REPORT.md (§Y).
+- Language suite: `python -m pytest tests -q` → 2387 passed.
 
-## First coverage sweep (RUN0 §U) — outcome
-Gaps found by rereading V3 and closed with implementation + tests:
-- Standard library (6.14/7.15): std.regex, std.datetime, std.chan, std.order.
-- Defects: BUG-0011 (type parameters in value position), BUG-0012 (unknown-method
-  code), BUG-0013 (effect variables in returned fn types), BUG-0014 (parser crash on
-  `let ()`), BUG-0015 (named imports typed Dyn — 10 false verified errors in
-  LocalFlow).
-- Diagnostics: every live runtime code now tested; dead codes removed; flattened
-  quiet view and cancellation summaries (7.13.6); render budget (7.13.5); seeded
-  scheduling history (7.14.5); capacity-liveness note (7.11.3); large-copy root
-  detail (7.10.10); S.EFFECT.BROAD_CATCH.
-- Evidence added for waiter FIFO, after-commit cancellation, task-result
-  classification, release failure during abandonment, failure ordering, absence
-  of every rejected/deferred feature, and property/fuzz suites (schedule
-  interleavings, graph copy, exhaustiveness vs brute force).
+  | suite | tests |
+  |---|---|
+  | unit | 47 |
+  | conformance | 334 |
+  | negative | 64 |
+  | interactions | 72 |
+  | regressions | 180 |
+  | fuzz/property | 1670 |
+  | tooling | 20 |
+
+  Eight consecutive full runs on a quiet tree were all green. The single unexplained
+  failure seen mid-run came from a background loop running against a tree that was
+  being edited; it never reproduced.
+- LocalFlow: `python -m pytest examples/localflow -q` → 446 passed, compared with the
+  Python oracle byte for byte: file bytes, stdout, directories with modes, and report
+  layout. The total includes:
+  - 30 acceptance scenarios (FIFO and seeds 1-3);
+  - 12 adversarial cases;
+  - 17 regression fixtures;
+  - 87 independent-review fixtures (FIFO and seed 5);
+  - source gates.
+
+  LocalFlow passes `lang check --mode=verified` with 0 errors and 11 advisories.
+- Required-feature coverage (FEATURE_MATRIX.md): 178 COMPLETE, 6 DEFERRED (V3 9.4, or
+  the semantics-neutral optimisation TYP-14), 1 OUT_OF_SCOPE (STD-06, IMPL-007).
+- Work items: 290/290 DONE (`python tools/workitems.py summary`).
+- Open regression bugs: 0.
+  - Interpreter: BUG-0001..0053, each with a regression test that failed first.
+  - Application: LF-001..007, ORACLE-001..003 and SPEC-LF-001..004 in
+    `examples/localflow/APP_BUG_LEDGER.md`.
+
+## Audit outcomes
+- First coverage sweep (§U): stdlib gaps (std.regex, std.datetime, std.chan,
+  std.order); BUG-0011..0015; diagnostics coverage.
+- Second independent audit (§V, two subagent auditors: concurrency and types):
+  BUG-0016..0050. AMB-002's timing dependence and the "creator holds sender" friction
+  were reviewed and kept, with rationale in DECISIONS.md.
+- LocalFlow final review (§W): sub-workflow timeout at the nested completion instant
+  (LF-004); four spec repairs (text rules, output paths, nested timeout, D9-D12
+  clarifications); two oracle fixes; a byte-level harness. It also found two
+  interpreter defects: atomic-write file mode (BUG-0051) and firstSuccess under
+  external cancellation (BUG-0052, V3 ambiguity AMB-013).
+- Final green run: CLI verification found BUG-0053 (`compareTo` only on `Str`, so
+  `std.order` could not sort Ints); fixed with a regression test.
 
 ## Blockers / ambiguities
-- None blocking. AMB-001..010 resolved narrowly (DECISIONS.md), to be listed in
-  FINAL_REPORT.md.
+- None blocking. AMB-001..013 are resolved in DECISIONS.md and discussed in
+  FINAL_REPORT.md §4-§5.
 
 ## Next actions
-1. Second independent coverage/correctness audit (AUDIT-002, subagent).
-2. LocalFlow final adversarial review (AUDIT-003).
-3. FINAL_REPORT.md (FINAL-001) and final green run of both suites.
+- None required by RUN0. FINAL_REPORT.md §14 proposes one next experiment: a
+  cold-start agent implementing LocalFlow from the guide and spec only.
