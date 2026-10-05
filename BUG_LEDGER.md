@@ -181,7 +181,7 @@ Regression test failed before fix: yes (both tests)
 Fix: the resolver marks such an index as a type parameter instead of resolving it as
   a value; the runtime applies the erased parameter as `Dyn` (IMPL-006)
   (lang/check/resolve.py, lang/runtime/interp/exprs.py).
-Commit: (pending)
+Commit: 4f8e1fc
 Status: fixed
 
 BUG-0012
@@ -196,5 +196,5 @@ Regression test failed before fix: yes (2 of 3; the third pins field reads)
 Fix: member lookup knows whether it serves a call; a missing callee member is
   `A.TYPE.UNKNOWN_METHOD`, a missing read is `A.TYPE.UNKNOWN_FIELD`
   (lang/runtime/interp/exprs.py, calls.py).
-Commit: (pending)
+Commit: 4f8e1fc
 Status: fixed
