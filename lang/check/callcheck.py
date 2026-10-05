@@ -275,8 +275,9 @@ class CallMixin:
         ret = info.ret
         eff_names = set(info.effect_names)
         eff_unknown = info.effect_unknown
-        ty_subst = {k: v for k, v in subst.items() if isinstance(v, T.Ty)}
-        ret = T.substitute(ret, ty_subst)
+        # effect variables bound by this call are substituted into a returned function
+        # type too, e.g. `compose(f, g) -> fn(A) -> C throws E1 | E2` (BUG-0013)
+        ret = T.substitute(ret, subst)
         # effect variables
         for n in list(eff_names):
             if n.startswith("$"):

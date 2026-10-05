@@ -303,8 +303,11 @@ def is_frozen_type(t: Ty, frozen_nominal: Callable[[TNominal], bool]) -> Optiona
 
 
 def substitute(t: Ty, subst: dict) -> Ty:
+    """Replace type variables bound to types; error-set variables bound to effects are
+    replaced inside function-type effects only (BUG-0013)."""
     if isinstance(t, TVar):
-        return subst.get(t.name, t)
+        r = subst.get(t.name, t)
+        return r if isinstance(r, Ty) else t
     if isinstance(t, TCon):
         return TCon(t.name, tuple(substitute(a, subst) for a in t.args))
     if isinstance(t, TTuple):
