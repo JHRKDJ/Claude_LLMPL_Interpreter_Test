@@ -79,7 +79,7 @@ class Scope:
 
 class FnCtx:
     __slots__ = ("kind", "level", "is_async", "provider", "captures", "nonlocals", "parallel_depth", "loop_depth",
-                 "in_defer", "decl", "contract")
+                 "in_defer", "decl", "contract", "break_das")
 
     def __init__(self, kind, level, is_async=False, provider=False, decl=None):
         self.kind = kind  # fn | lambda | spawn | contract | test | const
@@ -90,6 +90,7 @@ class FnCtx:
         self.nonlocals: set[str] = set()
         self.parallel_depth = 0
         self.loop_depth = 0
+        self.break_das: list = []  # per enclosing loop: definite-assignment sets at each `break`
         self.in_defer = 0
         self.decl = decl
         self.contract = None  # "requires" | "ensures" | "invariant" | "predicate"
@@ -636,6 +637,8 @@ class Resolver:
                 self.err("S.SYNTAX.MISPLACED_CONSTRUCT", f"`{word}` outside a loop", st.span)
             if ctx.in_defer:
                 self.err("S.SYNTAX.MISPLACED_CONSTRUCT", f"`{word}` inside `defer` is not allowed", st.span)
+            if c is A.BreakStmt and ctx.break_das and da is not TOP:
+                ctx.break_das[-1].append(da)
             return TOP
         if c is A.ThrowStmt:
             self.expr(st.value, scope, da)
@@ -677,10 +680,19 @@ class Resolver:
             body_scope = Scope(scope, scope.level, "block")
             da2 = self.cond(st.cond, scope, body_scope, da)
             ctx.loop_depth += 1
+            ctx.break_das.append([])
             try:
                 self.block(st.body, body_scope, da2, new_scope=False)
             finally:
                 ctx.loop_depth -= 1
+                breaks = ctx.break_das.pop()
+            if isinstance(st.cond, A.Literal) and st.cond.value is True:
+                # `while true` is left only by `break`: a binding is definitely assigned
+                # after the loop when every break has assigned it (BUG-0050)
+                out = TOP
+                for b in breaks:
+                    out = self.meet(out, b)
+                return out
             return da
         if c is A.ForStmt:
             da = self.expr(st.iterable, scope, da)
@@ -689,10 +701,12 @@ class Resolver:
             if st.is_await and not ctx.is_async:
                 self.err("S.ASYNC.AWAIT_OUTSIDE_ASYNC", "`for await` is only allowed in async functions", st.span)
             ctx.loop_depth += 1
+            ctx.break_das.append([])
             try:
                 self.block(st.body, body_scope, da, new_scope=False)
             finally:
                 ctx.loop_depth -= 1
+                ctx.break_das.pop()
             return da
         return da
 

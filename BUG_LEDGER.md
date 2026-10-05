@@ -720,3 +720,20 @@ Fix: --fix re-checks the rewritten program; REPL spans are labelled `<repl>`; on
   lang/check/expr.py, lang/runtime/interp/exprs.py).
 Commit: 362b91b
 Status: fixed
+
+BUG-0050
+Origin: second independent audit (types auditor, T20)
+Subsystems: checker (definite assignment × loops; frozenness × closures)
+Symptom: verified mode reported S.NAME.UNINITIALISED after `while true { z = 5; break }`
+  (break states were ignored); a closure capturing mutable state passed verified mode
+  when stored in a frozen list, map or record, then abandoned with
+  A.TYPE.FROZEN_MUTATION at run time.
+Minimal reproduction: tests/regressions/test_bug_0050_definite_assignment_and_frozen_closures.py
+Regression test failed before fix: yes (3 of 6; the other 3 pin unchanged behaviour)
+Fix: the resolver records definite-assignment sets at each `break` and a `while true`
+  loop exits with their meet; list/map literals and frozen record constructors reject
+  closures whose static type is not frozen (lang/check/resolve.py, expr.py,
+  callcheck.py, types.py). The call-depth cap from the same audit item is documented as
+  IMPL-008 rather than changed.
+Commit: pending
+Status: fixed

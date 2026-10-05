@@ -12,8 +12,12 @@ from ..runtime.values import Builtin, TypeValue
 from ..syntax import ast as A
 from .decls import FnSig, TypeInfo
 from .exhaustive import check_match
-from .types import DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type, unify
+from .types import (DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type,
+                    unfrozen_closure, unify)
 from .walk import AGG, CHCLOSED, DEADLINE, CORE_CASES, contains_task, needs_rt_check, short
+
+_CLOSURE_HELP = ("a closure is frozen only when it captures frozen, never-reassigned bindings; store it in a "
+                 "MutableList/MutableMap or capture a frozen snapshot (`let snap = m.freeze()`)")
 
 
 class TypeRef(T.Ty):
@@ -259,6 +263,9 @@ class ExprMixin:
             if is_mutable_type(it):
                 self.oblig("S.TYPE.FROZEN_MUTATION", f"a frozen List cannot contain mutable {it}", i.span,
                            help="freeze it first or use `MutableList.of(...)`")
+            elif unfrozen_closure(it):
+                self.oblig("S.TYPE.FROZEN_MUTATION", f"a frozen List cannot contain this closure: it "
+                           f"{unfrozen_closure(it)}", i.span, help=_CLOSURE_HELP)
             t = join(t, it)
         return T.TCon("List", (DYN if t is T.NEVER else t,))
 
@@ -277,6 +284,9 @@ class ExprMixin:
             vv = self.expr(v, sc)
             if is_mutable_type(vv):
                 self.oblig("S.TYPE.FROZEN_MUTATION", f"a frozen Map cannot contain mutable {vv}", v.span)
+            elif unfrozen_closure(vv):
+                self.oblig("S.TYPE.FROZEN_MUTATION", f"a frozen Map cannot contain this closure: it "
+                           f"{unfrozen_closure(vv)}", v.span, help=_CLOSURE_HELP)
             vt = join(vt, vv)
         return T.TCon("Map", (DYN if kt is T.NEVER else kt, DYN if vt is T.NEVER else vt))
 

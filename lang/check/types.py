@@ -273,6 +273,14 @@ def unify(param: T.Ty, arg: T.Ty, subst: dict) -> None:
         unify(param.inner, arg.inner if isinstance(arg, T.TBorrow) else arg, subst)
 
 
+def unfrozen_closure(t: T.Ty) -> Optional[str]:
+    """Why a function value is not frozen (it captures mutable or reassigned state),
+    so it cannot be stored in a frozen value (V3 5.1.3, BUG-0050); None otherwise."""
+    if isinstance(t, T.TFn) and t.unsendable:
+        return t.unsendable
+    return None
+
+
 def is_mutable_type(t: T.Ty) -> Optional[bool]:
     if isinstance(t, T.TCon):
         return t.name in T.MUTABLE_CONS

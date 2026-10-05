@@ -475,3 +475,15 @@ providers. They need no new core mechanism (they would be resource providers lik
 `std.fs`, whose semantics are fully implemented and tested), the sandbox has no
 services to exercise them against, and LocalFlow does not need them; they are
 recorded as out of scope for this reference implementation rather than stubbed.
+
+### IMPL-008 Call depth limit
+V3 does not bound recursion depth. The tree-walking interpreter uses several nested
+Python frames per language call on fixed-size task threads (`scheduler.STACK_SIZE`), so
+it caps language call depth at `MAX_CALL_DEPTH = 2500` (lang/runtime/interp/core.py).
+Exceeding it is a clean, attributable abandonment `A.RUNTIME.STACK_OVERFLOW` naming the
+function, with the repeated frames folded in the trace (tested in
+tests/conformance/test_functions_records.py), never a host crash. The limit is an
+implementation resource bound, not language semantics: a compiled implementation or a
+non-recursive evaluator may raise it. Deep recursion (> 2500) should be written as a
+loop; second audit item T20 recorded the low cap and it is kept, documented, because
+raising it requires an explicit-stack evaluator, not a constant change.

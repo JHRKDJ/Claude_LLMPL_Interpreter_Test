@@ -11,7 +11,7 @@ from ..syntax import ast as A
 from .decls import FnSig
 from .expr import BuiltinRef, BuiltinTypeRef, CaseRef, ModRef, SigRef, TypeRef, opt
 from .types import (DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type,
-                    task_error_names, task_error_type, unify)
+                    task_error_names, task_error_type, unfrozen_closure, unify)
 from .walk import AGG, CHCLOSED, DEADLINE, contains_task, needs_rt_check, short
 
 
@@ -377,6 +377,12 @@ class CallMixin:
                 return
         if isinstance(a.value, A.Lambda) and info.kind in ("ctor", "case"):
             self.check_lambda_escape(a.value, "stored in a value")
+        if info.kind == "ctor" and isinstance(info.ret, T.TNominal) and info.ret.kind in ("record", "error") \
+                and unfrozen_closure(t):
+            self.oblig("S.TYPE.FROZEN_MUTATION", f"field `{pname}` of frozen record {info.name} cannot hold this "
+                       f"closure: it {unfrozen_closure(t)}", a.span,
+                       help="capture only frozen, never-reassigned bindings, or make the record `mutable`")
+            return
         if not consistent(t, want, self.satisfies):
             reason = None
             if isinstance(want, T.TNominal) and want.kind == "protocol":

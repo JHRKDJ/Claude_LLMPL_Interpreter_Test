@@ -1926,7 +1926,7 @@
   {
    "id": "AUD2-T20",
    "title": "Minor checker false positives (loop definite assignment), frozen list closure static, recursion depth",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
