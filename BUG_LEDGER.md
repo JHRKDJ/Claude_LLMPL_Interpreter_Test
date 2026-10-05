@@ -737,3 +737,16 @@ Fix: the resolver records definite-assignment sets at each `break` and a `while 
   IMPL-008 rather than changed.
 Commit: 33a3199
 Status: fixed
+
+BUG-0051
+Origin: LocalFlow final review (the black-box harness now compares file modes)
+Subsystems: std.fs (atomic write provider)
+Symptom: `fs.openAtomicWrite` committed a file with mode 0600 (from `mkstemp`) while
+  `fs.writeText`/`openWrite` produce the umask default (0644), and replacing an
+  existing file reset its permissions; an atomic write was observably a different file.
+Minimal reproduction: tests/regressions/test_bug_0051_atomic_write_file_mode.py
+Regression test failed before fix: yes (both)
+Fix: the temporary file takes the existing target's mode, otherwise 0666 & ~umask
+  (lang/runtime/builtins/fs.py).
+Commit: pending
+Status: fixed

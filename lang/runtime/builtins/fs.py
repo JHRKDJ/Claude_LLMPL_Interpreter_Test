@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import stat
 import tempfile
 
 from ..core_types import FILE_NOT_FOUND, IO_FAILURE, NONE, PERMISSION_DENIED, make_error, some
@@ -93,6 +94,9 @@ class _FileProvider:
                 if not os.path.isdir(d):
                     raise FileNotFoundError(2, "directory does not exist", d)
                 fd, self.tmp = tempfile.mkstemp(prefix=".atomic-", dir=d)
+                # the committed file must look like a plain write (BUG-0051): keep an existing
+                # file's permissions, otherwise use the ordinary umask default
+                os.chmod(fd, _target_mode(self.path))
                 fh = os.fdopen(fd, "w", encoding="utf-8", newline="")
             else:
                 fh = open(self.path, self.mode, encoding="utf-8", newline="")
@@ -128,6 +132,17 @@ class _FileProvider:
                 h.closed = True
         if self.atomic and self.tmp:
             _silent_remove(self.tmp)
+
+
+_UMASK = os.umask(0o022)  # read once at import (os.umask can only be read by setting it)
+os.umask(_UMASK)
+
+
+def _target_mode(path: str) -> int:
+    try:
+        return stat.S_IMODE(os.stat(path).st_mode)
+    except OSError:
+        return 0o666 & ~_UMASK
 
 
 def _silent_remove(p):
