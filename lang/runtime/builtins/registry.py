@@ -78,4 +78,4 @@ def module_fn(module: str, name: str, min_args: int = 0, max_args: int | None = 
 
 def load_all() -> None:
     """Import every builtin module so their registrations run."""
-    from . import core, colls, strings, numbers, optres, timing, fs, jsonmod, mathmod  # noqa: F401
+    from . import core, colls, strings, numbers, optres, timing, fs, jsonmod, mathmod, regexmod, datetimemod  # noqa: F401

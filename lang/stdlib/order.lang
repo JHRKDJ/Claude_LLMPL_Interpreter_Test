@@ -1,0 +1,103 @@
+// std.order: the ordinary structural protocols Comparable, Hashable and Iterable
+// (V3 6.14, 7.15) and helpers that use them. Conformance is structural, like every
+// protocol: a record conforms by having the methods; `satisfies` is optional.
+
+// Total order: negative, zero or positive as `self` sorts before, with, or after `other`.
+pub protocol Comparable {
+    fn compareTo(self, other: Dyn) -> Int
+}
+
+// A frozen key standing for the value under equality, e.g. for grouping.
+pub protocol Hashable {
+    fn hashKey(self) -> Dyn
+}
+
+// A finite sequence view of a container.
+pub protocol Iterable[T] {
+    fn items(self) -> List[T]
+}
+
+// Stable sort of Comparable values (merge sort on `compareTo`).
+pub fn sort(xs: List[Comparable]) -> List[Comparable] {
+    if xs.length <= 1 {
+        return xs
+    }
+    let mid = xs.length.div(2)
+    let left = sort(xs.slice(0, mid))
+    let right = sort(xs.slice(mid, xs.length))
+    let out = MutableList[Comparable]()
+    let i = 0
+    let j = 0
+    while i < left.length && j < right.length {
+        if right[j].compareTo(left[i]) < 0 {
+            out.push(right[j])
+            j = j + 1
+        } else {
+            out.push(left[i])
+            i = i + 1
+        }
+    }
+    while i < left.length {
+        out.push(left[i])
+        i = i + 1
+    }
+    while j < right.length {
+        out.push(right[j])
+        j = j + 1
+    }
+    return out.freeze()
+}
+
+pub fn max(xs: List[Comparable]) -> Comparable? {
+    let best: Comparable? = null
+    for x in xs {
+        best = match best {
+            Some(b) => if x.compareTo(b) > 0 { Some(x) } else { Some(b) }
+            None => Some(x)
+        }
+    }
+    return best
+}
+
+pub fn min(xs: List[Comparable]) -> Comparable? {
+    let best: Comparable? = null
+    for x in xs {
+        best = match best {
+            Some(b) => if x.compareTo(b) < 0 { Some(x) } else { Some(b) }
+            None => Some(x)
+        }
+    }
+    return best
+}
+
+// Groups values whose hash keys are equal, keeping first-seen key order.
+pub fn groupByKey(xs: List[Hashable]) -> Map[Dyn, List[Hashable]] {
+    let groups = MutableMap[Dyn, MutableList[Hashable]]()
+    for x in xs {
+        let k = x.hashKey()
+        match groups.get(k) {
+            Some(g) => g.push(x)
+            None => {
+                let g = MutableList[Hashable]()
+                g.push(x)
+                groups.set(k, g)
+            }
+        }
+    }
+    let out = MutableMap[Dyn, List[Hashable]]()
+    for k in groups.keys() {
+        out.set(k, groups[k].freeze())
+    }
+    return out.freeze()
+}
+
+// Collects every item of every Iterable, in order.
+pub fn flatten[T](sources: List[Iterable[T]]) -> List[T] {
+    let out = MutableList[T]()
+    for s in sources {
+        for x in s.items() {
+            out.push(x)
+        }
+    }
+    return out.freeze()
+}

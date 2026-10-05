@@ -59,6 +59,14 @@ FILE_NOT_FOUND = _record("FileNotFound", [("path", T.STR)], "error", "IO")
 PERMISSION_DENIED = _record("PermissionDenied", [("path", T.STR)], "error", "IO")
 IO_FAILURE = _record("IOFailure", [("path", T.STR), ("detail", T.STR)], "error", "IO")
 JSON_ERROR = _record("JsonError", [("message", T.STR), ("line", T.INT), ("column", T.INT)], "error", "Data")
+PATTERN_ERROR = _record("PatternError", [("pattern", T.STR), ("message", T.STR), ("position", T.INT)], "error",
+                        "Data")
+FORMAT_ERROR = _record("FormatError", [("input", T.STR), ("expected", T.STR)], "error", "Data")
+# Frozen data records returned by std.regex / std.datetime (IMPL-007).
+REGEX_MATCH = _record("RegexMatch", [("text", T.STR), ("start", T.INT), ("end", T.INT),
+                                     ("groups", T.TCon("List", (T.option(T.STR),)))])
+DATE_TIME = _record("DateTime", [("year", T.INT), ("month", T.INT), ("day", T.INT), ("hour", T.INT),
+                                 ("minute", T.INT), ("second", T.INT), ("millis", T.INT)])
 CHANNEL_CLOSED = _record("ChannelClosed", [("channelId", T.INT), ("operation", T.STR), ("reason", T.STR),
                                            ("portId", T.INT)], "error", "Channels")
 DEADLINE_EXCEEDED = _record("DeadlineExceeded", [("deadline", T.INSTANT)], "error", "Time")
@@ -79,7 +87,8 @@ TASK_SELECTION = _record("TaskSelection", [("index", T.INT), ("result", T.TCon("
 
 CORE_ENUMS = {e.name: e for e in (OPTION, RESULT, SCOPE_EXIT, TRY_SEND, TRY_RECEIVE, RECEIVED, CANCEL_REASON,
                                   TASK_OUTCOME)}
-CORE_RECORDS = {r.name: r for r in (FILE_NOT_FOUND, PERMISSION_DENIED, IO_FAILURE, JSON_ERROR, CHANNEL_CLOSED,
+CORE_RECORDS = {r.name: r for r in (FILE_NOT_FOUND, PERMISSION_DENIED, IO_FAILURE, JSON_ERROR, PATTERN_ERROR,
+                                    FORMAT_ERROR, REGEX_MATCH, DATE_TIME, CHANNEL_CLOSED,
                                     DEADLINE_EXCEEDED, AGGREGATE_ENTRY, AGGREGATE_EXCEPTION, ABANDONMENT_REPORT,
                                     TASK_GROUP_REPORT, RECEIVE_SELECTION, TASK_SELECTION)}
 ALL_CORE_TYPES = {**CORE_ENUMS, **CORE_RECORDS}

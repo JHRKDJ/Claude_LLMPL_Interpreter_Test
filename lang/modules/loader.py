@@ -18,8 +18,9 @@ from ..syntax.parser import parse_source
 from .project import Project, load_project
 
 STDLIB_DIR = Path(__file__).resolve().parent.parent / "stdlib"
-# Native standard-library modules (implemented in lang/runtime/builtins).
-NATIVE_STD = {"std.fs", "std.json", "std.math", "std.strings", "std.time", "std.text"}
+# Native standard-library modules (implemented in lang/runtime/builtins); each one
+# has registered exports (tests/unit/test_stdlib.py checks this).
+NATIVE_STD = {"std.fs", "std.json", "std.math", "std.regex", "std.datetime"}
 
 
 @dataclass

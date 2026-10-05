@@ -408,3 +408,30 @@ The checker infers effect sets for functions without a `throws` clause and uses 
 for diagnostics. The runtime enforces only *written* `throws` clauses (AMB-005) and
 written function-type effects; it does not consult inferred sets. Rationale: as in
 IMPL-004, static inference must not change the outcome of a program at run time.
+
+### IMPL-006 Generic type parameters are erased at run time
+A type parameter (`T` in `fn f[T](...)`) is bound per call only statically. At run
+time it denotes `Dyn`: an annotation `x: T` performs no runtime check, and `T` used as
+a value-position type argument (`MutableList[T]()`) creates an unconstrained element
+type. Rationale: V3 5.3 requires written annotations to be checked, but a type
+parameter names *some* type chosen by the caller, so every value satisfies it for the
+appropriate instantiation; reifying instantiations would require inferring them at
+every call, which V3 does not ask for. Concrete type arguments (`MutableList[Int]()`)
+remain enforced. Static generic checking in verified mode is unaffected (BUG-0011).
+
+### IMPL-007 Standard-library scope of the reference implementation
+V3 6.14/7.15 list standard-library domains "as scope permits". Provided:
+`std.fs` (resource providers), `std.json`, `std.math`, `std.regex`, `std.datetime`
+(native), and `std.chan` (fan-in, drain/receive-until-closed, request-response,
+worker pool) and `std.order` (the structural protocols `Comparable`, `Hashable`,
+`Iterable` with sort/min/max/groupByKey/flatten) written in the language itself.
+Boundaries: regex patterns use Python `re` syntax (documented leakage; replacement
+templates use `$n`); `DateTime` is UTC-only with millisecond precision and
+`datetime.utcNow()` is the one wall-clock (nondeterministic) function; the standard
+errors `PatternError`/`FormatError` (category `Data`) and the data records
+`RegexMatch`/`DateTime` are registered beside the other core records so the checker
+and runtime share one definition. Not provided: network, HTTP, process and database
+providers. They need no new core mechanism (they would be resource providers like
+`std.fs`, whose semantics are fully implemented and tested), the sandbox has no
+services to exercise them against, and LocalFlow does not need them; they are
+recorded as out of scope for this reference implementation rather than stubbed.

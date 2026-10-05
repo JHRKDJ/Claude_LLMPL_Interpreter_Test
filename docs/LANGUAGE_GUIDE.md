@@ -267,3 +267,36 @@ Draft mode runs programs with missing annotations and markers, reporting them as
 warnings; written annotations, contracts, resources and task isolation are always
 enforced. Verified mode (`--mode=verified`, or `mode = "verified"` in `lang.toml`)
 turns those obligations into errors; release builds (`--release`) require it.
+
+## 10. Standard library
+
+`import std.<name>` binds the module name. Native modules: `std.fs` (resource
+providers such as `fs.openRead`), `std.json`, `std.math`, `std.regex`,
+`std.datetime`. Written in the language itself (lang/stdlib/): `std.chan`
+(`drain`, `fanIn`, `ask`/`serve` request-response, `workerPool`) and `std.order`
+(the structural protocols `Comparable`, `Hashable`, `Iterable` and helpers).
+Standard errors (`JsonError`, `PatternError`, `FormatError`, `FileNotFound`, ...)
+belong to catch categories such as `Data` and `IO`.
+
+```lang
+import std.regex
+import std.datetime
+import std.order
+
+record Version { major: Int, minor: Int
+    fn compareTo(self, other: Dyn) -> Int {
+        let o = other as Version
+        return if self.major != o.major { self.major - o.major } else { self.minor - o.minor }
+    }
+}
+
+fn main() throws PatternError, FormatError {
+    print((try regex.findAll("\\d+", "v1.22.3")).map(fn(m) => m.text))
+    let d = try datetime.parseIso("2024-02-28T23:30:00Z")
+    print(datetime.formatIso(datetime.addMillis(d, 3600000)))
+    print(order.max([Version(major: 1, minor: 4), Version(major: 2, minor: 0)]))
+}
+// prints: ["1", "22", "3"]
+// prints: 2024-02-29T00:30:00Z
+// prints: Some(Version(major: 2, minor: 0))
+```
