@@ -703,7 +703,7 @@ Fix: describe_mismatch qualifies clashing names and describes payloads, `as` fai
   carry the reason, Frame.call_node gives an entry-boundary secondary label, builtin
   arguments are reported as "argument N" (lang/runtime/interp/calls.py, exprs.py,
   core.py, lang/check/callcheck.py).
-Commit: pending
+Commit: 362b91b
 Status: fixed
 
 BUG-0049
@@ -718,5 +718,5 @@ Fix: --fix re-checks the rewritten program; REPL spans are labelled `<repl>`; on
   FORMAT_SPEC grammar shared by checker and runtime, invalid literal specs are
   S.SYNTAX.INVALID_FORMAT_SPEC (lang/tooling/cli.py, repl.py, lang/syntax/tokens.py,
   lang/check/expr.py, lang/runtime/interp/exprs.py).
-Commit: pending
+Commit: 362b91b
 Status: fixed
