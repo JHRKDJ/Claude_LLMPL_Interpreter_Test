@@ -126,13 +126,16 @@ EMPTY_EFFECT = Effect()
 
 
 class TFn(Ty):
-    __slots__ = ("params", "ret", "effect", "is_async")
+    __slots__ = ("params", "ret", "effect", "is_async", "unsendable", "captures_task")
 
     def __init__(self, params, ret: Ty, effect: Optional[Effect], is_async: bool = False):
         self.params = tuple(params)
         self.ret = ret
         self.effect = effect  # None => unknown (Dyn effect)
         self.is_async = is_async
+        # capture metadata of a lambda's type (not part of type identity; BUG-0035)
+        self.unsendable: Optional[str] = None
+        self.captures_task = False
 
     def _key(self):
         return (self.params, self.ret, self.effect, self.is_async)

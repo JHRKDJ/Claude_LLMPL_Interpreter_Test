@@ -167,6 +167,7 @@ CODES: dict[str, str] = {
     "A.TASK.EMPTY_GROUP": "race/firstSuccess requires at least one child",
     "A.ASYNC.SYNC_CONTEXT": "async function called from a non-async context",
     "A.CONCURRENCY.DEADLOCK": "every task is blocked and no deadline can wake any of them",
+    "S.CHANNEL.BROADCAST_MUTABLE": "broadcast declared with a mutable element type",
     "A.CHANNEL.BROADCAST_MUTABLE": "broadcast messages must be transitively frozen",
     "A.CHANNEL.PORT_RELEASED": "port used by a task that released (or never held) it",
     "A.RUNTIME.STACK_OVERFLOW": "call depth limit exceeded",

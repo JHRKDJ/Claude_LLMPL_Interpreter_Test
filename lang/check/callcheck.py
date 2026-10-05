@@ -194,6 +194,8 @@ class CallMixin:
         ret, eff_names, eff_unknown = self.check_args(e, info, arg_types)
         if self.report:
             self.annotate_typed_call(e, info, recv_ty, arg_types, sc)
+            if info.kind == "builtin" and info.name in ("SendPort.send", "SendPort.trySend") and arg_types:
+                self.check_sendable(arg_types[0][1], arg_types[0][0].value, "channel message")
         # async rules
         if info.is_async:
             if fs is not None and not fs.is_async and fs.kind not in ("contract",):
@@ -705,6 +707,10 @@ class CallMixin:
             self.oblig("S.TASK.NOT_SENDABLE", f"{what}: task handles stay within their structured scope", node.span)
         elif isinstance(t, T.TCon) and t.name in ("File", "Dir"):
             self.oblig("S.TASK.NOT_SENDABLE", f"{what}: resources cannot cross task boundaries", node.span)
+        if isinstance(t, T.TFn) and t.unsendable and not isinstance(node, A.Lambda):
+            self.oblig("S.TASK.NOT_SENDABLE", f"{what}: this closure {t.unsendable}; closures with mutable "
+                       f"captures cannot cross task boundaries", node.span,
+                       help="pass the data as an explicit argument (it will be graph-copied)")
         if isinstance(node, A.Lambda):
             for name, reassigned in node.ann.get("captures", []):
                 if reassigned:

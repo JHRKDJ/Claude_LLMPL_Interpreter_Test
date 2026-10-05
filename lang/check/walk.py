@@ -526,6 +526,8 @@ def _ends_abruptly(b) -> bool:
 
 
 def contains_task(t) -> bool:
+    if isinstance(t, T.TFn):
+        return t.captures_task  # a closure capturing a handle carries it (BUG-0035)
     if isinstance(t, T.TCon):
         return t.name == "Task" or any(contains_task(a) for a in t.args)
     if isinstance(t, T.TTuple):

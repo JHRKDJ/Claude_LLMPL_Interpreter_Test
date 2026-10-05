@@ -12,7 +12,7 @@ from ..syntax import ast as A
 from .decls import FnSig, TypeInfo
 from .exhaustive import check_match
 from .types import DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type, unify
-from .walk import AGG, CHCLOSED, DEADLINE, CORE_CASES, needs_rt_check, short
+from .walk import AGG, CHCLOSED, DEADLINE, CORE_CASES, contains_task, needs_rt_check, short
 
 
 class TypeRef(T.Ty):
@@ -489,11 +489,15 @@ class ExprMixin:
 
     def x_Index(self, e, sc):
         ot = self.expr(e.obj, sc)
-        its = [self.expr(i, sc) for i in e.indices]
+        its = [DYN if isinstance(i, A.TypeExpr) else self.expr(i, sc) for i in e.indices]
         if isinstance(ot, T.TBorrow):
             ot = ot.inner
         if isinstance(ot, (BuiltinTypeRef, TypeRef)):
             args = [self.type_from_value_expr(i) for i in e.indices]
+            if isinstance(ot, BuiltinTypeRef) and ot.name == "Broadcast" and args and is_mutable_type(args[0]):
+                self.legal("S.CHANNEL.BROADCAST_MUTABLE", f"broadcast messages must be transitively frozen; "
+                           f"{args[0]} is mutable", e.span,
+                           help="broadcast a frozen value (e.g. `List`), or use one ordinary channel per subscriber")
             if isinstance(ot, TypeRef):
                 return TypeRef(ot.info, args)
             return BuiltinTypeRef(ot.name, args)
@@ -533,6 +537,8 @@ class ExprMixin:
 
     def type_from_value_expr(self, e) -> T.Ty:
         """Interpret an expression used as a type argument (e.g. `Int` in `Channel[Int]`)."""
+        if isinstance(e, A.TypeExpr):  # e.g. `fn() -> Int` in `MutableList[fn() -> Int]()` (BUG-0036)
+            return self.ty(e, self.cur_module, self.tparams())
         if isinstance(e, A.Name):
             if e.name in T.PRIMS:
                 return T.PRIMS[e.name]
@@ -618,6 +624,15 @@ class ExprMixin:
                                                     [T.TVar(n[1:]) for n in coll.names if n.startswith("$")])
             e.ann["effect"] = None if coll.unknown else frozenset(n for n in coll.names if not n.startswith("$"))
         ft = T.TFn(ptys, ret_ann if ret_ann is not None else body_t, eff, e.is_async)
+        for name, reassigned in e.ann.get("captures", []):
+            ent = sc.get(name)
+            ct = ent[0] if ent is not None else DYN
+            if ft.unsendable is None and reassigned:
+                ft.unsendable = f"captures reassigned binding `{name}`"
+            elif ft.unsendable is None and is_mutable_type(ct):
+                ft.unsendable = f"captures mutable {ct} `{name}`"
+            if contains_task(ct):
+                ft.captures_task = True
         # a closure capturing a resource borrow is itself borrow-like: it may be called
         # or passed down, never bound, stored, returned or sent (V3 5.5.5; BUG-0029)
         for name, _ in e.ann.get("captures", []):

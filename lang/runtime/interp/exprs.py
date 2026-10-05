@@ -183,8 +183,9 @@ class ExprMixin:
     def eval_Index(self, node: A.Index, env: Env):
         obj = self.eval(node.obj, env)
         if type(obj) is TypeValue:
-            return self.type_apply(obj, [DYN_TYPE if i.ann.get("tparam") else self.eval(i, env)
-                                         for i in node.indices], node, env)
+            return self.type_apply(obj, [DYN_TYPE if i.ann.get("tparam") else
+                                         self.type_of_expr(i, env) if isinstance(i, A.TypeExpr) else
+                                         self.eval(i, env) for i in node.indices], node, env)
         if len(node.indices) != 1:
             raise self.abandon("A.RUNTIME.INVALID_ARGUMENT", "exactly one index is supported", node.span, env)
         idx = self.eval(node.indices[0], env)

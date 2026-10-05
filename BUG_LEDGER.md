@@ -501,3 +501,32 @@ Fix: the carrying channel holds in-transit ports until a receiver takes the mess
   the hold is dropped if the carrier's receivers are all lost (lang/runtime/interp/chan.py).
 Commit: 4e61bca
 Status: fixed
+
+BUG-0035
+Origin: second independent audit (concurrency auditor, F13)
+Subsystems: static checker (sendability)
+Symptom: verified mode accepted closures with mutable/reassigned captures passed to
+  `spawn` or sent on a channel, `Broadcast[MutableList[...]]`, and a task handle escaping
+  its group inside a closure; only the runtime caught them.
+Minimal reproduction: tests/regressions/test_bug_0035_static_sendability.py
+Regression test failed before fix: yes (4 of 5)
+Fix: a lambda's function type carries capture metadata (unsendable reason, captures a
+  task); check_sendable uses it for spawn arguments, select sends and port sends;
+  `Broadcast[T]` with mutable T is S.CHANNEL.BROADCAST_MUTABLE (lang/typesys.py,
+  lang/check/expr.py, callcheck.py, walk.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0036
+Origin: second independent audit (types auditor, T16)
+Subsystems: parser (type arguments in value position)
+Symptom: `MutableList[fn() -> Int]()` / `Channel[fn(Int) -> Int].unbounded()` did not
+  parse: `fn(` inside brackets always started a lambda.
+Minimal reproduction: tests/regressions/test_bug_0036_fn_type_value_position.py
+Regression test failed before fix: yes (all 3)
+Fix: inside brackets a function type is tried first and kept when `,`/`]` follows;
+  resolver, checker, runtime and formatter accept type-expression index items
+  (lang/syntax/parser.py, lang/check/resolve.py, expr.py, lang/runtime/interp/exprs.py,
+  lang/format/__init__.py).
+Commit: PENDING
+Status: fixed

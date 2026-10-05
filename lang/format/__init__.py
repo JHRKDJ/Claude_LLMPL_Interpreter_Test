@@ -542,7 +542,8 @@ class Formatter:
         return callee + self._seq("(", args, ")", ind)
 
     def e_Index(self, e, ind):
-        return self.wrap(e.obj, ind, P_POSTFIX) + "[" + ", ".join(self.expr(i, ind) for i in e.indices) + "]"
+        items = [self.type_(i) if isinstance(i, A.TypeExpr) else self.expr(i, ind) for i in e.indices]
+        return self.wrap(e.obj, ind, P_POSTFIX) + "[" + ", ".join(items) + "]"
 
     def e_Field(self, e, ind):
         return self.wrap(e.obj, ind, P_POSTFIX) + "." + e.name

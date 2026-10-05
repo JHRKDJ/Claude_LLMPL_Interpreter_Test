@@ -1758,7 +1758,7 @@
   {
    "id": "AUD2-C13",
    "title": "F13 static sendability: mutable-capture closures, mutable broadcast, handle escape via closure",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
@@ -1898,7 +1898,7 @@
   {
    "id": "AUD2-T16",
    "title": "Function types in value-position type arguments do not parse",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

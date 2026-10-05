@@ -1063,6 +1063,23 @@ class Parser:
             raise self.error("S.SYNTAX.UNSUPPORTED_SYNTAX", "`not` is not an operator", t.span, help="use `!`")
         return self.parse_postfix(self.parse_primary())
 
+    def parse_index_item(self):
+        """An index or type argument. `fn(...)` starts a lambda in expression position,
+        but inside brackets it may also be a function *type* (`MutableList[fn() -> Int]()`,
+        BUG-0036): try the type first and keep it only if `,` or `]` follows."""
+        t = self.peek()
+        if t.kind == "fn" or (t.kind == "async" and self.raw(1).kind == "fn"):
+            save_i, save_d = self.i, len(self.diags)
+            try:
+                ty = self.parse_type()
+                if self.at(",") or self.at("]"):
+                    return ty
+            except ParseError:
+                pass
+            self.i = save_i
+            del self.diags[save_d:]
+        return self.parse_expr()
+
     def parse_postfix(self, e: A.Expr) -> A.Expr:
         while True:
             t = self.peek()
@@ -1074,7 +1091,7 @@ class Parser:
                 idx = []
                 with self.nl_ctx(True):
                     while not self.at("]"):
-                        idx.append(self.parse_expr())
+                        idx.append(self.parse_index_item())
                         if not self.eat(","):
                             break
                     close = self.expect("]", "`]` closing the index")
