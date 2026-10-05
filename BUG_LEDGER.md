@@ -476,3 +476,28 @@ Fix: aggregate only when the body can fail or more than one cleanup can fail
   (V3 5.6 table) (lang/check/walk.py).
 Commit: 4078e43
 Status: fixed
+
+BUG-0033
+Origin: second independent audit (concurrency auditor, F11)
+Subsystems: cancellation masking × deadlines
+Symptom: while cleanup ran masked, a `within` deadline opened by the cleanup itself
+  never fired, so cleanup could not bound its own duration (V3 5.6.3, 7.10.11).
+Minimal reproduction: tests/regressions/test_bug_0033_cleanup_own_deadline.py
+Regression test failed before fix: yes (1 of 2; the other pins outer masking)
+Fix: masks are a stack of floors over the task's cancel scopes; only scopes opened
+  inside the masked region are deliverable; `within` reports its own deadline while an
+  outer masked cancellation stays pending (lang/runtime/tasks.py, interp/core.py, conc.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0034
+Origin: second independent audit (concurrency auditor, F12)
+Subsystems: channels (endpoint holder tracking)
+Symptom: a receive port carried inside a buffered message had no holder, so its channel
+  reported NoReceivers although the port would still be delivered and worked.
+Minimal reproduction: tests/regressions/test_bug_0034_port_in_transit.py
+Regression test failed before fix: yes (1 of 2; the other pins the undeliverable case)
+Fix: the carrying channel holds in-transit ports until a receiver takes the message;
+  the hold is dropped if the carrier's receivers are all lost (lang/runtime/interp/chan.py).
+Commit: PENDING
+Status: fixed

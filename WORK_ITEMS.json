@@ -1744,14 +1744,14 @@
   {
    "id": "AUD2-C11",
    "title": "F11 masked cleanup suppresses its own inner within deadline",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C12",
    "title": "F12 receive port in transit not counted as receiver",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

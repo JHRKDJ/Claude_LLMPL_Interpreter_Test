@@ -38,16 +38,41 @@ class ChannelMixin:
         for p in list(task.held_ports):
             self.release_port(p, task)
 
+    def hold_in_transit(self, ch, ports) -> None:
+        """Ports inside a buffered message are held by the carrying channel until a
+        receiver takes the message (BUG-0034)."""
+        for p in ports:
+            p.holders.add(ch)
+
+    def end_transit(self, ch, ports) -> None:
+        for p in ports:
+            p.holders.discard(ch)
+
+    def drop_undeliverable(self, ch) -> None:
+        """The carrying channel can no longer deliver its buffer: release in-transit holds."""
+        for _seq, _v, _path, ports in list(ch.buffer):
+            for p in ports:
+                if ch in p.holders:
+                    p.holders.discard(ch)
+                    if not p.holders:
+                        self._endpoint_lost(p, None)
+
     def release_port(self, port, task) -> None:
         port.holders.discard(task)
         task.held_ports.discard(port)
         if not port.holders:
-            ch = port.channel
-            if isinstance(ch, Channel):
-                ch.record("endpoint-lost", task.path, port.id, note=type(port).__name__)
-                self.recheck_waiters(ch)
-            elif isinstance(ch, Broadcast):
-                self.recheck_broadcast(ch)
+            self._endpoint_lost(port, task)
+
+    def _endpoint_lost(self, port, task) -> None:
+        ch = port.channel
+        if isinstance(ch, Channel):
+            ch.record("endpoint-lost", task.path if task is not None else "<in transit>", port.id,
+                      note=type(port).__name__)
+            if type(port).__name__ == "ReceivePort" and ch.receivers_lost() and ch.buffer:
+                self.drop_undeliverable(ch)
+            self.recheck_waiters(ch)
+        elif isinstance(ch, Broadcast):
+            self.recheck_broadcast(ch)
 
     def recheck_waiters(self, ch: Channel) -> None:
         for q in (ch.send_waiters, ch.recv_waiters):
@@ -132,6 +157,7 @@ class ChannelMixin:
         v, tr = self.copy_message(value)
         seq = ch.next_seq()
         ch.buffer.append((seq, v, sender.path, tr.ports))
+        self.hold_in_transit(ch, tr.ports)
         ch.record("send", sender.path, port.id if port else None, seq, note="buffered")
         n = len(ch.buffer)
         if n > ch.peak:
@@ -170,6 +196,7 @@ class ChannelMixin:
             v, tr = self.copy_message(sw.value)
             seq = ch.next_seq()
             ch.buffer.append((seq, v, sw.task.path, tr.ports))
+            self.hold_in_transit(ch, tr.ports)
             ch.record("send", sw.task.path, sw.port.id, seq, note="buffered after wait")
             sw.committed = True
             sw.seq = seq
@@ -237,6 +264,7 @@ class ChannelMixin:
         seq, v, spath, ports = ch.buffer.popleft()
         ch.record("receive", task.path, port.id if port else None, seq)
         self.adopt_ports(task, ports)
+        self.end_transit(ch, ports)
         self.refill_from_waiting_sender(ch)
         bc = getattr(ch, "broadcast", None)
         if bc is not None:

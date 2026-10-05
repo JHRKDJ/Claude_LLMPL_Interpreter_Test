@@ -178,7 +178,7 @@ class InterpCore:
     # ------------------------------------------------------------ cancellation points
     def check_cancel(self, span=None) -> None:
         t = self.sched.current
-        if t.mask == 0 and t.cancel_pending():
+        if t.cancel_pending():
             raise Cancelled("cancellation delivered", span)
 
     # ------------------------------------------------------------ task bodies

@@ -459,7 +459,10 @@ class ConcMixin:
         try:
             return self.exec_block(node.body, env)
         except Cancelled:
-            if scope.cancelled and not any(s.cancelled for s in task.scopes if s is not scope):
+            floor = task.mask_floors[-1] if task.mask_floors else 0
+            # only deliverable scopes compete: an outer cancellation held back by a mask
+            # stays pending while this deadline is reported (BUG-0033)
+            if scope.cancelled and not any(s.cancelled for s in task.scopes[floor:] if s is not scope):
                 task.scopes.remove(scope)
                 err = make_error(DEADLINE_EXCEEDED, deadline=deadline)
                 raise Thrown(err, self.new_provenance(node.span)) from None

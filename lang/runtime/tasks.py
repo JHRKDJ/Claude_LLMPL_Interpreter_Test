@@ -63,7 +63,9 @@ class Task:
         self.root_scope = CancelScope("task", self)
         self.scopes: list[CancelScope] = [self.root_scope]
         self.groups: list[TaskGroup] = []  # groups opened by this task (stack)
-        self.mask = 0
+        # cancellation masks (cleanup, release): one floor per masked region, recording how
+        # many cancel scopes existed when it began (BUG-0033)
+        self.mask_floors: list[int] = []
         self.outcome: Optional[Outcome] = None
         self.done = False
         self.in_ready = False
@@ -81,10 +83,25 @@ class Task:
         sched.all_tasks.append(self)
 
     # ------------------------------------------------------------ cancellation
+    @property
+    def mask(self) -> int:
+        """Masking depth. Assigning a larger value enters masked regions, a smaller one
+        leaves them (so `task.mask += 1` / `task.mask -= 1` bracket a cleanup)."""
+        return len(self.mask_floors)
+
+    @mask.setter
+    def mask(self, value: int) -> None:
+        while len(self.mask_floors) < value:
+            self.mask_floors.append(len(self.scopes))
+        while len(self.mask_floors) > value:
+            self.mask_floors.pop()
+
     def cancel_pending(self) -> bool:
-        if self.mask:
-            return False
-        for s in self.scopes:
+        """A cancellation is deliverable unless it belongs to a scope that was already
+        open when the innermost mask began: masking delays the *pending* cancellation, but
+        a deadline opened inside the cleanup itself still fires (V3 5.6.3; BUG-0033)."""
+        floor = self.mask_floors[-1] if self.mask_floors else 0
+        for s in self.scopes[floor:]:
             if s.cancelled:
                 return True
         return False
@@ -139,7 +156,7 @@ def cancel_scope(scope: CancelScope, reason: str) -> None:
 
 def wake_for_cancel(task: Task) -> None:
     w = task.wait
-    if w is None or task.done or not w.cancellable or task.mask:
+    if w is None or task.done or not w.cancellable:
         return
     if not task.cancel_pending():
         return
