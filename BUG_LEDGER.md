@@ -487,7 +487,7 @@ Regression test failed before fix: yes (1 of 2; the other pins outer masking)
 Fix: masks are a stack of floors over the task's cancel scopes; only scopes opened
   inside the masked region are deliverable; `within` reports its own deadline while an
   outer masked cancellation stays pending (lang/runtime/tasks.py, interp/core.py, conc.py).
-Commit: PENDING
+Commit: 4e61bca
 Status: fixed
 
 BUG-0034
@@ -499,5 +499,5 @@ Minimal reproduction: tests/regressions/test_bug_0034_port_in_transit.py
 Regression test failed before fix: yes (1 of 2; the other pins the undeliverable case)
 Fix: the carrying channel holds in-transit ports until a receiver takes the message;
   the hold is dropped if the carrier's receivers are all lost (lang/runtime/interp/chan.py).
-Commit: PENDING
+Commit: 4e61bca
 Status: fixed
