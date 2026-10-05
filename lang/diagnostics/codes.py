@@ -68,6 +68,7 @@ CODES: dict[str, str] = {
     # ---- effects / errors ----
     "S.EFFECT.MISSING_TRY": "call that may throw lacks a `try` marker or handler",
     "S.EFFECT.UNDECLARED_THROWS": "error may escape but is not in the function's throws clause",
+    "S.EFFECT.BROAD_CATCH": "catch-all handler (`catch _`, `catch e`, `catch Exception`) is not available",
     "S.EFFECT.BROAD_FALLBACK": "unqualified `else` fallback over an open or multi-type error set",
     "S.EFFECT.THROWS_AND_RESULT": "function both declares throws and returns Result",
     "S.EFFECT.NOT_AN_ERROR": "thrown/caught type is not a declared error type",

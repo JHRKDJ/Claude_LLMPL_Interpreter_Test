@@ -25,7 +25,10 @@ If this file conflicts with V3, V3 wins.
 - `try e` marks/propagates; `try e catch T as x => h …` handles named types, enum
   cases (catching every case of an error enum handles the type) and categories;
   `try e else f` handles exactly the checker-proved type (`fallback_qual`);
-  `catch … else …` together is a syntax error.
+  `catch … else …` together is a syntax error. Catch-all spellings from other
+  languages (`catch _`, `catch e`, `catch Exception`/`Error`/`Throwable`) are
+  `S.EFFECT.BROAD_CATCH` with a fix hint; an unqualified `else` over several types
+  is `S.EFFECT.BROAD_FALLBACK` (tests/negative/test_rejected_and_deferred.py).
 - `capture e` → `Result`; `propagate r` returns `Err` early from a Result-returning
   function (`S.EFFECT.PROPAGATE_CONTEXT` elsewhere); `r.orThrow()`; `.context(k, v)`.
 - Written `throws` is enforced at runtime (AMB-005): an undeclared escaping error

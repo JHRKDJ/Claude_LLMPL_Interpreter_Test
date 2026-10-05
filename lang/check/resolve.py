@@ -153,6 +153,10 @@ class ProjectIndex:
         return [m for m in self.by_name.get(name, []) if m != exclude]
 
 
+# Spellings of catch-all handlers in other languages (`catch _`, `catch e`, ...).
+BROAD_CATCH_NAMES = {"_", "Exception", "Error", "Throwable", "BaseException", "Any", "Dyn", "all"}
+
+
 class Resolver:
     def __init__(self, program, mode: str):
         self.program = program
@@ -797,7 +801,14 @@ class Resolver:
             for cl in e.catches:
                 first = cl.path[0]
                 b = scope.lookup(first)
-                if b is None:
+                if b is None and len(cl.path) == 1 and (first in BROAD_CATCH_NAMES or first[:1].islower()):
+                    # V3 5.7.5/7.7.3: no broad untyped catch-all
+                    self.err("S.EFFECT.BROAD_CATCH",
+                             f"`catch {first}` would be a catch-all handler, which the language does not have: "
+                             f"it would silently suppress errors nobody anticipated", cl.span, "catch-all",
+                             help="name the error types (`catch FileNotFound => ...`), a category "
+                                  "(`catch IO => ...`), or bind one: `catch JsonError as e => ...`")
+                elif b is None:
                     self.unresolved(first, cl.span, scope, as_type=True)
                 else:
                     b.used = True
