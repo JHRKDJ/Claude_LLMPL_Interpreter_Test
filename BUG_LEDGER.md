@@ -660,7 +660,7 @@ Regression test failed before fix: yes (all 4)
 Fix: one rounding rule (half away from zero, exact binary value), language exponent
   display, zero-padding, strict numeric grammars (SPEC-010 extended)
   (lang/runtime/builtins/numbers.py, strings.py, equality.py, interp/exprs.py).
-Commit: PENDING
+Commit: 51a9642
 Status: fixed
 
 BUG-0046
@@ -674,7 +674,7 @@ Regression test failed before fix: yes (2 of 3)
 Fix: map/set lookups abandon when only the other numeric kind's twin key is present;
   nested Int/Float comparisons are S.TYPE.INVALID_OPERATOR (lang/runtime/builtins/colls.py,
   lang/check/expr.py).
-Commit: PENDING
+Commit: 51a9642
 Status: fixed
 
 BUG-0047
@@ -687,5 +687,5 @@ Regression test failed before fix: yes (all 3)
 Fix: constant duplicate keys are S.NAME.DUPLICATE, run-time duplicates in a literal
   abandon with A.MAP.DUPLICATE_KEY; duplicate named arguments are S.TYPE.ARITY
   (lang/check/expr.py, callcheck.py, lang/runtime/interp/exprs.py).
-Commit: PENDING
+Commit: 51a9642
 Status: fixed
