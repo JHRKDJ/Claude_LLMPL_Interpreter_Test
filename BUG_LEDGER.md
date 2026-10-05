@@ -735,5 +735,5 @@ Fix: the resolver records definite-assignment sets at each `break` and a `while 
   closures whose static type is not frozen (lang/check/resolve.py, expr.py,
   callcheck.py, types.py). The call-depth cap from the same audit item is documented as
   IMPL-008 rather than changed.
-Commit: pending
+Commit: 33a3199
 Status: fixed
