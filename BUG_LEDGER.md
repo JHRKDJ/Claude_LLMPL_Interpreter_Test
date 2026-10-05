@@ -153,7 +153,7 @@ Regression test failed before fix: yes (2 of 3; the third pins the runtime backs
 Fix: type_from_value_expr converts tuple literals to tuple types; destructuring a
   statically non-tuple value (or a tuple of the wrong arity) is
   S.TYPE.STATIC_MISMATCH with an unwrap hint for Options (lang/check/expr.py, walk.py).
-Commit: (next commit)
+Commit: d886ef1
 Status: fixed
 
 BUG-0010
@@ -166,5 +166,5 @@ Minimal reproduction: tests/regressions/test_bug_0010_diverging_blocks.py
 Regression test failed before fix: yes
 Fix: block() types a block whose last statement transfers control as Never
   (lang/check/walk.py).
-Commit: (next commit)
+Commit: d886ef1
 Status: fixed
