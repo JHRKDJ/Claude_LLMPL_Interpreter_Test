@@ -12,7 +12,7 @@ from .decls import FnSig
 from .expr import BuiltinRef, BuiltinTypeRef, CaseRef, ModRef, SigRef, TypeRef, opt
 from .types import (DYN, consistent, is_mutable_type, join, kind_of_type, receiver_bindings, sig_type,
                     task_error_names, task_error_type, unify)
-from .walk import AGG, CHCLOSED, DEADLINE, contains_task, short
+from .walk import AGG, CHCLOSED, DEADLINE, contains_task, needs_rt_check, short
 
 
 class CallInfo:
@@ -190,6 +190,8 @@ class CallMixin:
             arg_types.append((a, at))
         fs = self.fn_stack[-1] if self.fn_stack else None
         ret, eff_names, eff_unknown = self.check_args(e, info, arg_types)
+        if self.report:
+            self.annotate_typed_call(e, info, recv_ty, arg_types, sc)
         # async rules
         if info.is_async:
             if fs is not None and not fs.is_async and fs.kind not in ("contract",):
@@ -296,6 +298,47 @@ class CallMixin:
                 elif not self._in_generic_scope(var):
                     eff_names.discard(n)
         return ret, frozenset(eff_names), eff_unknown
+
+    def annotate_typed_call(self, e: A.Call, info, recv_ty, arg_types, sc) -> None:
+        """IMPL-004 for calls: when the callee's type comes from a written annotation —
+        a method of an annotated mutable collection, or a value of annotated function
+        type — record the transient checks the runtime must perform: arguments against
+        the parameter types (writes before insertion), the result against the return
+        type, and escaping errors against the written throws set (V3 5.3.7, 7.7.6;
+        BUG-0024, BUG-0026)."""
+        callee = e.callee
+        positional = [(a, t) for a, t in arg_types if a.name is None]
+        if info.kind == "builtin" and isinstance(callee, A.Field):
+            rt = recv_ty.inner if isinstance(recv_ty, T.TBorrow) else recv_ty
+            if not (isinstance(rt, T.TCon) and rt.name in ("MutableList", "MutableMap", "MutableSet")):
+                return
+            origin = self.origin_of(callee.obj, sc)
+            if origin is None or not info.params:
+                return
+            checks = [(i, p[1]) for i, ((a, at), p) in enumerate(zip(positional, info.params))
+                      if at is DYN and needs_rt_check(p[1]) and not isinstance(p[1], T.TFn)]
+            if checks:
+                e.ann["typed_call"] = (checks, None, None, origin)
+            return
+        if info.kind != "fn" or info.sig is not None:
+            return
+        ct = callee.ann.get("_sty")
+        if isinstance(ct, T.TBorrow):
+            ct = ct.inner
+        if not isinstance(ct, T.TFn):
+            return
+        origin = self.origin_of(callee, sc)
+        if origin is None:
+            return
+        checks = [(i, p) for i, ((a, at), p) in enumerate(zip(positional, ct.params)) if needs_rt_check(p)]
+        ret = ct.ret if needs_rt_check(ct.ret) else None
+        effect = None
+        if ct.effect is not None:
+            names, unknown = eff_names_from(ct.effect)
+            if not unknown and not any(n.startswith("$") for n in names):
+                effect = tuple(sorted(names))
+        if checks or ret is not None or effect is not None:
+            e.ann["typed_call"] = (checks, ret, effect, origin)
 
     def _in_generic_scope(self, var: str) -> bool:
         for fs in self.fn_stack:

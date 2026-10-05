@@ -31,6 +31,9 @@ class CallMixin:
     # ------------------------------------------------------------------ entry points
     def eval_Call(self, node: A.Call, env: Env, awaited: bool = False):
         callee = node.callee
+        tc = node.ann.get("typed_call")
+        if tc is not None:
+            return self.eval_typed_call(node, env, awaited, tc)
         try:
             if callee.__class__ is A.Field:
                 obj = self.eval(callee.obj, env)
@@ -45,6 +48,49 @@ class CallMixin:
             args, kwargs = self.eval_args(node, env)
             self.sched.current.frames[-1].cur_env = env
             return self.call_value(f, args, kwargs, node.span, awaited, node, env)
+        except Thrown as t:
+            if not node.ann.get("marked", True):
+                t.prov.unmarked.append(node.span)
+            raise
+
+    def eval_typed_call(self, node: A.Call, env: Env, awaited: bool, tc):
+        """A call whose callee type comes from a written annotation (IMPL-004; BUG-0024,
+        BUG-0026): arguments are checked before the call (writes before insertion), the
+        result after it, and an escaping error against the annotation's throws set."""
+        checks, ret, effect, origin = tc
+        callee = node.callee
+        try:
+            if callee.__class__ is A.Field:
+                obj = self.eval(callee.obj, env)
+                f = None
+            else:
+                f = self.eval(callee, env)
+            args, kwargs = self.eval_args(node, env)
+            for i, ty in checks:
+                if i < len(args):
+                    self.transient_check((ty, origin), args[i], node.args[i].span, env, f"argument {i + 1}")
+            self.sched.current.frames[-1].cur_env = env
+            try:
+                if f is None:
+                    v = self.call_member(obj, callee.name, args, kwargs, node, env, awaited)
+                else:
+                    v = self.call_value(f, args, kwargs, node.span, awaited, node, env)
+            except Thrown as t:
+                if effect is not None:
+                    allowed = [self.registry.nominals.get(q) for q in effect]
+                    if not self.error_in(t.error, [a for a in allowed if a is not None]):
+                        raise Abandoned(self.make_diag(
+                            "A.EFFECT.UNDECLARED_EXCEPTION",
+                            f"a call through a value typed with throws {{{', '.join(q.split('.')[-1] for q in effect) or 'nothing'}}} "
+                            f"let {self.error_summary(t.error)} escape", node.span, env,
+                            label="call relies on the annotated effect",
+                            secondary=[Label(origin, "relied-upon function type")] if origin is not None else [],
+                            help="narrow the callable to a type whose throws set includes this error, or handle "
+                                 "the error inside the callable"))
+                raise
+            if ret is not None:
+                self.transient_check((ret, origin), v, node.span, env, "the call's result")
+            return v
         except Thrown as t:
             if not node.ann.get("marked", True):
                 t.prov.unmarked.append(node.span)
@@ -402,6 +448,8 @@ class CallMixin:
     def check_effect(self, clo, t: Thrown, span, env) -> None:
         allowed = self.allowed_errors(clo)
         if allowed is None:
+            allowed = self.allowed_errors_bound(clo, env)
+        if allowed is None:
             return
         err = t.error
         if self.error_in(err, allowed):
@@ -436,6 +484,53 @@ class CallMixin:
                 if rtt is not None:
                     out.append(rtt)
         decl.ann["rt_throws"] = out
+        return out
+
+    def allowed_errors_bound(self, clo, fenv):
+        """Written throws sets with error-set variables (`throws E`): each variable is
+        bound per call by the effects of the callable arguments whose annotated type
+        mentions it (V3 5.8, 7.7.5; BUG-0027). None (permissive) if any binding callable
+        has an unknown effect or a variable is unbound."""
+        decl = clo.decl
+        throws = getattr(decl, "throws", None)
+        if not throws:
+            return None
+        out, variables = [], set()
+        for texpr in throws:
+            ty = self.type_of_expr(texpr, clo.env)
+            if ty is T.DYN:
+                return None
+            if isinstance(ty, T.TVar):
+                variables.add(ty.name)
+            elif isinstance(ty, T.TNominal):
+                rtt = self.registry.nominals.get(ty.qualname)
+                if rtt is not None:
+                    out.append(rtt)
+        bound = {v: set() for v in variables}
+        seen = set()
+        for p in decl.params:
+            if p.is_self or p.type is None:
+                continue
+            pty = self.type_of_expr(p.type, clo.env)
+            if not isinstance(pty, T.TFn) or pty.effect is None:
+                continue
+            vars_here = [i.name for i in pty.effect.items if isinstance(i, T.TVar) and i.name in bound]
+            if not vars_here:
+                continue
+            arg = fenv.vars.get(p.name)
+            eff = _callable_effect(arg)
+            if eff is None:
+                return None
+            for v in vars_here:
+                bound[v] |= set(eff)
+                seen.add(v)
+        if seen != variables:
+            return None
+        for names in bound.values():
+            for q in names:
+                rtt = self.registry.nominals.get(q)
+                if rtt is not None:
+                    out.append(rtt)
         return out
 
     def error_in(self, err, allowed) -> bool:
@@ -587,7 +682,10 @@ class CallMixin:
     def construct(self, tv: TypeValue, args, kwargs, span, env, node=None):
         k = tv.kind
         if k == "record":
-            return self.construct_record(tv.target, args, kwargs, span, env, node)
+            obj = self.construct_record(tv.target, args, kwargs, span, env, node)
+            if tv.args and getattr(tv.target, "type_params", None):
+                self.check_type_arguments(tv, obj, span, env, node)
+            return obj
         if k == "case":
             return self.construct_case(tv.target, args, kwargs, span, env)
         if k == "builtin":
@@ -610,6 +708,24 @@ class CallMixin:
             raise Fault("A.TYPE.NOT_CALLABLE", f"enum `{tv.name}` is not constructible directly; choose a case, "
                                                f"e.g. `{tv.name}.{next(iter(tv.target.cases), 'Case')}(...)`")
         raise Fault("A.TYPE.NOT_CALLABLE", f"`{tv.name}` is not callable")
+
+    def check_type_arguments(self, tv: TypeValue, obj, span, env, node) -> None:
+        """`Box[Int](v: ...)`: explicitly written type arguments are annotations, so the
+        fields whose declared type mentions a parameter are checked (BUG-0025)."""
+        rt = tv.target
+        sub = {p: self.type_arg(tv, i) for i, p in enumerate(rt.type_params)}
+        sub = {k: v for k, v in sub.items() if v is not None}
+        for f, v in zip(rt.fields, obj.values):
+            if f.type is None:
+                continue
+            want = T.substitute(f.type, sub)
+            if want is f.type or str(want) == str(f.type):
+                continue
+            if not self.registry.check(want, v):
+                raise Abandoned(self.make_diag(
+                    "A.TYPE.DYNAMIC_MISMATCH", f"field `{f.name}` of {tv.name}[...] expects {want}, received "
+                    f"{type_name(v)}", self._field_arg_span(node, f.name, span), env, label=f"expected {want}",
+                    expected=str(want), found=type_name(v)))
 
     def type_arg(self, tv: TypeValue, i: int):
         if i < len(tv.args):
@@ -696,3 +812,17 @@ class CallMixin:
         if ci is ERR_CASE:
             return VariantValue(ci, tuple(vals), self.new_provenance(span))
         return VariantValue(ci, tuple(vals))
+
+
+def _callable_effect(v):
+    """The known effect (qualified error names) of a runtime callable, or None."""
+    t = type(v)
+    if t is Closure:
+        return v.effect
+    if t is BoundMethod:
+        return v.func.effect
+    if t is Builtin:
+        return frozenset(v.effect or ())
+    if t is BuiltinBound:
+        return frozenset(v.builtin.effect or ())
+    return None

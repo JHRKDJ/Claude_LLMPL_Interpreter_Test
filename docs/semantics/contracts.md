@@ -29,7 +29,9 @@ If this file conflicts with V3, V3 wins.
 - Invariants: checked after construction, after `with`, and at exit (normal,
   exception, cancellation — after cleanup) of each *outermost* method call on the
   object; writes to invariant fields outside the record's methods are
-  `S.CONTRACT.INVARIANT_FIELD_WRITE` / `A.CONTRACT.INVARIANT_FIELD_WRITE`.
+  `S.CONTRACT.INVARIANT_FIELD_WRITE` / `A.CONTRACT.INVARIANT_FIELD_WRITE`; an
+  invariant field holding a mutable value cannot even be read outside those methods
+  (or contracts) — `S.CONTRACT.INVARIANT_FIELD_ACCESS` / `A.CONTRACT.INVARIANT_FIELD_ACCESS`.
   `W.INVARIANT.ACROSS_AWAIT` warns when a method mutates an invariant field before a
   cancellation point (V3 8.8).
 

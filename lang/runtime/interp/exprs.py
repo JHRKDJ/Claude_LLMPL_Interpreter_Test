@@ -230,7 +230,11 @@ class ExprMixin:
 
     def eval_Field(self, node: A.Field, env: Env):
         obj = self.eval(node.obj, env)
-        return self.get_member(obj, node.name, node, env)
+        v = self.get_member(obj, node.name, node, env)
+        rc = node.ann.get("rt_check")
+        if rc is not None:  # generic field read through an annotation (BUG-0025)
+            self.transient_check(rc, v, node.span, env, f"field `{node.name}`")
+        return v
 
     def get_member(self, obj, name: str, node, env, call: bool = False):
         t = type(obj)
@@ -256,7 +260,16 @@ class ExprMixin:
             rt = obj.rtype
             i = rt.field_index.get(name)
             if i is not None:
-                return obj.values[i]
+                v = obj.values[i]
+                if t is MutableRecord and name in rt.invariant_fields and not is_frozen(v) \
+                        and not self.sched.current.frames[-1].contract_mode and not self.in_own_method(obj):
+                    raise self.abandon("A.CONTRACT.INVARIANT_FIELD_ACCESS",
+                                       f"field `{name}` of {rt.name} holds a mutable value and participates in an "
+                                       f"invariant; outside {rt.name}'s methods it cannot be accessed (mutating or "
+                                       f"aliasing it would bypass the invariant check)", node.span, env,
+                                       help=f"add a method on {rt.name} for the operation, or one that returns a "
+                                            f"frozen copy (e.g. `.freeze()`)")
+                return v
             m = rt.methods.get(name)
             if m is not None:
                 return BoundMethod(obj, m)

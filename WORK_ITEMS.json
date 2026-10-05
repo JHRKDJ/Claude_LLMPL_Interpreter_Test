@@ -1807,42 +1807,42 @@
   {
    "id": "AUD2-T03",
    "title": "Invariant field control bypassed through mutable sub-objects",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T04",
    "title": "Typed mutable collection parameter not enforced on writes",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T05",
    "title": "Generic record annotations (Box[Int]) not enforced",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T06",
    "title": "Function-typed values: call results/args unchecked at runtime",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T07",
    "title": "Effect of a narrowed callable not enforced on invocation",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T08",
    "title": "Written throws E (effect variable) advisory at runtime",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
@@ -1919,7 +1919,7 @@
   {
    "id": "AUD2-T19",
    "title": "Doc mismatches: IMPL-005, SPEC-004",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

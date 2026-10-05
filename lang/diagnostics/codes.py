@@ -79,6 +79,7 @@ CODES: dict[str, str] = {
     "S.CONTRACT.RECURSIVE_PREDICATE": "predicates may not be recursive",
     "S.CONTRACT.OLD_NOT_SNAPSHOTTABLE": "old(expr) result is not primitive/frozen",
     "S.CONTRACT.OLD_OUTSIDE_ENSURES": "old() used outside an ensures clause",
+    "S.CONTRACT.INVARIANT_FIELD_ACCESS": "mutable invariant field accessed outside the record's methods",
     "S.CONTRACT.INVARIANT_FIELD_WRITE": "invariant-relevant field assigned outside the record's methods",
     "S.CONTRACT.RESULT_OUTSIDE_ENSURES": "`result` used outside an ensures clause",
     # ---- resources ----
@@ -131,6 +132,7 @@ CODES: dict[str, str] = {
     "A.TYPE.FROZEN_MUTATION": "attempt to mutate a frozen value",
     "A.TYPE.NOT_ITERABLE": "value is not iterable",
     "A.TYPE.MISSING_FIELD": "record construction lacks a required field",
+    "A.CONTRACT.INVARIANT_FIELD_ACCESS": "mutable invariant field accessed outside the record's methods",
     "A.CONTRACT.INVARIANT_FIELD_WRITE": "invariant-relevant field assigned outside the record's own methods",
     "A.BINDING.UNINITIALISED": "binding read before initialisation",
     "A.MATCH.NO_ARM": "no match arm matched the value",

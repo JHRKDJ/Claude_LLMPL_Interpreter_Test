@@ -349,3 +349,73 @@ Fix: firstSuccess aggregates failures whenever any exist (cancellation pending);
   (lang/runtime/interp/conc.py).
 Commit: 5d3cef8
 Status: fixed
+
+BUG-0024
+Origin: second independent audit (types auditor, T04)
+Subsystems: gradual typing × mutable collections
+Symptom: a `MutableList[Str]` passed a `MutableList[Int]` parameter (element-type
+  metadata ignored at the boundary), and typed code pushed a dynamically produced Str
+  into an annotated `MutableList[Int]` unchecked (V3 7.6.3: writes check before insertion).
+Minimal reproduction: tests/regressions/test_bug_0024_typed_mutable_collection_writes.py
+Regression test failed before fix: yes (2 of 3)
+Fix: boundary checks compare runtime element-type metadata; the checker marks calls on
+  annotation-typed mutable collections so Dyn arguments are checked before the call
+  (lang/runtime/rtypes.py, lang/check/callcheck.py, lang/runtime/interp/calls.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0025
+Origin: second independent audit (types auditor, T05)
+Subsystems: gradual typing × generic records
+Symptom: `Box[Int](v: "s")` built a Box holding a Str, and reading `b.v` with
+  `b: Box[Int]` used a Str as Int; generic record annotations were never enforced.
+Minimal reproduction: tests/regressions/test_bug_0025_generic_record_annotations.py
+Regression test failed before fix: yes (2 of 3)
+Fix: explicit type arguments are checked at construction; T-typed field reads through
+  an annotated instantiation get a transient check (lang/check/expr.py,
+  lang/runtime/interp/calls.py, exprs.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0026
+Origin: second independent audit (types auditor, T06/T07)
+Subsystems: gradual typing × function types × effects
+Symptom: calling a value whose type came from a written function-type annotation
+  checked nothing at run time: wrong arguments passed in draft, wrong results were used
+  as the annotated type, and a callable narrowed with `as fn(..) throws E1` let E2 escape.
+Minimal reproduction: tests/regressions/test_bug_0026_function_typed_calls.py
+Regression test failed before fix: yes (3 of 4, verified by stashing the fix)
+Fix: typed calls carry argument/result/effect checks naming the relied-upon annotation;
+  `as` counts as an annotation origin (lang/check/callcheck.py, expr.py,
+  lang/runtime/interp/calls.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0027
+Origin: second independent audit (types auditor, T08)
+Subsystems: effect polymorphism at run time
+Symptom: a written `throws E` (error-set variable) was permissive at run time, so a
+  generic higher-order function could let an unrelated error escape.
+Minimal reproduction: tests/regressions/test_bug_0027_effect_variable_runtime.py
+Regression test failed before fix: yes
+Fix: E is bound per call from the effects of the callable arguments whose annotation
+  mentions it; unknown callback effects stay permissive (lang/runtime/interp/calls.py;
+  IMPL-005 corrected).
+Commit: PENDING
+Status: fixed
+
+BUG-0028
+Origin: second independent audit (types auditor, T03)
+Subsystems: contracts (invariant field control) × mutable sub-objects
+Symptom: only direct assignment to invariant fields was controlled; an invariant field
+  holding a mutable value could be mutated from outside (`b.items.push(1)`,
+  `a.inner.v = -50`) or aliased, breaking the invariant silently until a later method
+  entry blamed the record. Verified mode accepted it.
+Minimal reproduction: tests/regressions/test_bug_0028_invariant_mutable_subobject.py
+Regression test failed before fix: yes (3 of 4)
+Fix: access to a mutable-valued invariant field is restricted to the record's own
+  methods and contracts, statically (S.CONTRACT.INVARIANT_FIELD_ACCESS) and at run time
+  (A.CONTRACT.INVARIANT_FIELD_ACCESS); SPEC-014 amended (lang/check/expr.py,
+  lang/runtime/interp/exprs.py).
+Commit: PENDING
+Status: fixed

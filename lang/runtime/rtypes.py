@@ -70,15 +70,15 @@ class TypeRegistry:
             if n == "List":
                 return tv is FrozenList
             if n == "MutableList":
-                return tv is MutableList
+                return tv is MutableList and _meta_ok(ty.args, (v.elem_type,))
             if n == "Map":
                 return tv is FrozenMap
             if n == "MutableMap":
-                return tv is MutableMap
+                return tv is MutableMap and _meta_ok(ty.args, (v.key_type, v.value_type))
             if n == "Set":
                 return tv is FrozenSet
             if n == "MutableSet":
-                return tv is MutableSet
+                return tv is MutableSet and _meta_ok(ty.args, (getattr(v, "elem_type", None),))
             if n == "Option":
                 if tv is not VariantValue or v.case.etype is not OPTION:
                     return False
@@ -243,3 +243,16 @@ def method_conforms(pdecl, m) -> Optional[str]:
     if type(m) is Builtin:
         return None
     return "is not a method"
+
+
+def _meta_ok(wanted, actual) -> bool:
+    """A mutable collection created with element types (`MutableList[Str]()`) carries
+    them at run time; they must agree with the annotation it crosses (BUG-0024).
+    Collections without metadata, Dyn and type variables on either side are accepted
+    (their elements are checked transiently on typed reads and writes)."""
+    for w, a in zip(wanted, actual):
+        if a is None or w is T.DYN or a is T.DYN or isinstance(w, T.TVar) or isinstance(a, T.TVar):
+            continue
+        if str(w) != str(a):
+            return False
+    return True

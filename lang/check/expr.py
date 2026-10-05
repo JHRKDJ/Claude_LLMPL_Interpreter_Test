@@ -118,6 +118,8 @@ class ExprMixin:
         c = e.__class__
         if c is A.Name:
             return sc.origin(e.name)
+        if c is A.As:  # `value as T` is a written annotation the narrowed value relies on
+            return e.type.span
         if c is A.Index:
             return self.origin_of(e.obj, sc)
         if c is A.Field:
@@ -361,7 +363,35 @@ class ExprMixin:
     # ------------------------------------------------------------------ members
     def x_Field(self, e, sc):
         ot = self.expr(e.obj, sc)
-        return self.member_type(ot, e, sc)
+        t = self.member_type(ot, e, sc)
+        base = ot.inner if isinstance(ot, T.TBorrow) else ot
+        if isinstance(base, T.TNominal) and base.kind == "mrecord":
+            self.check_invariant_field_access(e, base, t)
+        if self.report and isinstance(base, T.TNominal) and base.args and needs_rt_check(t):
+            ti = self.types.get(base.qualname)
+            declared = ti.fields.get(e.name) if ti is not None else None
+            if declared is not None and _mentions_tvar(declared):
+                origin = self.origin_of(e.obj, sc)
+                if origin is not None:  # Box[Int] annotation relied on for a T-typed field (BUG-0025)
+                    e.ann["rt_check"] = (t, origin)
+        return t
+
+    def check_invariant_field_access(self, e: A.Field, base, t) -> None:
+        """SPEC-014 / V3 5.10.7: an invariant field holding a mutable value may only be
+        accessed inside the record's own methods (on `self`) or in contracts (BUG-0028)."""
+        ti = self.types.get(base.qualname)
+        if ti is None or e.name not in getattr(ti, "invariant_fields", ()) or not is_mutable_type(t):
+            return
+        if any(fs.kind == "contract" for fs in self.fn_stack):
+            return
+        fs = self.current_fn()
+        if fs is not None and fs.owner is ti and isinstance(e.obj, A.Name) and e.obj.name == "self":
+            return
+        self.legal("S.CONTRACT.INVARIANT_FIELD_ACCESS",
+                   f"field `{e.name}` of {ti.name} holds a mutable {t} and participates in an invariant; outside "
+                   f"{ti.name}'s methods it cannot be accessed, since mutating or aliasing it would bypass the "
+                   f"invariant check", e.span,
+                   help=f"add a method on {ti.name} for the operation, or one that returns a frozen copy")
 
     def member_type(self, ot, e: A.Field, sc, for_call: bool = False):
         name = e.name
@@ -743,3 +773,15 @@ class ExprMixin:
         if not rest:
             return ti, None
         return ti, rest[0]
+
+
+def _mentions_tvar(t) -> bool:
+    if isinstance(t, T.TVar):
+        return True
+    if isinstance(t, T.TCon):
+        return any(_mentions_tvar(a) for a in t.args)
+    if isinstance(t, T.TTuple):
+        return any(_mentions_tvar(a) for a in t.items)
+    if isinstance(t, T.TNominal):
+        return any(_mentions_tvar(a) for a in t.args)
+    return False

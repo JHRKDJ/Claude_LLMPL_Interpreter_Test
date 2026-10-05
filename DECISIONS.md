@@ -60,7 +60,9 @@ decision with semantic consequences.
   (`Config.defaults()`).
 - Lambdas share the `fn` family (V3 7.1.6): `fn(x) => x + 1` (expression) and
   `fn(x: Int) -> Int throws E { ... }` (block; needs `return`). `async fn(...)`.
-- Parameters may have defaults (`y: Int = 0`, frozen constant expressions only).
+- Parameters may have defaults (`y: Int = 0`). A default expression is evaluated afresh on
+  every call that omits the argument (so `acc = MutableList[Int]()` gives each call its own
+  list; there is no shared Python-style mutable default).
   Calls accept positional then named arguments `f(1, y: 2)`.
 
 ### SPEC-005 Types and Dyn spelling (V3 5.3.1, 6.4, 9.3#4)
@@ -166,6 +168,13 @@ decision with semantic consequences.
   (Eiffel qualified-call rule: calls on `self` from within an active method of the
   same object do not re-check).
 
+- **Mutable invariant fields (second audit, BUG-0028):** an invariant field whose
+  value is mutable (a mutable collection or mutable record) may be *accessed* only in
+  the record's own methods on `self` or in contract expressions. Otherwise mutation
+  through the sub-object, or an alias to it, would change invariant-relevant state
+  without an invariant check (V3 5.10.7). Static `S.CONTRACT.INVARIANT_FIELD_ACCESS`
+  (both modes); runtime backstop `A.CONTRACT.INVARIANT_FIELD_ACCESS`. Expose such data
+  through methods, e.g. one returning `.freeze()`.
 - **Quantifier bound policy (V3 7.8.2):** `all`/`any`/`count` in contracts range
   only over finite collections, maps, sets or ranges (the language has no infinite
   sequences), with an inline lambda in the same restricted subset; evaluation cost is
@@ -409,11 +418,18 @@ The failure names the use site (primary) and the relied-upon annotation (seconda
 A typed `else` fallback handles only the error type the checker proved
 (`fallback_qual`); any other error propagates.
 
-### IMPL-005 Inferred effects are static-only
-The checker infers effect sets for functions without a `throws` clause and uses them
-for diagnostics. The runtime enforces only *written* `throws` clauses (AMB-005) and
-written function-type effects; it does not consult inferred sets. Rationale: as in
-IMPL-004, static inference must not change the outcome of a program at run time.
+### IMPL-005 Inferred effects: what the runtime does and does not use (corrected)
+The checker infers effect sets for functions and lambdas without a `throws` clause.
+*Enforcement* at run time uses only written effects: a written `throws` clause (AMB-005),
+a written function-type effect at a boundary or on a typed call, and written error-set
+variables (bound per call, BUG-0027). Inferred sets are *metadata* of a callable, used
+when a written annotation is checked against a value: the shape/effect check of a
+callable crossing a `fn(...) throws X` or protocol boundary (V3 5.3.6, 7.5.2) and the
+binding of an error-set variable by a callback argument. A callable whose effect could
+not be inferred is treated as unknown (permissive). Inference is deterministic and
+independent of draft/verified mode, so modes still never change meaning (V3 5.15.8).
+(The earlier wording "the runtime does not consult inferred sets" was inaccurate — found
+by the second audit, T19.)
 
 ### IMPL-006 Generic type parameters are erased at run time
 A type parameter (`T` in `fn f[T](...)`) is bound per call only statically. At run
