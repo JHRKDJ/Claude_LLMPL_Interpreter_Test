@@ -818,7 +818,11 @@ class Parser:
         destructure = False
         if self.at("("):
             destructure = True
-            self.advance()
+            open_tok = self.advance()
+            if self.at(")"):  # BUG-0014: `let ()` binds nothing
+                raise self.error("S.SYNTAX.UNEXPECTED_TOKEN",
+                                 "a destructuring `let` needs at least one name", open_tok.span.to(self.peek().span),
+                                 help="write `let (a, b) = pair`, or drop the binding")
             with self.nl_ctx(True):
                 while not self.at(")"):
                     n = self.expect_ident("a binding name")
