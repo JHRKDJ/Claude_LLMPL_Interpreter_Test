@@ -748,5 +748,5 @@ Minimal reproduction: tests/regressions/test_bug_0051_atomic_write_file_mode.py
 Regression test failed before fix: yes (both)
 Fix: the temporary file takes the existing target's mode, otherwise 0666 & ~umask
   (lang/runtime/builtins/fs.py).
-Commit: pending
+Commit: e700474
 Status: fixed
