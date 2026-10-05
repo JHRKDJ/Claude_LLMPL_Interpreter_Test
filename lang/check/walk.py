@@ -455,6 +455,9 @@ class WalkMixin:
                             "(V3 5.5.11)")
 
     def check_field_assign(self, tgt: A.Field, ot: T.Ty, vt: T.Ty, st) -> None:
+        if isinstance(vt, T.TBorrow):  # BUG-0030
+            self.oblig("S.RESOURCE.ESCAPE", f"a resource borrow cannot be stored in field `{tgt.name}`", st.span)
+            return
         inner = ot.inner if isinstance(ot, T.TBorrow) else ot
         if isinstance(inner, T.TNominal):
             ti = self.types.get(inner.qualname)

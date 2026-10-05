@@ -338,6 +338,12 @@ class CallMixin:
             ty = self.type_of_expr(p.type, clo.env)
             v = fenv.vars[p.name]
             if p.borrow:
+                if isinstance(ty, T.TFn) and type(v) is not Borrow:
+                    # `f: borrow fn(...)` accepts a callable, typically one capturing a borrow
+                    if not reg.check(ty, v):
+                        raise self.mismatch(f"`{clo.name}` expects {ty} for `{p.name}`, received {type_name(v)}",
+                                            ty, v, p, node, i, span, fenv)
+                    continue
                 if type(v) is not Borrow:
                     raise self.mismatch(f"`{clo.name}` expects a borrowed resource for `{p.name}`, received "
                                         f"{type_name(v)}", self.arg_span(node, i, p.name, span), p.type, clo,

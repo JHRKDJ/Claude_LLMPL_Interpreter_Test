@@ -419,3 +419,34 @@ Fix: access to a mutable-valued invariant field is restricted to the record's ow
   lang/runtime/interp/exprs.py).
 Commit: 3fd2815
 Status: fixed
+
+BUG-0029
+Origin: second independent audit (concurrency auditor, F7)
+Subsystems: resources × closures
+Symptom: a closure capturing a resource borrow could escape its scope (as the `use`
+  value, into an outer binding, a collection) with no diagnostic in either mode; misuse
+  surfaced only when it was later called. tests/conformance/test_resources.py had pinned
+  that behaviour (`test_use_after_release_through_escaped_closure`); it was corrected,
+  not weakened: the escape is now rejected at the boundary and use-after-release stays
+  tested through a draft-mode outer assignment.
+Minimal reproduction: tests/regressions/test_bug_0029_borrow_capturing_closures.py
+Regression test failed before fix: yes (2 of 3)
+Fix: a lambda capturing a borrow is typed `borrow fn(...)`, so all borrow escape rules
+  apply; calls through it are typed; `borrow fn` parameters accept callables; the
+  runtime rejects a borrow-capturing closure as a scope value (lang/check/expr.py,
+  callcheck.py, lang/runtime/frozen.py, interp/res.py, interp/calls.py, rtypes.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0030
+Origin: second independent audit (concurrency auditor, F8)
+Subsystems: static checker (borrow escapes)
+Symptom: verified mode accepted `Some(c)`, `(c, 1)` and a helper storing a borrow
+  parameter into a mutable record field; only the runtime caught them.
+Minimal reproduction: tests/regressions/test_bug_0030_static_borrow_escapes.py
+Regression test failed before fix: yes (both)
+Fix: borrows passed to any record/variant constructor (including generic `Some`),
+  tuple literals and field assignments are S.RESOURCE.ESCAPE (lang/check/callcheck.py,
+  expr.py, walk.py).
+Commit: PENDING
+Status: fixed

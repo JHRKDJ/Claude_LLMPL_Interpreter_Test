@@ -154,6 +154,8 @@ class CallMixin:
         if isinstance(t, (ModRef,)):
             self.oblig("S.TYPE.NOT_CALLABLE", f"module `{t.module}` is not callable", e.callee.span)
             return CallInfo("dyn")
+        if isinstance(t, T.TBorrow) and isinstance(t.inner, T.TFn):
+            return self.info_for(t.inner, name, e)  # calling a borrow-capturing closure (BUG-0029)
         if isinstance(t, T.TBorrow) or t is DYN:
             return CallInfo("dyn", effect_unknown=True)
         self.oblig("S.TYPE.NOT_CALLABLE", f"a value of type {t} is not callable", e.callee.span)
@@ -348,6 +350,10 @@ class CallMixin:
         return False
 
     def check_one_arg(self, info, pname, a, t, want, borrow) -> None:
+        if isinstance(t, T.TBorrow) and info.kind in ("ctor", "case"):
+            # wrapping a borrow in a record or variant (e.g. `Some(c)`) stores it (BUG-0030)
+            self.oblig("S.RESOURCE.ESCAPE", f"a resource borrow cannot be stored in `{info.name}`", a.span)
+            return
         if isinstance(t, T.TBorrow) and not isinstance(want, T.TBorrow):
             if info.kind in ("ctor", "case"):
                 self.oblig("S.RESOURCE.ESCAPE", f"a resource borrow cannot be stored in `{info.name}`", a.span)

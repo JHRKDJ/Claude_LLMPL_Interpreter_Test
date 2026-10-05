@@ -18,6 +18,7 @@ from ...diagnostics import Note, ResourceProvenance
 from ...syntax import ast as A
 from ..core_types import SCOPE_EXIT
 from ..equality import type_name
+from ..frozen import captures_borrow
 from ..signals import Abandoned, BreakSignal, Cancelled, ContinueSignal, Fault, ReturnSignal, Thrown
 from ..values import Borrow, Builtin, BuiltinBound, Closure, ResourceState, UNIT
 from .core import Env
@@ -117,9 +118,10 @@ class ResourceMixin:
         benv.vars[node.name] = borrow
         try:
             v = self.exec_block(node.body, benv)
-            if type(v) is Borrow:
-                raise self.abandon("A.RESOURCE.ESCAPE", "a `use` scope cannot produce its resource as its value",
-                                   node.body.span, benv, help="return data derived from the resource instead")
+            if type(v) is Borrow or captures_borrow(v):
+                raise self.abandon("A.RESOURCE.ESCAPE", "a `use` scope cannot produce its resource (or a closure "
+                                   "capturing it) as its value", node.body.span, benv,
+                                   help="return data derived from the resource instead")
             return ("ok", v), state
         except Thrown as t:
             return ("threw", t), state

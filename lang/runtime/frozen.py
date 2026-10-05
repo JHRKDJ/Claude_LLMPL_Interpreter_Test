@@ -52,3 +52,18 @@ def closure_is_frozen(c: Closure) -> bool:
         if not is_frozen(e.vars[name]):
             return False
     return True
+
+
+def captures_borrow(v) -> bool:
+    """True for a closure that captures a resource borrow (it is borrow-like and must
+    not outlive the scope; V3 5.5.5, BUG-0029)."""
+    if type(v) is not Closure:
+        return False
+    caps = v.decl.ann.get("captures") if hasattr(v.decl, "ann") else None
+    if not caps or v.env is None:
+        return False
+    for name, _ in caps:
+        e = v.env.find(name)
+        if e is not None and type(e.vars.get(name)) is Borrow:
+            return True
+    return False

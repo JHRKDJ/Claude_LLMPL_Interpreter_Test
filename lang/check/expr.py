@@ -269,7 +269,11 @@ class ExprMixin:
         return T.TCon("Map", (DYN if kt is T.NEVER else kt, DYN if vt is T.NEVER else vt))
 
     def x_TupleLit(self, e, sc):
-        return T.TTuple(self.expr(i, sc) for i in e.items)
+        items = [self.expr(i, sc) for i in e.items]
+        for i, t in zip(e.items, items):
+            if isinstance(t, T.TBorrow):  # BUG-0030
+                self.oblig("S.RESOURCE.ESCAPE", "a resource borrow cannot be stored in a tuple", i.span)
+        return T.TTuple(items)
 
     def x_Range(self, e, sc):
         for x in (e.lo, e.hi):
@@ -613,7 +617,14 @@ class ExprMixin:
                                                      if not n.startswith("$")] +
                                                     [T.TVar(n[1:]) for n in coll.names if n.startswith("$")])
             e.ann["effect"] = None if coll.unknown else frozenset(n for n in coll.names if not n.startswith("$"))
-        return T.TFn(ptys, ret_ann if ret_ann is not None else body_t, eff, e.is_async)
+        ft = T.TFn(ptys, ret_ann if ret_ann is not None else body_t, eff, e.is_async)
+        # a closure capturing a resource borrow is itself borrow-like: it may be called
+        # or passed down, never bound, stored, returned or sent (V3 5.5.5; BUG-0029)
+        for name, _ in e.ann.get("captures", []):
+            ent = sc.get(name)
+            if ent is not None and isinstance(ent[0], T.TBorrow):
+                return T.TBorrow(ft)
+        return ft
 
     # ------------------------------------------------------------------ control flow
     def x_If(self, e: A.If, sc):

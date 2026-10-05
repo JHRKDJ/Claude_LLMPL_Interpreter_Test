@@ -1716,14 +1716,14 @@
   {
    "id": "AUD2-C07",
    "title": "F7 escaping closure capturing a borrow not rejected",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C08",
    "title": "F8 static borrow escapes via Some/tuple/helper field write",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

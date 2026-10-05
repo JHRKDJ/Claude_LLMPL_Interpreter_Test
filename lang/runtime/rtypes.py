@@ -113,6 +113,8 @@ class TypeRegistry:
         if isinstance(ty, T.TVar):
             return True
         if isinstance(ty, T.TBorrow):
+            if isinstance(ty.inner, T.TFn) and tv is not Borrow:
+                return self.check(ty.inner, v)  # `borrow fn(...)` accepts (borrow-capturing) callables
             return tv is Borrow and self.check(ty.inner, v.target)
         return True
 

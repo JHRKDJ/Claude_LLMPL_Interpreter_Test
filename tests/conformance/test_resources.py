@@ -131,14 +131,29 @@ fn main() throws AcquireFailed, ReleaseFailed { use c = try connect(7) { print(d
     assert r.lines == ["acquire 7", "conn 7 open=true", "release 7 ScopeExit.Normal"]
 
 
-def test_use_after_release_through_escaped_closure():
+def test_borrow_capturing_closure_cannot_be_the_scope_value():
+    # V3 5.5.5: a resource may not be captured by an escaping closure; the escape itself
+    # is rejected at the scope boundary (BUG-0029), not only a later call
     r = run(PROV + """
 fn main() throws AcquireFailed, ReleaseFailed {
     let f = use c = try connect(8) { fn() => c.id }
     print(f())
 }""")
+    assert r.codes == ["A.RESOURCE.ESCAPE"]
+    assert "S.RESOURCE.ESCAPE" in r.check_codes
+
+
+def test_use_after_release_through_escaped_closure():
+    # draft mode only warns about the outer assignment; the runtime still catches the use
+    r = run(PROV + """
+fn main() throws AcquireFailed, ReleaseFailed {
+    let f: fn() -> Int = fn() => 0
+    use c = try connect(8) { f = fn() => c.id }
+    print(f())
+}""")
     assert r.codes == ["A.RESOURCE.USE_AFTER_RELEASE"]
     assert r.diag.resource is not None
+    assert "S.RESOURCE.ESCAPE" in r.check_codes
 
 
 def test_composed_provider_scoped_delegation():
