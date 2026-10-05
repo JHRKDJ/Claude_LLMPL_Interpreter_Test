@@ -299,6 +299,10 @@ class ConcMixin:
         threw = [("task", (c.path, c.outcome.thrown)) for c in children if c.outcome.kind == "threw"]
         if not threw:
             raise Cancelled("all firstSuccess children cancelled", group.site)
+        if outer_cancel and any(c.outcome.kind == "cancelled" for c in children):
+            # not every child failed: the external cancellation cut the group short, so it
+            # propagates; tolerated failures are not a group failure (V3 7.10.7; BUG-0052)
+            raise Cancelled("external cancellation of firstSuccess group", group.site)
         # failures are processed even when external cancellation coincides; the
         # cancellation stays pending for redelivery (V3 5.12.11; BUG-0023)
         raise self.aggregate_thrown(threw, group.site, cancel_pending=outer_cancel)

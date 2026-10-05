@@ -1,7 +1,8 @@
 """BUG-0023 (second audit, C06/F6): when external cancellation coincided with a child's
 recoverable failure, `firstSuccess` and `collect` groups raised plain cancellation and
 the failure vanished (V3 5.12.11/8.11: preserve both — the failure is processed and the
-cancellation stays pending). A `collect` body that threw also lost earlier unobserved
+cancellation stays pending; the firstSuccess half was later narrowed by AMB-013 /
+BUG-0052). A `collect` body that threw also lost earlier unobserved
 child failures (5.12.5: each contributes once)."""
 from tests.helpers import run
 
@@ -14,7 +15,12 @@ async fn slow() -> Int throws Boom { await sleep(100.millis)
 """
 
 
-def test_first_success_failure_processed_then_cancellation_redelivered():
+def test_first_success_tolerated_failure_does_not_replace_cancellation():
+    # Originally pinned as "failure processed, cancellation redelivered" (reading
+    # 5.12.11 literally). Corrected by AMB-013 / BUG-0052: in first-success a child's
+    # recoverable failure is tolerated, not a group failure, while a sibling is still
+    # running (7.10.7), so the deadline propagates; no failure was lost because none was
+    # the group's. The all-children-failed case still aggregates (BUG-0052 tests).
     r = run(ERR + """
 async fn main() {
     let r = try within 5.millis {
@@ -27,7 +33,7 @@ async fn main() {
     } catch DeadlineExceeded => 99
     print("result", r)
 }""")
-    assert r.lines == ["group failure processed: 1", "after group -1", "result 99"], r.text()
+    assert r.lines == ["result 99"], r.text()
 
 
 def test_collect_report_kept_when_cancellation_coincides():

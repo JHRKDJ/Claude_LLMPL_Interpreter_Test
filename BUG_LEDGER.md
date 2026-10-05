@@ -349,6 +349,10 @@ Fix: firstSuccess aggregates failures whenever any exist (cancellation pending);
   (lang/runtime/interp/conc.py).
 Commit: 5d3cef8
 Status: fixed
+Note: the firstSuccess half was narrowed by AMB-013 / BUG-0052 — when a sibling is
+  still running (so it is cancelled, not failed) the cancellation propagates; the
+  aggregate-with-pending-cancellation rule applies when every child failed. The
+  first test's expectation was corrected accordingly.
 
 BUG-0024
 Origin: second independent audit (types auditor, T04)
@@ -749,4 +753,20 @@ Regression test failed before fix: yes (both)
 Fix: the temporary file takes the existing target's mode, otherwise 0666 & ~umask
   (lang/runtime/builtins/fs.py).
 Commit: e700474
+Status: fixed
+
+BUG-0052
+Origin: LocalFlow final review fixture f42 (external job with `hang` and `permanent`
+  mirrors under a timeout: oracle `timeout`, LocalFlow `permanent`)
+Subsystems: task groups (firstSuccess) × external cancellation
+Symptom: a `parallel firstSuccess` group cancelled from outside (a `within` deadline)
+  after one child had failed recoverably threw `AggregateException`, although another
+  child was still running when cancelled — not every child had failed (V3 7.10.7).
+Minimal reproduction: tests/regressions/test_bug_0052_first_success_cancellation.py
+Regression test failed before fix: yes (1 of 3; the other 2 pin the unchanged success
+  and all-failed outcomes)
+Fix: with external cancellation pending and a cancelled child, firstSuccess propagates
+  the cancellation (lang/runtime/interp/conc.py). V3 ambiguity recorded as AMB-013;
+  the BUG-0023 firstSuccess expectation was corrected to match.
+Commit: pending
 Status: fixed

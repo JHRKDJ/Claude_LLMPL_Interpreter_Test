@@ -403,6 +403,23 @@ patch) — executing it can never succeed and V3 makes the diagnostic the point.
 
 ---
 
+### AMB-013 First-success under external cancellation after a tolerated failure
+V3 5.12.11/8.11 say external cancellation "coinciding with child failure preserves both;
+the group failure is reported or processed", while 7.10.7 says first-success *tolerates*
+recoverable failures, throws `AggregateException` only "if all children fail
+recoverably", and keeps external cancellation pending. When a deadline cancels a
+first-success group in which one child has failed and another is still running, the
+readings disagree (BUG-0023 first implemented the general one). Resolution: the
+mode-specific rule governs. A tolerated child failure is not a group failure, so the
+group's outcome is the propagated cancellation (`within` → `DeadlineExceeded`); if every
+child failed recoverably, the group throws `AggregateException` and the cancellation
+stays pending for redelivery (8.11 still holds: cancellation is never cleared). Reasons:
+the failure would be discarded had a sibling succeeded, so promoting it because a
+deadline arrived instead would turn a timeout into an arbitrary expected failure; and
+LocalFlow's independently written spec (mirrors: a hanging and a failing provider under
+a timeout → `timeout`) expects this reading. Pinned by
+tests/regressions/test_bug_0052_first_success_cancellation.py.
+
 ## C. Implementation architecture with semantic consequences
 
 ### IMPL-001 Deterministic cooperative scheduler on baton-passing threads

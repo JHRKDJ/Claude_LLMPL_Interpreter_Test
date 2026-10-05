@@ -24,6 +24,9 @@ If this file conflicts with V3, V3 wins.
   `S.TASK.HANDLE_ESCAPE`, `A.TASK.HANDLE_OUTSIDE_SCOPE`).
 - Fail-fast observation rule (AMB-002); awaiting cancelled/abandoned children
   (AMB-003); external cancellation of children propagates after quiescence (BUG-0002).
+- External cancellation × child failure (5.12.11/8.11): fail-fast and collect process
+  the failure and keep the cancellation pending (BUG-0023); first-success aggregates
+  only when every child failed, otherwise the cancellation propagates (AMB-013).
 - Cancel scopes (task, group, `within`) cascade to nested groups and children.
   Cancellation points (AMB-004): `await`, `cancel.check()`, `sleep`, waits in
   `within`/select/channels. `W.CANCEL.NO_CANCELLATION_POINT` (unconditional loops in
