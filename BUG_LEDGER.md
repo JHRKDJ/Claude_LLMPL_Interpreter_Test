@@ -598,7 +598,7 @@ Minimal reproduction: tests/regressions/test_bug_0041_builtin_protocol_arity.py
 Regression test failed before fix: yes (2 of 3)
 Fix: built-in methods conform by arity range, async-ness and effect, statically and at
   the boundary (lang/runtime/rtypes.py, lang/check/typecheck.py).
-Commit: PENDING
+Commit: 9252948
 Status: fixed
 
 BUG-0042
@@ -614,5 +614,5 @@ Fix: the resolver builds a declaration reference graph and reports cycles static
   detection uses A.MODULE.INIT_CYCLE / A.MODULE.MUTABLE_GLOBAL. Two conformance
   assertions that pinned the old link-time S codes were updated to the stricter
   behaviour (lang/check/resolve.py, lang/runtime/interp/link.py).
-Commit: PENDING
+Commit: 9252948
 Status: fixed
