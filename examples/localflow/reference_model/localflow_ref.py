@@ -337,14 +337,17 @@ def transform_text(op, text):
     if op == "upper":
         return text.upper(), None
     if op == "number":
+        if text == "":  # an empty text has no lines (ORACLE-003)
+            return "", None
         lines = text.split("\n")
-        if lines and lines[-1] == "":
+        if lines[-1] == "":
             body, trail = lines[:-1], "\n"
         else:
             body, trail = lines, ""
         return "\n".join(f"{i + 1}: {ln}" for i, ln in enumerate(body)) + trail, None
     # csvSum
-    rows = [ln for ln in text.split("\n") if ln != ""]
+    rows = [ln[:-1] if ln.endswith("\r") else ln for ln in text.split("\n")]
+    rows = [ln for ln in rows if ln != ""]
     if not rows:
         return None, "bad-input"
     header = rows[0].split(",")
@@ -414,8 +417,10 @@ def plan_transform(job, start, ctx):
 
     def attempt(k, t0):
         try:
-            text = src.read_text(encoding="utf-8")
-        except OSError:
+            # exact text: no newline translation (ORACLE-003); undecodable input is `io`
+            with open(src, encoding="utf-8", newline="") as fh:
+                text = fh.read()
+        except (OSError, UnicodeDecodeError):
             return t0, "io", None
         out, problem = transform_text(cfg["op"], text)
         if problem:
@@ -706,7 +711,8 @@ def apply_effect(eff):
     kind, outdir, name, text = eff
     p = Path(outdir) / name
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(text, encoding="utf-8")
+    with open(p, "w", encoding="utf-8", newline="") as fh:
+        fh.write(text)
 
 
 def invalid_report(wf, errors):
@@ -725,11 +731,16 @@ def invalid_report(wf, errors):
             "summary": summary, "jobs": jobs}
 
 
+def _reject_constant(name):
+    # NaN / Infinity / -Infinity are not JSON (RFC 8259); Python accepts them by default (ORACLE-002)
+    raise json.JSONDecodeError(f"{name} is not JSON", name, 0)
+
+
 def main(argv):
     wf_path, outdir = Path(argv[1]), Path(argv[2])
     outdir.mkdir(parents=True, exist_ok=True)
     try:
-        wf = json.loads(wf_path.read_text(encoding="utf-8"))
+        wf = json.loads(wf_path.read_text(encoding="utf-8"), parse_constant=_reject_constant)
         errors = validate(wf)
     except json.JSONDecodeError:
         wf, errors = None, [err("malformed", None, None, "invalid JSON")]

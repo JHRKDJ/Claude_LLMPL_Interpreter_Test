@@ -19,3 +19,4 @@ def test_random_schedule_matches_oracle(name, seed, tmp_path):
     assert got.exit == exp.exit, stderr[-2000:]
     assert strip_messages(got.report) == strip_messages(exp.report)
     assert got.files == exp.files
+    assert got.tree == exp.tree and got.layout == exp.layout

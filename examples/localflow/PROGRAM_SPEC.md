@@ -133,7 +133,15 @@ An attempt:
    with `N: ` (1-based); `csvSum` → the input is CSV with a header row; the output
    is the CSV `column,sum` followed by one row per column, in header order, whose
    sum is the sum of the column's integer values (any non-integer cell → failure
-   class `bad-input`);
+   class `bad-input`). Text rules: files are read and written as UTF-8 exactly, with
+   no newline translation (input that is not valid UTF-8 → `io`); `\n` is the only
+   line terminator and `\r` is ordinary text, so `number` keeps it; the lines of a
+   text are its `\n`-separated pieces, except that a final empty piece (after a
+   trailing `\n`) is not a line, so an empty text has no lines and `number` turns it
+   into the empty text and keeps a trailing `\n`. For `csvSum`, one `\r` at the end of
+   a row is removed (CRLF files are accepted), empty rows are ignored, cells are split
+   on `,` with no quoting, header names are kept verbatim, and an integer cell is
+   optional surrounding whitespace around `-?[0-9]+` (no `+`, no decimal point);
 4. writes the result to `OUTDIR/output` *atomically*: the file appears only if the
    attempt succeeds; it waits `latencyMs` after writing and before committing;
 5. if `failAfterWrite`, fails with class `transform` after waiting (so the write is
@@ -148,7 +156,9 @@ The read happens at the start of the attempt, so `io` and `bad-input` failures o
 0 ms after the attempt starts; the attempt otherwise lasts `latencyMs`.
 Output: `{"file": output, "bytes": N}` (N = length of the written text in characters).
 After any run no `OUTDIR/.scratch/*` marker remains and no output file exists for a
-job that did not succeed.
+job that did not succeed: `OUTDIR` then holds only `report.json`, the outputs of
+succeeded `transform` jobs and the directories that contain them (no empty directory
+such as `.scratch` remains). Files are created with the ordinary default permissions.
 
 ### 4.4 `map` — fan-out
 `config`: `items` (array of integers) or `from` (id of a dependency whose output is

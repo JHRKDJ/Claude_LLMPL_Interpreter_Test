@@ -1,0 +1,5 @@
+{"workflow": "r12", "jobs": [
+  {"id": "u", "kind": "transform", "config": {"input": "data/crlf.txt", "output": "u.txt", "op": "upper"}},
+  {"id": "n", "kind": "transform", "config": {"input": "data/crlf.txt", "output": "n.txt", "op": "number"}},
+  {"id": "c", "kind": "transform", "config": {"input": "data/crlf.csv", "output": "c.csv", "op": "csvSum"}}
+]}

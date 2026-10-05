@@ -93,3 +93,26 @@ programmer error, and the diagnostic quality.
     returning `fn(A) -> C throws E1 | E2` lost the effect variables (BUG-0013), so a
     verified function could leak an undeclared error. Writing the design document's
     own examples as tests is a cheap, high-yield audit technique.
+
+## Final adversarial review (AUDIT-003)
+
+19. **Lambda parameters are not typed from context.** `text.split("\n").map(fn(r) =>
+    r.endsWith("\r") ...)` is rejected in verified mode: `r` is `Dyn`, and a method
+    call on `Dyn` is `S.TYPE.DYNAMIC_CALL` because its effect is unknown. The fix is
+    to write `fn(r: Str)`. The diagnostic is accurate but suggests narrowing with
+    `as`, not annotating the parameter. Contextual lambda typing (V3 7.1.6 does not
+    require it) would remove a common verified-mode stumble; field access on `Dyn`
+    (`p.0`) is allowed, which makes the asymmetry surprising.
+20. **`try` marks a whole expression.** `if fs.isDir(p) && try prune(p)` is a syntax
+    error; it has to be `if try fs.isDir(p) && prune(p)`. The diagnostic said exactly
+    that. It is V3's explicit-propagation rule (3.6) working as designed, but
+    natural-language reading puts `try` beside the failing call.
+21. **Most review findings were host-language defaults, not language defects.**
+    Of the review's 12 discrepancies, D1 was a LocalFlow bug in timing at
+    one instant (LF-004). The rest were silent spec gaps that each implementation
+    filled from its host's defaults. Python's `read_text` translates CRLF; `json`
+    accepts NaN; `"".split("\n")` is one empty line; `mkstemp` makes 0600 files
+    (this last one in the *interpreter's* std.fs, BUG-0051). The language side made
+    them visible because its defaults are strict (BUG-0045's numeric grammar meant
+    `+5` already agreed once the rule was written). The harness comparing decoded
+    text instead of bytes had hidden two of them.

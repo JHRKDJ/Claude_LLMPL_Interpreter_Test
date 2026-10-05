@@ -1,0 +1,1 @@
+{"workflow": "r14", "jobs": [{"id": "u", "kind": "transform", "config": {"input": "data/bad_utf8.txt", "output": "u.txt", "op": "upper"}}]}

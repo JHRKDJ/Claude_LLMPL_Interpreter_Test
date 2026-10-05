@@ -1,0 +1,1 @@
+{"workflow":"i01","jobs":[{"id":"plus","kind":"transform","config":{"input":"data/plus.csv","output":"p.csv","op":"csvSum"}},{"id":"spaced","kind":"transform","config":{"input":"data/spaced.csv","output":"s.csv","op":"csvSum"}}]}

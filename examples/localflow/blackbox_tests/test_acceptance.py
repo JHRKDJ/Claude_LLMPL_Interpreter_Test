@@ -32,6 +32,7 @@ def test_matches_oracle(name, results):
         json.dumps(strip_messages(got.report), indent=1)[:4000], stderr[-2000:])
     assert got.files == exp.files
     assert got.stdout == exp.stdout
+    assert got.tree == exp.tree and got.layout == exp.layout
 
 
 def job(report, jid):

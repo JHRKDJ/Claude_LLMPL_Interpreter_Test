@@ -78,3 +78,52 @@ Failed before fix: yes (oracle side)
 Fix: effects are recorded with absolute logical times and applied only if the
   producing job completed before any cancellation (reference_model/localflow_ref.py).
 Interpreter involved: no
+
+LF-005
+Origin: final adversarial review (AUDIT-003, D3)
+Symptom: `number` on an empty file produced `"1: "` (the empty text was one line).
+Fixture: fixtures/regressions/r11_number_empty_file.json
+Failed before fix: yes
+Fix: an empty text has no lines (jobs.lang transformText; SPEC-LF-002).
+Interpreter involved: no
+
+LF-006
+Origin: final adversarial review (harness: leftover `.scratch` directories)
+Symptom: LocalFlow left an empty `OUTDIR/.scratch` (and empty nested output
+  directories); the oracle creates directories only for files it writes. The old
+  harness compared regular files only, so this was invisible.
+Fixture: every fixture with a transform (harness `tree` comparison), e.g. r01, r11
+Failed before fix: yes (once the harness compared directories)
+Fix: main.lang prunes empty directories after the run; the spec states that OUTDIR
+  holds only the report, succeeded outputs and their directories.
+Interpreter involved: no
+
+SPEC-LF-002
+Origin: final adversarial review (D3, D4, D5)
+Symptom: the spec did not define lines, newline handling, CSV cells or integer cells;
+  the two implementations relied on host-language defaults (Python `read_text`
+  translates CRLF; `split("\n")` on an empty text gives one empty line).
+Fixture: r11, r12, r13
+Fix: PROGRAM_SPEC.md §4.3 "Text rules": exact UTF-8, `\n` the only terminator, an
+  empty text has no lines, csvSum drops one trailing `\r`, integer cell grammar.
+Interpreter involved: no (BUG-0045 had already made `toInt` strict, which is why
+  `+5` was handled identically once the rule was written down)
+
+ORACLE-002
+Origin: final adversarial review (D6)
+Symptom: the oracle accepted `NaN`, `Infinity` and `-Infinity` (Python json default);
+  they are not JSON and LocalFlow reported `malformed`.
+Fixture: r09_infinity_literal.json, r10_nan_literal.json
+Failed before fix: yes
+Fix: `json.loads(..., parse_constant=...)` rejects them.
+Interpreter involved: no
+
+ORACLE-003
+Origin: final adversarial review (D3, D5)
+Symptom: the oracle read inputs with newline translation (CRLF → LF) and turned an
+  empty file into `"\n"` under `number`; undecodable input crashed it.
+Fixture: r11, r12, r14
+Failed before fix: yes
+Fix: exact reads/writes (`newline=""`), empty text special case, `UnicodeDecodeError`
+  is `io`.
+Interpreter involved: no

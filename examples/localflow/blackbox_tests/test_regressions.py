@@ -14,3 +14,4 @@ def test_regression_matches_oracle(name, tmp_path):
     assert got.exit == exp.exit, stderr[-2000:]
     assert strip_messages(got.report) == strip_messages(exp.report)
     assert got.files == exp.files and got.stdout == exp.stdout
+    assert got.tree == exp.tree and got.layout == exp.layout

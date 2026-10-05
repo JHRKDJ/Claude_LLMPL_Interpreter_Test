@@ -367,11 +367,19 @@ fn primaryWithCleanup(agg: AggregateException) -> JobFailed {
     return if cleanup { primary with { details: primary.details.appended("cleanup") } } else { primary }
 }
 
+// CSV rows may end in CRLF: one trailing "\r" is not part of the row (§4.3)
+fn withoutCr(row: Str) -> Str {
+    return if row.endsWith("\r") { row.slice(0, row.length - 1) } else { row }
+}
+
 fn transformText(op: Str, text: Str) -> Str throws JobFailed {
     if op == "upper" {
         return text.toUpper()
     }
     if op == "number" {
+        if text.isEmpty() {
+            return ""  // an empty text has no lines (LF-005)
+        }
         let trailing = text.endsWith("\n")
         let lines = text.split("\n")
         let body = if trailing { lines.take(lines.length - 1) } else { lines }
@@ -379,7 +387,7 @@ fn transformText(op: Str, text: Str) -> Str throws JobFailed {
         return numbered.join("\n") + if trailing { "\n" } else { "" }
     }
     // csvSum
-    let rows = text.split("\n").filter(fn(r) => r != "")
+    let rows = text.split("\n").map(withoutCr).filter(fn(r) => r != "")
     if rows.isEmpty() {
         throw fail("bad-input", "empty CSV")
     }

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import stat
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -20,7 +22,9 @@ class Observed:
     exit: int
     stdout: str
     report: object
-    files: dict
+    files: dict  # path -> exact bytes of every regular file except report.json
+    tree: list  # (path, "dir" | "file", permission bits) of every entry, report.json included
+    layout: object  # report.json text with message values masked (key order, indentation)
 
 
 def strip_messages(x):
@@ -32,20 +36,44 @@ def strip_messages(x):
 
 
 def snapshot(outdir: Path) -> dict:
+    """Exact bytes: no newline translation or decoding, so CRLF and encoding
+    differences are observable (final review harness finding)."""
     files = {}
     if outdir.exists():
         for p in sorted(outdir.rglob("*")):
-            if p.is_file() and p.name != "report.json":
-                files[str(p.relative_to(outdir))] = p.read_text(encoding="utf-8")
+            if p.is_file() and p.relative_to(outdir) != Path("report.json"):
+                files[str(p.relative_to(outdir))] = p.read_bytes()
     return files
+
+
+def tree(outdir: Path) -> list:
+    """Every directory and file left behind (empty leftovers included) with its mode."""
+    out = []
+    if outdir.exists():
+        for p in sorted(outdir.rglob("*")):
+            out.append((str(p.relative_to(outdir)), "dir" if p.is_dir() else "file",
+                        stat.S_IMODE(p.stat().st_mode)))
+    return out
+
+
+_MESSAGE = re.compile(r'^(\s*"message": )"(?:[^"\\]|\\.)*"', re.M)
+
+
+def layout(outdir: Path):
+    rep = outdir / "report.json"
+    if not rep.exists():
+        return None
+    return _MESSAGE.sub(r'\1"…"', rep.read_bytes().decode("utf-8", "replace"))
 
 
 def observe(cmd, outdir: Path, timeout=600) -> Observed:
     env = dict(os.environ, PYTHONPATH=str(ROOT))
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, env=env, cwd=str(ROOT))
+    # bytes, decoded without newline translation, so stdout is compared exactly
+    p = subprocess.run(cmd, capture_output=True, timeout=timeout, env=env, cwd=str(ROOT))
+    out, err = p.stdout.decode("utf-8", "replace"), p.stderr.decode("utf-8", "replace")
     rep_path = outdir / "report.json"
-    report = json.loads(rep_path.read_text(encoding="utf-8")) if rep_path.exists() else None
-    return Observed(p.returncode, p.stdout, report, snapshot(outdir)), p.stderr
+    report = json.loads(rep_path.read_bytes()) if rep_path.exists() else None
+    return Observed(p.returncode, out, report, snapshot(outdir), tree(outdir), layout(outdir)), err
 
 
 def run_oracle(fixture: Path, outdir: Path) -> Observed:

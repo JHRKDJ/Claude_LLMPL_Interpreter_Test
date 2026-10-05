@@ -19,6 +19,22 @@ fn dirName(path: Str) -> Str {
     return if dir == "" { "/" } else { dir }
 }
 
+// Removes the directories a run created but left empty (the transform scratch area,
+// a sub-workflow's output directory without outputs) so that OUTDIR holds only the
+// report and the outputs of succeeded transforms (§4.3). Returns whether `dir` is empty.
+fn pruneEmpty(dir: Str) -> Bool throws IOFailure, FileNotFound, PermissionDenied {
+    let empty = true
+    for name in try fs.listDir(dir) {
+        let path = fs.join(dir, name)
+        if try fs.isDir(path) && pruneEmpty(path) {
+            try fs.remove(path)
+        } else {
+            empty = false
+        }
+    }
+    return empty
+}
+
 fn writeReport(outDir: Str, rep: Map[Str, Dyn]) throws IOFailure, FileNotFound, PermissionDenied {
     try fs.writeText(fs.join(outDir, "report.json"), json.stringify(rep, 2) + "\n")
 }
@@ -57,6 +73,7 @@ async fn main(args: List[Str]) -> Int throws IOFailure, FileNotFound, Permission
     let ctx = Context(baseDir: dirName(wfPath), outDir: outDir, workflows: wf.workflows, clock: clock)
     let sink = Progress(attempts: 0, subreport: null, beat: null)
     let result = await engine.run(wf, ctx, wf.cancelAfterMs, sink)
+    try pruneEmpty(outDir)
     try writeReport(outDir, result.report)
     match result.report.getOrDefault("jobs", null) {
         js: List[Dyn] => {
