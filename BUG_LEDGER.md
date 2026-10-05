@@ -768,5 +768,5 @@ Regression test failed before fix: yes (1 of 3; the other 2 pin the unchanged su
 Fix: with external cancellation pending and a cancelled child, firstSuccess propagates
   the cancellation (lang/runtime/interp/conc.py). V3 ambiguity recorded as AMB-013;
   the BUG-0023 firstSuccess expectation was corrected to match.
-Commit: pending
+Commit: 9939a56
 Status: fixed
