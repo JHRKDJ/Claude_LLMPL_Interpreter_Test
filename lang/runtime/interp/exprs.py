@@ -5,6 +5,7 @@ import math
 import re
 
 from ...syntax import ast as A
+from ...syntax.tokens import FORMAT_SPEC
 from ..builtins.colls import flist, fmap
 from ..builtins.numbers import round_half_away
 from ..builtins.common import kind_of, no_borrow, want_frozen_element
@@ -25,7 +26,7 @@ from ... import typesys as T
 DYN_TYPE = TypeValue("prim", T.PRIMS["Dyn"], (), "Dyn")
 
 MAX_FORMAT_WIDTH = 1000
-_SPEC = re.compile(r"^([<>^])?(0)?(\d+)?(?:\.(\d+))?$")
+_SPEC = FORMAT_SPEC
 
 
 class ConstThunk:
@@ -482,8 +483,14 @@ class ExprMixin:
         v = self.eval(node.expr, env)
         ty = self.type_of_expr(node.type, env)
         if not self.registry.check(ty, v):
+            reason = None
+            if isinstance(ty, T.TFn):
+                reason = self.registry.check_callable(ty, v)
+            elif isinstance(ty, T.TNominal) and ty.kind == "protocol":
+                reason = self.registry.protocol_shape(ty.qualname, v)
             raise self.abandon("A.TYPE.DYNAMIC_MISMATCH",
-                               f"`as {ty}` narrowing failed: value is {type_name(v)}", node.span, env,
+                               f"`as {ty}` narrowing failed: value is {type_name(v)}"
+                               + (f" ({reason})" if reason else ""), node.span, env,
                                expected=str(ty), found=type_name(v),
                                secondary=[self.origin_label(node.expr, env)] if self.origin_label(node.expr, env) else None)
         return v

@@ -1,10 +1,14 @@
 """Token definitions."""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
 from ..source import Span
+
+# interpolation format spec: `[<|>|^][0]width[.precision]` (SPEC-009, SPEC-010)
+FORMAT_SPEC = re.compile(r"^([<>^])?(0)?(\d+)?(?:\.(\d+))?$")
 
 HARD_KEYWORDS = frozenset("""
 fn async await let const return if else while for in break continue match mutable

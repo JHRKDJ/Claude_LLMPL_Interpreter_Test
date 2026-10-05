@@ -381,8 +381,10 @@ class CallMixin:
             reason = None
             if isinstance(want, T.TNominal) and want.kind == "protocol":
                 reason = self.conformance(t, want)
-            msg = (f"argument `{pname}` of `{info.name}` expects {want}, found {t}" if not reason or reason is True
-                   else f"argument `{pname}` of `{info.name}`: {t} does not satisfy {want}: {reason}")
+            shown = (f"argument {int(pname[3:]) + 1}" if pname.startswith("arg") and pname[3:].isdigit()
+                     else f"argument `{pname}`")  # builtin parameters have no names (BUG-0048)
+            msg = (f"{shown} of `{info.name}` expects {want}, found {t}" if not reason or reason is True
+                   else f"{shown} of `{info.name}`: {t} does not satisfy {want}: {reason}")
             self.oblig("S.TYPE.STATIC_MISMATCH", msg, a.span, expected=str(want), found=str(t),
                        help=self.mismatch_help(want, t))
 

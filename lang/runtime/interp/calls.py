@@ -209,6 +209,7 @@ class CallMixin:
         self.bind_params(clo, params, args, kwargs, fenv, span, node)
         frame = Frame(clo.name, decl, span, fenv, clo.is_async, clo)
         frame.self_value = self_value
+        frame.call_node = node
         frame.provider_state = provider_body
         task.frames.append(frame)
         task.depth += 1
@@ -359,10 +360,11 @@ class CallMixin:
                     shape = reg.protocol_shape(ty.qualname, v)
                 elif isinstance(ty, T.TFn):
                     shape = reg.check_callable(ty, v)
-                msg = (f"argument `{p.name}` of `{clo.name}` expects {ty}, received {type_name(v)}" if not shape
-                       else f"argument `{p.name}` of `{clo.name}` does not satisfy {ty}: {shape}")
-                raise self.mismatch(msg, self.arg_span(node, i, p.name, span), p.type, clo, str(ty),
-                                    type_name(v), fenv, origin_node=self.arg_node(node, i, p.name))
+                exp, found = describe_mismatch(ty, v)
+                msg = (f"argument `{p.name}` of `{clo.name}` expects {exp}, received {found}" if not shape
+                       else f"argument `{p.name}` of `{clo.name}` does not satisfy {exp}: {shape}")
+                raise self.mismatch(msg, self.arg_span(node, i, p.name, span), p.type, clo, exp,
+                                    found, fenv, origin_node=self.arg_node(node, i, p.name))
 
     def arg_node(self, node, i, name):
         if node is None or not isinstance(node, A.Call):
@@ -412,11 +414,31 @@ class CallMixin:
         if type(v) is Borrow:
             v = v.target
         if not self.registry.check(ty, v):
+            exp, found = describe_mismatch(ty, v)
+            secondary = [Label(origin, "relied-upon annotation")] if origin is not None else []
+            entry = self.entry_boundary(origin)
+            if entry is not None:
+                secondary.append(entry)
             raise Abandoned(self.make_diag(
-                "A.TYPE.DYNAMIC_MISMATCH", f"{what} is {type_name(v)}, but the annotation relied on here says {ty}",
-                span, env, label=f"expected {ty}", expected=str(ty), found=type_name(v),
-                secondary=[Label(origin, "relied-upon annotation")] if origin is not None else [],
+                "A.TYPE.DYNAMIC_MISMATCH", f"{what} is {found}, but the annotation relied on here says {exp}",
+                span, env, label=f"expected {exp}", expected=exp, found=found, secondary=secondary,
                 help="the value entered typed code through a dynamic boundary; validate or convert it there"))
+
+    def entry_boundary(self, origin):
+        """V3 7.6.5: for a nested mismatch, the boundary where the value entered typed code
+        (the call argument checked shallowly against `origin`) is shown as well (BUG-0048)."""
+        if origin is None:
+            return None
+        fr = self.sched.current.frames[-1] if self.sched.current and self.sched.current.frames else None
+        if fr is None or fr.decl is None or fr.call_node is None:
+            return None
+        for i, p in enumerate(getattr(fr.decl, "params", []) or []):
+            if p.type is not None and p.type.span == origin:
+                sp = self.arg_span(fr.call_node, i, p.name, fr.call_span)
+                if sp is not None:
+                    return Label(sp, f"value entered typed code here as `{p.name}` (the boundary checks only the "
+                                     f"outer type)")
+        return None
 
     def check_return(self, clo, value, ret_span, env) -> None:
         decl = clo.decl
@@ -834,3 +856,22 @@ def _callable_effect(v):
     if t is BuiltinBound:
         return frozenset(v.builtin.effect or ())
     return None
+
+
+def describe_mismatch(ty, v) -> tuple[str, str]:
+    """Expected/found texts that disambiguate (BUG-0048): Option/Result payloads, and
+    module-qualified names when the short names of different nominal types coincide."""
+    exp, found = str(ty), _describe(v)
+    if isinstance(ty, T.TNominal) and type(v) in (FrozenRecord, MutableRecord, VariantValue):
+        vq = v.rtype.qualname if type(v) is not VariantValue else v.case.etype.qualname
+        if vq != ty.qualname and vq.rsplit(".", 1)[-1] == ty.qualname.rsplit(".", 1)[-1]:
+            exp, found = ty.qualname, vq
+    return exp, found
+
+
+def _describe(v) -> str:
+    if type(v) is VariantValue and v.case.etype in (OPTION, RESULT):
+        if v.case.fields:
+            return f"{v.case.name}({type_name(v.values[0])})"
+        return v.case.name
+    return type_name(v)

@@ -58,12 +58,14 @@ def cmd_check(args) -> int:
         prog = load_program(path)
         mode = _mode(args, prog.project.mode)
         co = check_program(prog, mode)
-        all_diags.extend(co.diagnostics)
         if args.fix:
             from .fixes import apply_import_fixes
             changed = apply_import_fixes(co.diagnostics, write=not args.diff, stream=sys.stdout)
             if changed and not args.json:
                 sys.stderr.write(f"applied {changed} import fix(es)\n")
+            if changed and not args.diff:  # report the program as it now is (BUG-0049)
+                co = check_program(load_program(path), mode)
+        all_diags.extend(co.diagnostics)
         if co.blocking:
             status = 2
     if args.json:

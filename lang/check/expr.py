@@ -5,6 +5,7 @@ from typing import Optional
 
 from .. import typesys as T
 from ..diagnostics import Label
+from ..syntax.tokens import FORMAT_SPEC
 from ..runtime.builtins.registry import METHODS, MODULES, PRELUDE, PROPS, STATICS
 from ..runtime.core_types import ALL_CORE_TYPES
 from ..runtime.values import Builtin, TypeValue
@@ -236,7 +237,10 @@ class ExprMixin:
         for p in e.parts:
             if isinstance(p, A.InterpPart):
                 t = self.expr(p.expr, sc)
-                if p.spec and "." in p.spec and t not in (T.FLOAT, DYN):
+                if p.spec and not FORMAT_SPEC.match(p.spec):  # BUG-0049
+                    self.legal("S.SYNTAX.INVALID_FORMAT_SPEC", f"invalid format spec `{p.spec}`", p.span,
+                               help="format specs are `[<|>|^][0]width` and/or `.precision`, e.g. {x:>8.2}")
+                elif p.spec and "." in p.spec and t not in (T.FLOAT, DYN):
                     self.oblig("S.TYPE.STATIC_MISMATCH", f"precision format applies to Float, found {t}", p.span)
         return T.STR
 

@@ -54,7 +54,7 @@ class Env:
 
 class Frame:
     __slots__ = ("name", "decl", "call_span", "env", "cur_env", "is_async", "groups", "select_cursors",
-                 "closure", "provider_state", "snapshots", "self_value", "contract_mode")
+                 "closure", "provider_state", "snapshots", "self_value", "contract_mode", "call_node")
 
     def __init__(self, name: str, decl, call_span, env: Env, is_async: bool, closure=None):
         self.name = name
@@ -69,6 +69,7 @@ class Frame:
         self.provider_state = None
         self.snapshots: Optional[dict] = None
         self.self_value = None
+        self.call_node = None  # the call expression, to locate where arguments entered (BUG-0048)
         self.contract_mode = False
 
 

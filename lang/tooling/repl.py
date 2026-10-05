@@ -66,7 +66,7 @@ class ReplSession:
         from ..modules.loader import load_program
         from ..runtime.interp import Interpreter, RunOptions
         from .driver import check_program
-        prog = load_program(self.root / "__repl__.lang", text=self.workspace_text(imports, decls))
+        prog = _label(load_program(self.root / "__repl__.lang", text=self.workspace_text(imports, decls)))
         co = check_program(prog, self.mode)
         errors = [d for d in co.diagnostics if d.severity == "error"]
         if errors:
@@ -143,7 +143,7 @@ class ReplSession:
         body = "\n".join(text[st.span.start:st.span.end] for st in stmts)
         params = ", ".join(sorted(self.bindings))
         src = self.workspace_text() + f"\nasync fn __repl_entry__({params}) {{\n{body}\n}}\n"
-        prog = load_program(self.root / "__repl__.lang", text=src)
+        prog = _label(load_program(self.root / "__repl__.lang", text=src))
         co = check_program(prog, self.mode)
         start = len(self.workspace_text())
         mine = [d for d in co.diagnostics if d.primary is not None and d.primary.span is not None
@@ -303,3 +303,12 @@ def repl_main(args) -> int:
     if buf.strip():
         sess.execute(buf)
     return 0
+
+
+def _label(prog):
+    """Diagnostics name the session workspace `<repl>`, not a file that does not exist
+    (BUG-0049); the source snippet still shows the workspace text."""
+    for ms in prog.modules.values():
+        if ms.file is not None and str(ms.file.path).endswith("__repl__.lang"):
+            ms.file.path = "<repl>"
+    return prog

@@ -689,3 +689,34 @@ Fix: constant duplicate keys are S.NAME.DUPLICATE, run-time duplicates in a lite
   (lang/check/expr.py, callcheck.py, lang/runtime/interp/exprs.py).
 Commit: 51a9642
 Status: fixed
+
+BUG-0048
+Origin: second independent audit (types auditor, T17)
+Subsystems: runtime type checks × diagnostics (5.3.12, 7.6.5)
+Symptom: dynamic mismatches between same-named types from different modules printed
+  identical names; Option/Result payload mismatches said only "Option"; a failed `as`
+  narrowing gave no reason; a mismatch deep inside a call had no label at the typed
+  entry boundary; builtin argument mismatches named an internal parameter.
+Minimal reproduction: tests/regressions/test_bug_0048_dynamic_mismatch_diagnostics.py
+Regression test failed before fix: yes (all 5)
+Fix: describe_mismatch qualifies clashing names and describes payloads, `as` failures
+  carry the reason, Frame.call_node gives an entry-boundary secondary label, builtin
+  arguments are reported as "argument N" (lang/runtime/interp/calls.py, exprs.py,
+  core.py, lang/check/callcheck.py).
+Commit: pending
+Status: fixed
+
+BUG-0049
+Origin: second independent audit (types auditor, T18)
+Subsystems: tooling (check --fix, REPL) × checker (format specs)
+Symptom: `lang check --fix` printed diagnostics for the pre-fix program; REPL
+  diagnostics named a fake `__repl__.lang` file; an invalid literal format spec such as
+  `{x:zz}` passed verified mode and only abandoned at run time.
+Minimal reproduction: tests/regressions/test_bug_0049_tooling_defects.py
+Regression test failed before fix: yes (all 3)
+Fix: --fix re-checks the rewritten program; REPL spans are labelled `<repl>`; one
+  FORMAT_SPEC grammar shared by checker and runtime, invalid literal specs are
+  S.SYNTAX.INVALID_FORMAT_SPEC (lang/tooling/cli.py, repl.py, lang/syntax/tokens.py,
+  lang/check/expr.py, lang/runtime/interp/exprs.py).
+Commit: pending
+Status: fixed

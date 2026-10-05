@@ -1905,14 +1905,14 @@
   {
    "id": "AUD2-T17",
    "title": "Dynamic-type diagnostic quality gaps (5.3.12/7.6.5)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-T18",
    "title": "Tooling: check --fix stale output; REPL span path; literal format spec static check",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

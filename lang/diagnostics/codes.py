@@ -27,6 +27,7 @@ CODES: dict[str, str] = {
     "S.SYNTAX.INVALID_ASSIGNMENT_TARGET": "left side of assignment is not assignable",
     "S.SYNTAX.MISPLACED_CONSTRUCT": "construct not allowed in this position",
     "S.SYNTAX.UNSUPPORTED_SYNTAX": "syntax from another language that this language does not have",
+    "S.SYNTAX.INVALID_FORMAT_SPEC": "an interpolation format spec that cannot be applied",
     "S.SYNTAX.INTERPOLATION": "malformed string interpolation",
     # ---- names / modules ----
     "S.NAME.UNRESOLVED": "name is not defined in scope or imports",
