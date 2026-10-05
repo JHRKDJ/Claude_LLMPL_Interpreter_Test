@@ -266,3 +266,64 @@ async fn main() {
 }""")
     assert r.codes == ["A.CONCURRENCY.DEADLOCK"]
     assert r.diag.channel.channel_id >= 1
+
+
+def test_waiter_queue_fifo_cancellation_removes_and_reregistration_joins_back():
+    """V3 5.14.18: endpoint waiters are served FIFO; a cancelled waiter is removed and
+    a re-registration joins the back of the queue."""
+    src = """
+async fn recv(name: Str, rx: ReceivePort[Int], log: SendPort[Str]) throws ChannelClosed {
+    let v = try await rx.receive()
+    try await log.send("{name}:{v}")
+}
+async fn impatient(rx: ReceivePort[Int], log: SendPort[Str]) throws ChannelClosed {
+    let first = try within 3.millis { try await rx.receive() } catch DeadlineExceeded => -1
+    try await log.send("b-timeout:{first}")
+    let v = try await rx.receive()
+    try await log.send("b:{v}")
+}
+async fn main() throws ChannelClosed, AggregateException {
+    let ch = Channel[Int].rendezvous()
+    let logc = Channel[Str].unbounded()
+    let tx = ch.sender()
+    parallel {
+        spawn recv("a", ch.receiver(), logc.sender())
+        await sleep(1.millis)
+        spawn impatient(ch.receiver(), logc.sender())
+        await sleep(1.millis)
+        spawn recv("c", ch.receiver(), logc.sender())
+        await sleep(3.millis)
+        for i in 0..3 { try await tx.send(i) }
+    }
+    logc.close()
+    for await m in logc.receiver() { print(m) }
+}"""
+    for kw in ({}, {"schedule": "random", "seed": 5}, {"schedule": "random", "seed": 9}):
+        # which waiter received which message is fixed by the FIFO queue; the order in
+        # which the receivers then log it is schedule-dependent
+        assert sorted(ok(src, **kw).lines) == ["a:0", "b-timeout:-1", "b:2", "c:1"]
+
+
+def test_cancellation_after_commit_keeps_the_committed_message():
+    """V3 5.13.13: the race winner's send commits to the waiting receiver; the receiver
+    is then cancelled, but obtains the committed value first (nothing is lost) and the
+    cancellation is delivered at its next cancellation point."""
+    r = ok("""
+async fn waiter(rx: ReceivePort[Int]) -> Int throws ChannelClosed {
+    let v = try await rx.receive()
+    print("got {v}")
+    await sleep(1.millis)
+    print("not reached")
+    return v
+}
+async fn sender(tx: SendPort[Int]) -> Int throws ChannelClosed {
+    try await tx.send(7)
+    return 0
+}
+async fn main() throws AggregateException, ChannelClosed {
+    let ch = Channel[Int].rendezvous()
+    let w = parallel race { spawn waiter(ch.receiver())
+        spawn sender(ch.sender()) }
+    print("winner {w}")
+}""")
+    assert r.lines == ["got 7", "winner 0"]

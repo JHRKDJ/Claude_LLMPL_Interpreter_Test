@@ -4,13 +4,40 @@ Rendering is a pure function of the Diagnostic object. Modes:
   default — full primary/secondary spans, notes, provenance, frames (bounded)
   quiet   — header line + primary location only
   deep    — like default plus select/channel event history and all frames
+
+Rendering is bounded (V3 7.13.5): outside deep mode at most MAX_CHILDREN child
+reports are shown per diagnostic, and a RenderBudget (default about thirty seconds)
+stops rendering with an explicit truncation note. JSON output is never truncated.
 """
 from __future__ import annotations
 
-from typing import Iterable
+import time
+from typing import Iterable, Optional
 
 from ..source import Span
 from .model import Diagnostic, Label
+
+MAX_CHILDREN = 20
+DEFAULT_RENDER_BUDGET_S = 30.0
+
+
+class RenderBudget:
+    """Wall-clock budget shared by every diagnostic rendered for one report."""
+
+    def __init__(self, seconds: float = DEFAULT_RENDER_BUDGET_S):
+        self.seconds = seconds
+        self.deadline = time.monotonic() + seconds
+        self.exhausted = False
+
+    def over(self) -> bool:
+        if not self.exhausted and time.monotonic() > self.deadline:
+            self.exhausted = True
+        return self.exhausted
+
+    def note(self) -> str:
+        return (f"note: the {self.seconds:g}s rendering budget was exhausted; the report is truncated "
+                f"(use --json for the complete structured report)")
+
 
 HEADER_WORD = {
     "A": "abandonment",
@@ -53,7 +80,8 @@ def _gutter(spans: Iterable[Span]) -> int:
     return width
 
 
-def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: int = 8) -> str:
+def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: int = 8,
+           budget: Optional[RenderBudget] = None) -> str:
     lines: list[str] = []
     word = header_word(d)
     cascade = " (likely cascade of an earlier error)" if d.likely_cascade else ""
@@ -153,14 +181,23 @@ def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: i
     out = [indent + l for l in lines]
     for c in d.causes:
         out.append(indent + "  caused by:")
-        out.append(render(c, mode, indent + "    ", max_frames))
+        out.append(render(c, mode, indent + "    ", max_frames, budget))
     if d.children:
         out.append(indent + f"  contains {len(d.children)} child report(s):")
         cancelled = [c for c in d.children if c.stable_code == "C.TASK.CANCELLED" and not c.children]
-        for c in d.children:
+        shown = 0
+        for i, c in enumerate(d.children):
             if c in cancelled and mode != "deep" and len(cancelled) > 1:
                 continue
-            out.append(render(c, mode, indent + "    ", max_frames))
+            if budget is not None and budget.over():
+                out.append(indent + "    " + budget.note())
+                break
+            if mode != "deep" and shown >= MAX_CHILDREN:
+                rest = sum(1 for x in d.children[i:] if not (x in cancelled and len(cancelled) > 1))
+                out.append(indent + f"    ... {rest} more child report(s) (use --deep or --json)")
+                break
+            out.append(render(c, mode, indent + "    ", max_frames, budget))
+            shown += 1
         if mode != "deep" and len(cancelled) > 1:
             # repetitive cancellations are summarised in the human view (V3 7.13.6)
             paths = [c.task.path for c in cancelled if c.task is not None]
@@ -181,8 +218,15 @@ def leaves(d: Diagnostic) -> list[Diagnostic]:
     return out
 
 
-def render_all(diags: Iterable[Diagnostic], mode: str = "default") -> str:
-    parts = [render(d, mode) for d in diags]
+def render_all(diags: Iterable[Diagnostic], mode: str = "default", budget: Optional[RenderBudget] = None) -> str:
+    budget = budget or RenderBudget()
+    parts = []
+    diags = list(diags)
+    for i, d in enumerate(diags):
+        if budget.over():
+            parts.append(budget.note() + f"; {len(diags) - i} diagnostic(s) not shown")
+            break
+        parts.append(render(d, mode, budget=budget))
     return "\n\n".join(parts)
 
 

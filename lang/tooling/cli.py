@@ -40,8 +40,7 @@ def _render(diags, args, stream=sys.stderr, **extra) -> None:
         stream.write(render_json(diags, **extra) + "\n")
         return
     mode = "quiet" if args.quiet else ("deep" if args.deep else "default")
-    for d in diags:
-        stream.write(render(d, mode) + "\n\n")
+    stream.write(render_all(diags, mode) + "\n\n")
 
 
 def _mode(args, project_mode: str) -> str:

@@ -414,3 +414,35 @@ async fn main() { parallel { for i in 0..6 { spawn w(i) } } }"""
     a = ok(src, schedule="random", seed=7)
     b = ok(src, schedule="random", seed=7)
     assert a.lines == b.lines and sorted(a.lines) == [str(i) for i in range(6)]
+
+
+def test_task_result_is_classified_at_the_boundary():
+    """V3 5.11: task results cross the boundary too; a closure with mutable captures
+    cannot be a task result."""
+    r = run("""
+async fn leak() -> fn() -> Int {
+    let xs = MutableList[Int]()
+    return fn() => xs.length
+}
+async fn main() {
+    let f = parallel { let h = spawn leak()
+        await h }
+    print(f())
+}""")
+    assert r.codes == ["A.TASK.GROUP_FAILURE"]
+    assert r.diag.children[0].stable_code == "A.TASK.NOT_SENDABLE"
+    assert "task result" in r.diag.children[0].message
+
+
+def test_mutable_task_result_is_copied_not_aliased():
+    r = ok("""
+async fn make() -> MutableList[Int] { let xs = MutableList[Int]()
+ xs.push(1)
+ return xs }
+async fn main() {
+    let a = parallel { let h = spawn make()
+        await h }
+    a.push(2)
+    print(a)
+}""")
+    assert r.lines == ["MutableList[1, 2]"]

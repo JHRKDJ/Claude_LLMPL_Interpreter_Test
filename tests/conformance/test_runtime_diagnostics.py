@@ -289,3 +289,63 @@ async fn main() { parallel { spawn crash()
     assert d.stable_code == "A.TASK.GROUP_FAILURE"
     assert [c.stable_code for c in d.children] == ["A.INDEX.OUT_OF_RANGE", "C.TASK.CANCELLED"]
     assert d.children[1].severity == "info"
+
+
+# ---------------------------------------------------------------- release failure during abandonment
+def test_release_failure_during_abandonment_is_appended_not_replacing(tmp_path, monkeypatch):
+    """V3 5.5.13: a failing abandonment-safe release never replaces the abandonment."""
+    from lang.runtime.builtins.registry import METHODS, load_all
+    load_all()
+    close = METHODS["File"]["close"]
+
+    def failing_close(interp, recv, args, span):
+        raise OSError("device unavailable")
+    monkeypatch.setattr(close, "impl", failing_close)
+    target = tmp_path / "t.txt"
+    target.write_text("x")
+    r = run(f"""import std.fs
+resource fn guarded(path: Str) yields fs.File throws FileNotFound, PermissionDenied, IOFailure {{
+    use f = try fs.openRead(path) {{
+        onAbandon f.close()
+        yield f
+    }}
+}}
+fn main() throws FileNotFound, PermissionDenied, IOFailure {{
+    use f = try guarded("{target}") {{
+        let xs = [1]
+        print(xs[2])
+    }}
+}}""")
+    assert r.codes == ["A.INDEX.OUT_OF_RANGE"]
+    assert any("abandonment-safe release" in n.message and "device unavailable" in n.message
+               for n in r.diag.notes)
+
+
+# ---------------------------------------------------------------- render budgets (V3 7.13.5)
+MANY = """
+async fn crash(n: Int) { await sleep(1.millis)
+    let xs = [1]
+    print(xs[n]) }
+async fn main() { parallel collect {
+    for i in 0..30 { spawn crash(i + 5) }
+} }"""
+
+
+def test_default_view_caps_child_reports_but_json_and_deep_do_not():
+    import json
+    from lang.diagnostics.render_json import render_json
+    from lang.diagnostics.render_text import render_all
+    r = run(MANY.replace("parallel collect", "parallel"))
+    d = r.diag
+    assert len(d.children) == 30
+    text = render_all([d])
+    assert text.count("A.INDEX.OUT_OF_RANGE") == 20 and "... 10 more child report(s)" in text
+    assert render_all([d], "deep").count("A.INDEX.OUT_OF_RANGE") == 30
+    assert len(json.loads(render_json([d]))["diagnostics"][0]["children"]) == 30
+
+
+def test_exhausted_render_budget_emits_a_truncated_report():
+    from lang.diagnostics.render_text import RenderBudget, render_all
+    r = run(MANY.replace("parallel collect", "parallel"))
+    text = render_all([r.diag, r.diag], budget=RenderBudget(0.0))
+    assert "rendering budget was exhausted" in text and "2 diagnostic(s) not shown" in text
