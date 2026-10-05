@@ -514,7 +514,7 @@ Fix: a lambda's function type carries capture metadata (unsendable reason, captu
   task); check_sendable uses it for spawn arguments, select sends and port sends;
   `Broadcast[T]` with mutable T is S.CHANNEL.BROADCAST_MUTABLE (lang/typesys.py,
   lang/check/expr.py, callcheck.py, walk.py).
-Commit: PENDING
+Commit: 7c4dac7
 Status: fixed
 
 BUG-0036
@@ -528,5 +528,5 @@ Fix: inside brackets a function type is tried first and kept when `,`/`]` follow
   resolver, checker, runtime and formatter accept type-expression index items
   (lang/syntax/parser.py, lang/check/resolve.py, expr.py, lang/runtime/interp/exprs.py,
   lang/format/__init__.py).
-Commit: PENDING
+Commit: 7c4dac7
 Status: fixed
