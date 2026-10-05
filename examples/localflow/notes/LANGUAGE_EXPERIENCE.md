@@ -67,3 +67,29 @@ programmer error, and the diagnostic quality.
     five lines. Both fixed in the formatter; its self-verification (re-parse and
     compare, including comment count) also caught a lost comment in the first fix
     attempt before it could reach any file.
+
+## Later evidence (standard library and the first coverage sweep)
+
+14. **Verified mode on LocalFlow was blocked by a checker defect, not by the
+    program.** Ten `S.TYPE.DYNAMIC_CALL` errors had been attributed (in TODO.md) to
+    branch-type joins; re-checking during the coverage sweep showed every one was a
+    call to a fully annotated function imported with `import m.{f}` (BUG-0015). After
+    the fix LocalFlow passed verified mode with zero errors and only advisories. The
+    lesson for the experiment: a wrong "known limitation" can hide a real defect for a
+    long time when nobody re-derives it from a minimal reproduction.
+15. **Writing the standard library in the language** (std.chan, std.order) exposed
+    BUG-0011 at once: a generic function could not write `MutableList[T]()`. Library
+    code exercises generics far more than application code did.
+16. **`throw` is a statement**, so `None => throw Bad()` is a syntax error (same
+    family as entry 1). I made this mistake again while writing V3's own `compose`
+    example; the diagnostic points at `throw` but does not suggest `{ throw ... }`.
+17. **Cancellation-point advisory noise.** A `for` loop that only spawns children
+    (fan-in, worker pool) triggers `W.CANCEL.NO_CANCELLATION_POINT` in verified mode;
+    8 of LocalFlow's 11 verified-mode warnings are this advisory on bounded loops.
+    Adding `cancel.check()` silences it but adds no safety. The heuristic is honest
+    (V3 5.15.6 asks only for "regions without a cancellation point") but its
+    precision on bounded data loops is low.
+18. **V3's effect-polymorphism example found a checker false negative.** `compose`
+    returning `fn(A) -> C throws E1 | E2` lost the effect variables (BUG-0013), so a
+    verified function could leak an undeclared error. Writing the design document's
+    own examples as tests is a cheap, high-yield audit technique.

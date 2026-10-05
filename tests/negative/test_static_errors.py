@@ -127,3 +127,12 @@ def test_static_errors_block_run():
     from tests.helpers import run
     r = run("fn main() { print(nope) }")
     assert r.exit_code is None and r.check_errors == ["S.NAME.UNRESOLVED"]
+
+
+def test_statement_in_expression_position_suggests_a_block():
+    from lang.syntax.parser import parse_text
+    for stmt in ("throw Bad()", "return 1", "continue"):
+        r = parse_text("error Bad { }\nfn f(x: Int?) -> Int { for i in 0..1 { let v = match x { Some(n) => n, None => " + stmt + " } }\n return 0 }")
+        d = r.diagnostics[0]
+        assert d.stable_code == "S.SYNTAX.EXPECTED_EXPRESSION"
+        assert any("wrap it in a block" in h for h in d.help), d.help

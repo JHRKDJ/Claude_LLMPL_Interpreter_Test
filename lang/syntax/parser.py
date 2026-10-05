@@ -1220,8 +1220,12 @@ class Parser:
             return self.parse_unary()
         if k in ("NEWLINE", "EOF", "}"):
             raise self.error("S.SYNTAX.EXPECTED_EXPRESSION", "expected an expression", t.span, "expression expected")
+        help_ = None
+        if k in ("throw", "return", "break", "continue", "let", "const", "for", "while", "defer", "assert"):
+            # statements are not expressions: a match arm, lambda or `else` value needs a block
+            help_ = f"`{k}` starts a statement; where an expression is expected, wrap it in a block: `{{ {k} ... }}`"
         raise self.error("S.SYNTAX.EXPECTED_EXPRESSION", f"expected an expression, found {describe(t)}", t.span,
-                         "expression expected")
+                         "expression expected", help=help_)
 
     def parse_paren(self) -> A.Expr:
         open_ = self.advance()
