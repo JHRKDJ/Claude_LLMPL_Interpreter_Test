@@ -35,6 +35,14 @@ class Transfer:
         self.ports: list = []
         self.copied = 0
         self.memo: dict = {}
+        self.roots: list = []  # (root description, elements copied) for advisories
+
+    def root(self, v, path: str):
+        """Transfer one root value (an argument, capture, result or message)."""
+        before = self.copied
+        out = self.value(v, path)
+        self.roots.append((path, self.copied - before))
+        return out
 
     def reject(self, v, why: str, path: str):
         raise Fault("A.TASK.NOT_SENDABLE",

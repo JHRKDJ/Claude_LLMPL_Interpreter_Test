@@ -162,6 +162,8 @@ class InterpCore:
         t = self.sched.current
         if t is not None and t.select_ring:
             d.select_events = list(t.select_ring)
+        if self.sched.schedule == "random" and self.sched.decisions:
+            d.extra["schedule_decisions"] = list(self.sched.decisions)
         return d
 
     def abandon(self, stable: str, message: str, span, env: Optional[Env] = None, **kw) -> Abandoned:

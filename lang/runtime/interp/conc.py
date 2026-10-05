@@ -324,10 +324,13 @@ class ConcMixin:
             call = node.call
             f = self.eval(call.callee, env)
             args, kwargs = self.eval_args(call, env)
+            pnames = [p.name for p in getattr(getattr(f, "decl", None), "params", []) if not p.is_self] \
+                if type(f) is Closure else []
             try:
-                args = [tr.value(a, f"argument {i + 1}") for i, a in enumerate(args)]
+                args = [tr.root(a, f"argument `{pnames[i]}`" if i < len(pnames) else f"argument {i + 1}")
+                        for i, a in enumerate(args)]
                 if kwargs:
-                    kwargs = {k: tr.value(v, f"argument `{k}`") for k, v in kwargs.items()}
+                    kwargs = {k: tr.root(v, f"argument `{k}`") for k, v in kwargs.items()}
                 tr2 = Transfer("spawned function")
                 f = tr2.value(f, "callee")
                 tr.ports.extend(tr2.ports)
@@ -388,7 +391,7 @@ class ConcMixin:
     def finish_child_value(self, child: Task, value):
         tr = Transfer("task result")
         try:
-            v = tr.value(value, "result")
+            v = tr.root(value, "result")
         except Fault as flt:
             raise self.abandon_fault(flt, None, None)
         return v
@@ -407,9 +410,12 @@ class ConcMixin:
         return e
 
     def large_copy_advisory(self, tr: Transfer, span) -> None:
+        biggest = max(tr.roots, key=lambda r: r[1]) if tr.roots else None
+        where = f" (largest root: {biggest[0]}, about {biggest[1]} element(s))" if biggest else ""
         d = Diagnostic(code("W.TASK.LARGE_COPY"),
-                       f"{tr.what}: implicit graph copy of about {tr.copied} element(s) at a task boundary",
+                       f"{tr.what}: implicit graph copy of about {tr.copied} element(s) at a task boundary{where}",
                        severity="warning", primary=Label(span, "copied here"))
+        d.values["estimated_elements"] = str(tr.copied)
         d.help.append("freeze the data (frozen values are shared without copying) or pass a smaller projection")
         d.task = self.task_provenance()
         self.runtime_warnings.append(d)
@@ -514,6 +520,12 @@ class ConcMixin:
             if t.wait.kind == "channel" and t.wait.target is not None:
                 ch = t.wait.target
                 d.channel = self.channel_provenance(ch, t.wait.detail)
+                cap = getattr(ch, "capacity", None)
+                if cap and t.wait.detail.startswith("sending") and len(ch.buffer) >= cap:
+                    # V3 7.11.3: warn where liveness appears to depend on the capacity
+                    d.notes.append(Note(f"Channel#{ch.id} is full ({len(ch.buffer)}/{cap}); liveness here depends "
+                                        f"on its capacity: no receiver will drain it, so a larger buffer would "
+                                        f"only postpone this deadlock"))
             d.task = TaskProvenance(t.path, t.group.site if t.group else None, t.group.mode if t.group else None,
                                     self.sched.seed if self.sched.schedule == "random" else None)
             d.select_events = list(t.select_ring)

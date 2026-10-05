@@ -327,3 +327,15 @@ async fn main() throws AggregateException, ChannelClosed {
     print("winner {w}")
 }""")
     assert r.lines == ["got 7", "winner 0"]
+
+
+def test_deadlock_on_full_buffer_notes_capacity_dependence():
+    r = run("""
+async fn main() {
+    let ch = Channel[Int].buffered(2)
+    let tx = ch.sender()
+    let rx = ch.receiver()
+    for i in 0..3 { try await tx.send(i) catch ChannelClosed => () }
+}""")
+    assert r.codes == ["A.CONCURRENCY.DEADLOCK"]
+    assert any("is full (2/2)" in n.message and "capacity" in n.message for n in r.diag.notes)

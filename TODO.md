@@ -39,12 +39,19 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
 - [x] Conformance, negative, mode interactions, regressions, fuzz (formatter, parser)
 - [x] Interaction suite TEST-INT-001..030 (tests/interactions/test_interactions_{a,b,c}.py)
 
+## Standard library (found missing by the first coverage sweep)
+- [x] std.regex, std.datetime (native); std.chan, std.order (in the language) (IMPL-007)
+
 ## LocalFlow
-- [ ] PROGRAM_SPEC.md, TEST_PLAN.md, fixtures, Python oracle, black-box harness
-- [ ] Implementation in the language; acceptance suite green; adversarial cases
+- [x] PROGRAM_SPEC.md, TEST_PLAN.md, fixtures, Python oracle, black-box harness
+- [x] Implementation in the language; acceptance suite green; adversarial cases
+- [x] Verified-mode clean (after BUG-0015); manifest selects verified
 
 ## Audits / final
-- [ ] First V3 coverage sweep; second independent audit; LocalFlow adversarial review
+- [ ] First V3 coverage sweep (in progress: Part V-VII reread done for 5.x/6.x/7.1-7.7;
+      gaps closed so far: stdlib, diagnostic-code coverage, render budget, waiter FIFO,
+      after-commit cancellation, BUG-0011..0015)
+- [ ] Second independent audit; LocalFlow adversarial review
 - [ ] WORK_ITEMS.json / FEATURE_MATRIX.md status reconciliation
 - [ ] FINAL_REPORT.md; final green run
 
@@ -53,4 +60,6 @@ Ordered roughly by dependency. Newly discovered work is appended, never hidden.
   union types), so such mismatches are caught only at runtime boundaries
   (TEST-INT-001).
 - Checker: method calls on `Dyn` receivers are `S.TYPE.DYNAMIC_CALL` errors in
-  verified mode; narrowing with `as` is the remedy.
+  verified mode; narrowing with `as` is the remedy. This follows V3 5.3.10/7.7.6
+  (dynamic callables must be narrowed before verified invocation). The 10 such
+  errors once reported in LocalFlow were a checker defect (BUG-0015), not this rule.

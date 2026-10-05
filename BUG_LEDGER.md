@@ -198,3 +198,45 @@ Fix: member lookup knows whether it serves a call; a missing callee member is
   (lang/runtime/interp/exprs.py, calls.py).
 Commit: 4f8e1fc
 Status: fixed
+
+BUG-0013
+Origin: first V3 coverage reread (V3 7.7.5 `compose` example)
+Subsystems: static checker (error-effect polymorphism × higher-order returns)
+Symptom: error-set variables bound at a call were not substituted into a returned
+  function type, so `compose(parse, half)` had type `fn(Str) -> Int` with no effect:
+  `try f(s)` was a false W.EFFECT.USELESS_TRY and a function declaring `throws Bad`
+  that called the composition (which may throw `Worse`) was accepted in verified mode.
+Minimal reproduction: tests/regressions/test_bug_0013_effect_union_in_returned_fn.py
+Regression test failed before fix: yes (3 of 4; the fourth pins runtime behaviour)
+Fix: the call's full substitution (types and effects) is applied to its return type;
+  `substitute` replaces a type variable only by a type, and effect variables inside
+  function-type effects by their bound sets (lang/check/callcheck.py, lang/typesys.py).
+Commit: (pending)
+Status: fixed
+
+BUG-0014
+Origin: parser fuzzer (seed 127) after the stdlib tests joined the corpus
+Subsystems: parser (let destructuring)
+Symptom: `let ()` crashed the parser with an IndexError (empty name list).
+Minimal reproduction: tests/regressions/test_bug_0014_empty_destructuring.py
+Regression test failed before fix: yes (all 3)
+Fix: an empty destructuring pattern is `S.SYNTAX.UNEXPECTED_TOKEN` ("needs at least
+  one name") (lang/syntax/parser.py).
+Commit: (pending)
+Status: fixed
+
+BUG-0015
+Origin: first V3 coverage reread (re-checking LocalFlow in verified mode)
+Subsystems: static checker (module import binding)
+Symptom: a function or constant imported by name, `import model.{isFinal}`, kept the
+  placeholder entry created before signatures were filled, so the checker typed it
+  `Dyn`: every call was a false `S.TYPE.DYNAMIC_CALL` error in verified mode (10 in
+  LocalFlow, previously misattributed to branch-type joins in TODO.md) and argument
+  types and effects of named imports were not checked at all.
+Minimal reproduction: tests/regressions/test_bug_0015_brace_import_typing.py
+Regression test failed before fix: yes (3 of 4; qualified access was already typed)
+Fix: names bound by named imports are recorded and rebound to the filled entries
+  after signature construction (lang/check/typecheck.py). LocalFlow now passes
+  verified mode with zero errors and its manifest selects verified.
+Commit: (pending)
+Status: fixed

@@ -166,6 +166,12 @@ decision with semantic consequences.
   (Eiffel qualified-call rule: calls on `self` from within an active method of the
   same object do not re-check).
 
+- **Quantifier bound policy (V3 7.8.2):** `all`/`any`/`count` in contracts range
+  only over finite collections, maps, sets or ranges (the language has no infinite
+  sequences), with an inline lambda in the same restricted subset; evaluation cost is
+  linear in the collection size and visible at the clause. No further numeric cap is
+  imposed; the diagnostic budget (7.13.5) bounds only the rendering of a failure.
+
 ### SPEC-015 Resources (V3 5.5, 7.9, 9.3#5)
 - Provider: `resource fn openFile(path: Str) yields File throws IOError { ... }`
   (`async resource fn` allowed). Body must execute exactly one `yield value`.

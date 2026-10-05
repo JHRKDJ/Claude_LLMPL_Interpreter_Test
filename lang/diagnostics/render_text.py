@@ -157,6 +157,11 @@ def render(d: Diagnostic, mode: str = "default", indent: str = "", max_frames: i
         if mode == "deep":
             for ev in c.events:
                 lines.append(f"{' ' * gutter}     event {ev}")
+    if mode == "deep" and d.extra.get("schedule_decisions"):
+        dec = d.extra["schedule_decisions"]
+        lines.append(f"{' ' * gutter} = recent seeded scheduling decisions ({len(dec)}):")
+        for x in dec:
+            lines.append(f"{' ' * gutter}     #{x['switch']}: ran {x['ran']} (picked {x['pick']} of {x['ready']} ready)")
     if d.select_events and mode in ("default", "deep"):
         shown = d.select_events if mode == "deep" else d.select_events[-3:]
         lines.append(f"{' ' * gutter} = recent select events ({len(d.select_events)} recorded):")

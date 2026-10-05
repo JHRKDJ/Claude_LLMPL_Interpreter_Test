@@ -349,3 +349,30 @@ def test_exhausted_render_budget_emits_a_truncated_report():
     r = run(MANY.replace("parallel collect", "parallel"))
     text = render_all([r.diag, r.diag], budget=RenderBudget(0.0))
     assert "rendering budget was exhausted" in text and "2 diagnostic(s) not shown" in text
+
+
+def test_random_schedule_failure_records_seed_and_recent_decisions():
+    """V3 7.14.5: a failure under seeded random scheduling records the seed and the
+    recent scheduling decisions; FIFO runs record none."""
+    import json
+    from lang.diagnostics.render_json import render_json
+    from lang.diagnostics.render_text import render_all
+    src = """
+async fn w(n: Int) -> Int { await sleep(1.millis)
+ return n }
+async fn main() {
+    let t = parallel { let a = spawn w(1)
+        let b = spawn w(2)
+        let c = spawn w(3)
+        (await a) + (await b) + (await c) }
+    let xs = [1]
+    print(xs[t])
+}"""
+    r = run(src, schedule="random", seed=42)
+    d = r.diag
+    assert d.stable_code == "A.INDEX.OUT_OF_RANGE" and d.task.seed == 42
+    dec = d.extra["schedule_decisions"]
+    assert dec and all({"switch", "ran", "ready", "pick"} <= set(x) for x in dec) and len(dec) <= 32
+    assert "recent seeded scheduling decisions" in render_all([d], "deep")
+    assert json.loads(render_json([d]))["diagnostics"][0]["extra"]["schedule_decisions"] == dec
+    assert "schedule_decisions" not in run(src).diag.extra

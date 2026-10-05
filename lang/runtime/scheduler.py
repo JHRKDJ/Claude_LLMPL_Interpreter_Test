@@ -71,6 +71,9 @@ class Timer:
         return (self.deadline, self.seq) < (other.deadline, other.seq)
 
 
+DECISION_HISTORY = 32
+
+
 class Scheduler:
     def __init__(self, clock: str = "real", schedule: str = "fifo", seed: Optional[int] = None):
         self._baton = threading.Semaphore(0)
@@ -88,6 +91,8 @@ class Scheduler:
         self.blocked: set = set()
         self.on_deadlock: Optional[Callable[[], bool]] = None
         self.switches = 0
+        # bounded history of seeded choices, attached to failure reports (V3 7.14.5)
+        self.decisions: deque = deque(maxlen=DECISION_HISTORY)
 
     # ------------------------------------------------------------------ time
     def now(self) -> int:
@@ -126,10 +131,12 @@ class Scheduler:
 
     def _pick(self):
         if self.schedule == "random" and len(self.ready) > 1:
-            i = self.rng.randrange(len(self.ready))
+            n = len(self.ready)
+            i = self.rng.randrange(n)
             self.ready.rotate(-i)
             t = self.ready.popleft()
             self.ready.rotate(i)
+            self.decisions.append({"switch": self.switches + 1, "ran": t.path, "ready": n, "pick": i})
         else:
             t = self.ready.popleft()
         t.in_ready = False

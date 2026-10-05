@@ -446,3 +446,37 @@ async fn main() {
     print(a)
 }""")
     assert r.lines == ["MutableList[1, 2]"]
+
+
+def test_failure_ordering_follows_task_paths_not_arrival_time():
+    """V3 7.10.3(6): the aggregate lists failures in task-path (spawn) order whatever
+    order they arrive in; under random scheduling either child may fail first."""
+    src = """
+error E { n: Int }
+async fn fail(n: Int) throws E { throw E(n: n) }
+async fn main() {
+    let agg = try parallel { spawn fail(1)
+        spawn fail(2)
+        spawn fail(3) } catch AggregateException as a => a.entries.map(fn(e) => (e.error as E).n)
+    print(agg)
+}"""
+    for kw in ({}, {"schedule": "random", "seed": 1}, {"schedule": "random", "seed": 2},
+               {"schedule": "random", "seed": 3}, {"schedule": "random", "seed": 11}):
+        assert run(src, **kw).lines == ["[1, 2, 3]"]
+
+
+def test_large_copy_advisory_names_size_root_and_alternatives():
+    r = ok("""
+async fn sum(xs: MutableList[Int]) -> Int { let s = 0
+ for x in xs { s = s + x }
+ return s }
+async fn main() {
+    let big = MutableList[Int]()
+    for i in 0..20000 { big.push(1) }
+    print(parallel { let h = spawn sum(big)
+        await h })
+}""")
+    w = [d for d in r.warnings if d.stable_code == "W.TASK.LARGE_COPY"][0]
+    assert "largest root: argument `xs`, about 20001 element(s)" in w.message
+    assert w.values["estimated_elements"] == "20001"
+    assert any("freeze" in h for h in w.help)

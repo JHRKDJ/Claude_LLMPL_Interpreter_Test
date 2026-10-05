@@ -107,7 +107,7 @@ class ChannelMixin:
 
     def copy_message(self, value):
         tr = Transfer("channel message")
-        v = tr.value(value, "message")
+        v = tr.root(value, "message")
         return v, tr
 
     # ------------------------------------------------------------------ commit helpers
