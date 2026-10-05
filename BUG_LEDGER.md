@@ -530,3 +530,42 @@ Fix: inside brackets a function type is tried first and kept when `,`/`]` follow
   lang/format/__init__.py).
 Commit: 7c4dac7
 Status: fixed
+
+BUG-0037
+Origin: second independent audit (concurrency auditor, F14)
+Subsystems: isolation (bound methods)
+Symptom: `spawn run(c.bump)` with a mutable receiver silently graph-copied the receiver,
+  while the equivalent closure `fn() => c.bump()` was rejected.
+Minimal reproduction: tests/regressions/test_bug_0037_bound_method_sendability.py
+Regression test failed before fix: yes (1 of 2)
+Fix: a bound method of a mutable value is a closure with a mutable capture: rejected;
+  a bound method of a frozen value is shared (lang/runtime/isolation.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0038
+Origin: second independent audit (concurrency auditor, F16)
+Subsystems: diagnostics (task observation)
+Symptom: a child exception the body had caught was listed in a later TaskGroupFailure as
+  R.ERROR.UNHANDLED; an awaited abandoned child was displayed twice (V3 8.10).
+Minimal reproduction: tests/regressions/test_bug_0038_observation_diagnostics.py
+Regression test failed before fix: yes (both)
+Fix: observed child failures appear as info I.TASK.HANDLED_FAILURE; group reports skip
+  diagnostics already present in the body's abandonment tree (lang/runtime/interp/conc.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0039
+Origin: second independent audit (concurrency auditor, F17 minor findings)
+Subsystems: checker advisories × select purity × spawn × report typing; runtime display
+Symptom: (a) `select now` counted as a cancellation point; (b) frozen record
+  construction in a select send was "impure"; (c) spawning a provider produced a
+  spurious S.ASYNC.AWAIT_NON_ASYNC; (d) a `TaskGroupReport` annotation mismatched the
+  collect result; (e) printing a borrow showed `<borrow of ...>`; (f) the NestedGroup
+  outcome was never produced; (g) the select ring lacked commit sequence numbers.
+Minimal reproduction: tests/regressions/test_bug_0039_audit_minor_concurrency.py
+Regression test failed before fix: yes (all 5 initial; (f)/(g) added with their fixes)
+Fix: lang/check/walk.py, selectcheck.py, callcheck.py, types.py,
+  lang/runtime/equality.py, interp/conc.py, interp/selectx.py.
+Commit: PENDING
+Status: fixed

@@ -191,6 +191,13 @@ class ConcMixin:
         out = c.outcome
         if out.kind == "abandoned":
             return out.diagnostic
+        if out.kind == "threw" and c.origin.observed:
+            # caught or captured by the body: context only, never an unhandled error (BUG-0038)
+            d = Diagnostic(code("I.TASK.HANDLED_FAILURE"),
+                           f"task {c.path} threw {self.error_summary(out.thrown.error)} (handled by the group body)",
+                           severity="info")
+            d.task = TaskProvenance(c.path)
+            return d
         if out.kind == "threw":
             d = self.error_diag(out.thrown, "R.ERROR.UNHANDLED", f"task {c.path} threw")
             d.task = TaskProvenance(c.path, c.group.site if c.group else None, c.group.mode if c.group else None)
@@ -210,9 +217,12 @@ class ConcMixin:
         mode = group.mode
         outer_cancel = any(s.cancelled for s in task.scopes)
         if isinstance(body_exc, Abandoned):
+            shown = _all_diags(body_exc.diagnostic)
             for c in children:
                 if c.outcome.kind != "ok":
-                    body_exc.diagnostic.children.append(self.child_diag(c))
+                    cd = self.child_diag(c)
+                    if cd not in shown:  # e.g. already the cause of an awaited abandonment (BUG-0038)
+                        body_exc.diagnostic.children.append(cd)
             raise body_exc
         abandoned = [c for c in children if c.outcome.kind == "abandoned"]
         if abandoned and mode != "collect":
@@ -319,7 +329,11 @@ class ConcMixin:
                                        f"collect report: task {c.path} returned a mutable {type_name(out.value)}; "
                                        f"results stored in a TaskGroupReport must be frozen", group.site, env,
                                        help="return a frozen value (e.g. `.freeze()`) from the child task")
-                outcomes.append(VariantValue(TASK_OUTCOME.cases["Succeeded"], (c.path, out.value)))
+                if type(out.value) is FrozenRecord and out.value.rtype is TASK_GROUP_REPORT:
+                    # a child that returned its own collect report is a nested group (V3 7.10.8)
+                    outcomes.append(VariantValue(TASK_OUTCOME.cases["NestedGroup"], (c.path, out.value)))
+                else:
+                    outcomes.append(VariantValue(TASK_OUTCOME.cases["Succeeded"], (c.path, out.value)))
             elif out.kind == "threw":
                 outcomes.append(VariantValue(TASK_OUTCOME.cases["ThrewException"], (c.path, out.thrown.error)))
             elif out.kind == "abandoned":
@@ -559,3 +573,10 @@ class ConcMixin:
             t.wake = ("abandon", d)
             self.sched.make_ready(t)
         return True
+
+
+def _all_diags(d) -> list:
+    out = [d]
+    for c in list(d.causes) + list(d.children):
+        out.extend(_all_diags(c))
+    return out

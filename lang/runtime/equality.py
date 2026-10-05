@@ -267,9 +267,12 @@ def quote_str(s: str) -> str:
 
 
 def display(v) -> str:
-    """Program-facing text conversion (print, interpolation). Never calls user code."""
+    """Program-facing text conversion (print, interpolation). Never calls user code.
+    A borrow displays the borrowed value (diagnostic capture keeps `<borrow of ...>`)."""
     if type(v) is str:
         return v
+    if getattr(type(v), "__name__", "") == "Borrow":
+        return display(v.target)
     return repr_value(v)
 
 

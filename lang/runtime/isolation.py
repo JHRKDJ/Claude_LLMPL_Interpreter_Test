@@ -147,8 +147,10 @@ class Transfer:
                 return v
             self.reject(v, "closure with mutable captures", path)
         if t is BoundMethod:
-            recv = self.value(v.receiver, f"{path}.<receiver>")
-            return BoundMethod(recv, v.func)
+            if not is_frozen(v.receiver):  # a bound method closes over its receiver (BUG-0037)
+                self.reject(v, "bound method of a mutable value", path)
+            self._scan_frozen([v.receiver], f"{path}.<receiver>")
+            return v
         if t is BuiltinBound:
             recv = self.value(v.receiver, f"{path}.<receiver>")
             return BuiltinBound(recv, v.builtin)

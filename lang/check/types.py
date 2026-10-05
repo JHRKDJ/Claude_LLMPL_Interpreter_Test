@@ -160,6 +160,11 @@ def task_error_names(et: T.Ty):
     return set(), True
 
 
+def _is_report(t) -> bool:
+    return (isinstance(t, T.TCon) and t.name == "TaskGroupReport") or \
+        (isinstance(t, T.TNominal) and t.qualname == "core.TaskGroupReport")
+
+
 def consistent(src: T.Ty, dst: T.Ty, satisfies=None) -> bool:
     """Is a value of static type `src` acceptable where `dst` is expected?"""
     if src is DYN or dst is DYN or src == dst:
@@ -169,6 +174,8 @@ def consistent(src: T.Ty, dst: T.Ty, satisfies=None) -> bool:
     if isinstance(src, T.TVar) or isinstance(dst, T.TVar):
         return True
     if src is T.NEVER:
+        return True
+    if _is_report(src) and _is_report(dst):  # `TaskGroupReport` annotation vs collect result (BUG-0039)
         return True
     if isinstance(dst, T.TBorrow):
         return consistent(src.inner if isinstance(src, T.TBorrow) else src, dst.inner, satisfies)

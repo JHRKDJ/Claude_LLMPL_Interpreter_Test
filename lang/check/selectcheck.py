@@ -8,18 +8,35 @@ from .types import DYN, consistent
 PURE_NODES = (A.Name, A.Literal, A.Field, A.Binary, A.Unary, A.TupleLit, A.ListLit, A.MapLit, A.StringLit, A.Range)
 
 
-def is_pure_setup(e) -> bool:
+def is_pure_setup(e, is_frozen_ctor=None) -> bool:
     """Branch setup may use endpoints, handles, precomputed values, deadlines and
-    restricted pure expressions; effectful construction (calls, awaits...) is prohibited."""
+    restricted pure expressions; effectful construction (calls, awaits...) is prohibited.
+    Constructing a frozen record or a variant case is pure (BUG-0039)."""
     for n in A.walk(e):
         if isinstance(n, A.InterpPart):
             continue
+        if isinstance(n, (A.Call, A.Arg)) and is_frozen_ctor is not None:
+            if isinstance(n, A.Arg) or is_frozen_ctor(n.callee):
+                continue
+            return False
         if not isinstance(n, PURE_NODES):
             return False
     return True
 
 
 class SelectCheckMixin:
+    def _is_frozen_ctor(self, callee) -> bool:
+        """`P(...)` for a frozen record P, or `E.Case(...)` / `Some(...)` / `Ok(...)`."""
+        if isinstance(callee, A.Name):
+            if callee.name in ("Some", "Ok", "Err"):
+                return True
+            ent = self.lookup_global(self.cur_module, callee.name)
+            return ent is not None and ent[0] == "type" and getattr(ent[1], "kind", None) in ("record", "error")
+        if isinstance(callee, A.Field) and isinstance(callee.obj, A.Name):
+            ent = self.lookup_global(self.cur_module, callee.obj.name)
+            return ent is not None and ent[0] == "type" and getattr(ent[1], "kind", None) == "enum"
+        return False
+
     def x_Select(self, e: A.Select, sc):
         from .typecheck import Scope
         fs = self.fn_stack[-1] if self.fn_stack else None
@@ -40,7 +57,7 @@ class SelectCheckMixin:
         for b in e.branches:
             bsc = Scope(sc)
             for x in (b.target, b.value):
-                if x is not None and not is_pure_setup(x):
+                if x is not None and not is_pure_setup(x, self._is_frozen_ctor):
                     self.legal("S.SELECT.IMPURE_SETUP", "select branch setup must be a precomputed value (no calls, "
                                "awaits or other effects)", x.span,
                                help="compute it before the select: `let v = ...` then `send v to port`")

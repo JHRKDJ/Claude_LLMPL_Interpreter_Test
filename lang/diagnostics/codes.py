@@ -184,6 +184,7 @@ CODES: dict[str, str] = {
     "H.RUNTIME.INTERNAL_ERROR": "interpreter defect (please report)",
     # ---- tests ----
     "I.TEST.PASSED": "test passed",
+    "I.TASK.HANDLED_FAILURE": "child failure that the group body caught or captured (context)",
     "I.RUNTIME.REPORT": "informational runtime report",
 }
 

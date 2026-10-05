@@ -1765,28 +1765,28 @@
   {
    "id": "AUD2-C14",
    "title": "F14 bound method on mutable record silently copied across tasks",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C15",
    "title": "F15 awaited-and-caught child failure depends on timing (AMB-002)",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C16",
    "title": "F16 observation diagnostics mislabelled/duplicated",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },
   {
    "id": "AUD2-C17",
    "title": "F17 minors: select now cancel point, pure ctor in select send, ring seq, spurious await diag, TaskGroupReport typing/NestedGroup, creator sender holder, borrow display",
-   "state": "TODO",
+   "state": "DONE",
    "deps": [],
    "origin": "second independent audit"
   },

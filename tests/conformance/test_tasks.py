@@ -480,3 +480,31 @@ async fn main() {
     assert "largest root: argument `xs`, about 20001 element(s)" in w.message
     assert w.values["estimated_elements"] == "20001"
     assert any("freeze" in h for h in w.help)
+
+
+def test_catching_an_awaited_failure_is_timing_dependent_in_failfast():
+    """AMB-002 (second audit C15): in fail-fast, a child failure that happens before the
+    body reaches `await h` cancels the body; one that happens while the body waits on
+    `h` is delivered there and can be caught. Collect mode is the deterministic choice."""
+    tmpl = """
+error Boom { n: Int }
+async fn bad() -> Int throws Boom { throw Boom(n: 2) }
+async fn main() {
+    let v = try parallel {
+        let h = spawn bad()
+        BODY
+        try await h catch Boom as e => e.n * 100
+    } catch AggregateException => -1
+    print(v)
+}"""
+    assert run(tmpl.replace("BODY", "")).lines == ["200"]
+    assert run(tmpl.replace("BODY", "await sleep(5.millis)")).lines == ["-1"]
+    r = run("""
+error Boom { n: Int }
+async fn bad() -> Int throws Boom { throw Boom(n: 2) }
+async fn main() {
+    let rep = parallel collect { spawn bad()
+        await sleep(5.millis) }
+    print(rep.outcomes.filter(fn(o) => o is TaskOutcome.ThrewException).length)
+}""")
+    assert r.lines == ["1"]

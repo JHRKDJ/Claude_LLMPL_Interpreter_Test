@@ -312,6 +312,18 @@ one child"). An exception thrown by the body itself is also aggregated (path
 `<body>`); an awaited-but-uncaught child exception is aggregated once, under the
 child's path (V3 8.10 "no failure displayed twice").
 
+**Second-audit note (C15, retained with its consequence made explicit):** whether
+`try await h catch E => ...` observes a child failure depends on whether the body
+reaches that `await` before the failure cancels it — a timing dependence. Alternatives
+considered: (a) never cancel the body on child failure (only the other children) — then
+a fail-fast group could not stop a body waiting on unrelated work, defeating "fail
+fast"; (b) defer delivery to the next `await h` — the intervening cancellation point
+still decides. V3 7.10.4 explicitly allows schedule-dependent first-failure identity
+("user logic must not rely on first-failure identity"), so the resolution stands:
+code that must handle every child failure deterministically uses `parallel collect`
+(supervision) or converts inside the child (`capture`). Pinned by
+tests/conformance/test_tasks.py::test_catching_an_awaited_failure_is_timing_dependent_in_failfast.
+
 ### AMB-003 Awaiting a child that was cancelled or abandoned
 V3 says awaiting exposes recoverable exceptions; abandonment is never converted to a
 catchable exception (7.10.3). **Resolution:** awaiting an abandoned child makes the

@@ -179,7 +179,8 @@ class WalkMixin:
         for n in A.walk(d.body):
             if isinstance(n, A.WhileStmt) or (isinstance(n, A.ForStmt) and not n.is_await):
                 body_nodes = list(A.walk(n.body)) + list(A.walk(n.cond if isinstance(n, A.WhileStmt) else n.iterable))
-                has_point = any(isinstance(x, (A.Await, A.Select, A.Parallel, A.Within)) or
+                has_point = any(isinstance(x, (A.Await, A.Parallel, A.Within)) or
+                                (isinstance(x, A.Select) and x.mode != "now") or  # select now never waits
                                 (isinstance(x, A.Call) and isinstance(x.callee, A.Field) and x.callee.name == "check"
                                  and isinstance(x.callee.obj, A.Name) and x.callee.obj.name == "cancel")
                                 for x in body_nodes)

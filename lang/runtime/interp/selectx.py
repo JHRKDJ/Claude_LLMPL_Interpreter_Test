@@ -243,6 +243,9 @@ class SelectMixin:
                 b = real[pick]
                 self.record_select(node, invocation, real, ready, start, b, mode)
                 payload = self.commit_branch(b, node, env)
+                if b.port is not None and b.port.channel.events and task.select_ring:
+                    # the committed message's sequence number (V3 7.12.14; BUG-0039)
+                    task.select_ring[-1]["seq"] = b.port.channel.events[-1].get("seq")
                 if mode != "priority":
                     site[0] = (pick + 1) % n
                 return (handler or self.run_branch_handler)(b, payload, env)

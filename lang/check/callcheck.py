@@ -207,7 +207,8 @@ class CallMixin:
                            help=f"write `await {e.span.text}`")
             if fs is not None:
                 fs.has_cancel_point = True
-        elif awaited and info.kind not in ("dyn",):
+        elif awaited and info.kind not in ("dyn",) and not getattr(self, "_spawn_call", False):
+            # (`spawn f(...)` is checked as an awaited call; no `await` was written there)
             self.oblig("S.ASYNC.AWAIT_NON_ASYNC", f"`await` applied to non-async `{info.name}`", e.span)
         if info.is_provider and not (fs is not None and fs.in_use_init):
             self.legal("S.RESOURCE.PROVIDER_OUTSIDE_USE",
