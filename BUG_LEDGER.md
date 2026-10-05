@@ -540,7 +540,7 @@ Minimal reproduction: tests/regressions/test_bug_0037_bound_method_sendability.p
 Regression test failed before fix: yes (1 of 2)
 Fix: a bound method of a mutable value is a closure with a mutable capture: rejected;
   a bound method of a frozen value is shared (lang/runtime/isolation.py).
-Commit: PENDING
+Commit: 1754ff9
 Status: fixed
 
 BUG-0038
@@ -552,7 +552,7 @@ Minimal reproduction: tests/regressions/test_bug_0038_observation_diagnostics.py
 Regression test failed before fix: yes (both)
 Fix: observed child failures appear as info I.TASK.HANDLED_FAILURE; group reports skip
   diagnostics already present in the body's abandonment tree (lang/runtime/interp/conc.py).
-Commit: PENDING
+Commit: 1754ff9
 Status: fixed
 
 BUG-0039
@@ -567,5 +567,5 @@ Minimal reproduction: tests/regressions/test_bug_0039_audit_minor_concurrency.py
 Regression test failed before fix: yes (all 5 initial; (f)/(g) added with their fixes)
 Fix: lang/check/walk.py, selectcheck.py, callcheck.py, types.py,
   lang/runtime/equality.py, interp/conc.py, interp/selectx.py.
-Commit: PENDING
+Commit: 1754ff9
 Status: fixed
