@@ -1670,6 +1670,363 @@
    "title": "FINAL_REPORT.md",
    "state": "TODO",
    "deps": []
+  },
+  {
+   "id": "AUD2-C01",
+   "title": "F1 return/break/continue in parallel skip quiescence",
+   "state": "DONE",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C02",
+   "title": "F2 return/break/continue in use body: crash / no release",
+   "state": "DONE",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C03",
+   "title": "F3 closure over later-reassigned binding shared across tasks",
+   "state": "DONE",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C04",
+   "title": "F4 task handles nested in frozen collections cross boundaries",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C05",
+   "title": "F5 normal release not masked when cancellation arrives during release",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C06",
+   "title": "F6 firstSuccess/collect drop child failures on external cancel; collect body throw drops child failure",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C07",
+   "title": "F7 escaping closure capturing a borrow not rejected",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C08",
+   "title": "F8 static borrow escapes via Some/tuple/helper field write",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C09",
+   "title": "F9 provider yield-count checker false positives/negatives",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C10",
+   "title": "F10 throwing defer makes checker demand AggregateException",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C11",
+   "title": "F11 masked cleanup suppresses its own inner within deadline",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C12",
+   "title": "F12 receive port in transit not counted as receiver",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C13",
+   "title": "F13 static sendability: mutable-capture closures, mutable broadcast, handle escape via closure",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C14",
+   "title": "F14 bound method on mutable record silently copied across tasks",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C15",
+   "title": "F15 awaited-and-caught child failure depends on timing (AMB-002)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C16",
+   "title": "F16 observation diagnostics mislabelled/duplicated",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-C17",
+   "title": "F17 minors: select now cancel point, pure ctor in select send, ring seq, spurious await diag, TaskGroupReport typing/NestedGroup, creator sender holder, borrow display",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T01",
+   "title": "Big Int / format spec Python ValueError/OverflowError leaks as hard termination",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T02",
+   "title": "NaN identity leaks into frozen-value equality",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T03",
+   "title": "Invariant field control bypassed through mutable sub-objects",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T04",
+   "title": "Typed mutable collection parameter not enforced on writes",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T05",
+   "title": "Generic record annotations (Box[Int]) not enforced",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T06",
+   "title": "Function-typed values: call results/args unchecked at runtime",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T07",
+   "title": "Effect of a narrowed callable not enforced on invocation",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T08",
+   "title": "Written throws E (effect variable) advisory at runtime",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T09",
+   "title": "Formatter refuses code with comments in common positions; inline comment moves; stdlib not canonical",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T10",
+   "title": "Protocol shape check skips arity for builtin receivers",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T11",
+   "title": "check misses const init cycles / mutable-global init; exit code inconsistency",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T12",
+   "title": "Field access on category-bound catch variable passes verified",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T13",
+   "title": "Secret redaction incomplete; redacted flag wrong",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T14",
+   "title": "Numeric/display Python-isms (round, float repr, {5:07}, toInt whitespace, duplicate map keys, duplicate named args)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T15",
+   "title": "Int/Float containment/equality inconsistency",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T16",
+   "title": "Function types in value-position type arguments do not parse",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T17",
+   "title": "Dynamic-type diagnostic quality gaps (5.3.12/7.6.5)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T18",
+   "title": "Tooling: check --fix stale output; REPL span path; literal format spec static check",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T19",
+   "title": "Doc mismatches: IMPL-005, SPEC-004",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD2-T20",
+   "title": "Minor checker false positives (loop definite assignment), frozen list closure static, recursion depth",
+   "state": "TODO",
+   "deps": [],
+   "origin": "second independent audit"
+  },
+  {
+   "id": "AUD3-L01",
+   "title": "LocalFlow: subworkflow timeout drops nested completions at the same instant (D1)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L02",
+   "title": "Spec: nested run finishing exactly at subworkflow timeoutMs (D2)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L03",
+   "title": "number on empty file (D3, both wrong)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L04",
+   "title": "csvSum integer syntax: '+5', whitespace (D4)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L05",
+   "title": "Line endings CRLF (D5)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L06",
+   "title": "Oracle accepts NaN/Infinity JSON literals (D6)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L07",
+   "title": "Transform output in subdirectory (D7)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L08",
+   "title": "Path traversal / absolute paths (D8)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L09",
+   "title": "attempts count when backoff expires at cancel/fail-fast instant (D9)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L10",
+   "title": "Validation completeness: duplicate deps, invalid-id deps, 3.0 (D10)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L11",
+   "title": "reduce excluding skipped deps is dead spec text (D11)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L12",
+   "title": "Outputs of failed/cancelled subworkflow jobs remain (D12)",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L13",
+   "title": "Harness: compare bytes; leftover dirs; file modes",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
+  },
+  {
+   "id": "AUD3-L14",
+   "title": "Add the reviewer's passing candidate fixtures to the permanent suite",
+   "state": "TODO",
+   "deps": [],
+   "origin": "LocalFlow adversarial review"
   }
  ]
 }

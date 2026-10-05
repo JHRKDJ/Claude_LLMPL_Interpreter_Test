@@ -240,3 +240,44 @@ Fix: names bound by named imports are recorded and rebound to the filled entries
   verified mode with zero errors and its manifest selects verified.
 Commit: c596dfb
 Status: fixed
+
+BUG-0016
+Origin: second independent audit (concurrency auditor, F1)
+Subsystems: task groups × control flow (return/break/continue)
+Symptom: `return`, `break` or `continue` inside a `parallel` body left the group
+  without waiting for quiescence: children ran after the function returned, never
+  ran when the program ended, and their failures were lost (V3 5.12.2, 6.8).
+Minimal reproduction: tests/regressions/test_bug_0016_parallel_control_transfer.py
+Regression test failed before fix: yes (all 3)
+Fix: a control transfer ends the body normally; the group quiesces and settles its
+  outcome (a child failure still becomes the outward AggregateException), then the
+  transfer resumes (lang/runtime/interp/conc.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0017
+Origin: second independent audit (concurrency auditor, F2)
+Subsystems: resource scopes × control flow
+Symptom: `return` inside a `use` body crashed the interpreter
+  (H.RUNTIME.INTERNAL_ERROR: the return unwound through the provider's own frame);
+  `break`/`continue` inside a `use` body skipped normal release (resource leak).
+Minimal reproduction: tests/regressions/test_bug_0017_use_control_transfer.py
+Regression test failed before fix: yes (all 4)
+Fix: the scope body captures control transfers as a "transfer" outcome; release
+  runs with ScopeExit.Normal; a release failure replaces the transfer as on normal
+  exit; otherwise the transfer resumes (lang/runtime/interp/res.py).
+Commit: PENDING
+Status: fixed
+
+BUG-0018
+Origin: second independent audit (concurrency auditor, F3)
+Subsystems: name resolution × isolation (closure captures)
+Symptom: a closure capturing a binding that the enclosing scope reassigned *after*
+  creating the closure was considered sendable and was shared live with a child task;
+  a spawn block whose capture was reassigned after the spawn was silently snapshotted.
+Minimal reproduction: tests/regressions/test_bug_0018_capture_reassigned_later.py
+Regression test failed before fix: yes (2 of 3)
+Fix: capture "reassigned" flags are finalised after the whole program is resolved
+  (lang/check/resolve.py).
+Commit: PENDING
+Status: fixed

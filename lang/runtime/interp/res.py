@@ -18,7 +18,7 @@ from ...diagnostics import Note, ResourceProvenance
 from ...syntax import ast as A
 from ..core_types import SCOPE_EXIT
 from ..equality import type_name
-from ..signals import Abandoned, Cancelled, Fault, Thrown
+from ..signals import Abandoned, BreakSignal, Cancelled, ContinueSignal, Fault, ReturnSignal, Thrown
 from ..values import Borrow, Builtin, BuiltinBound, Closure, ResourceState, UNIT
 from .core import Env
 
@@ -125,6 +125,10 @@ class ResourceMixin:
             return ("threw", t), state
         except Cancelled as c:
             return ("cancelled", c), state
+        except (ReturnSignal, BreakSignal, ContinueSignal) as sig:
+            # control leaves the scope normally: release runs, then the transfer resumes
+            # (it must not unwind through the provider's own frame; BUG-0017)
+            return ("transfer", sig), state
         finally:
             state.active = False
 
@@ -244,7 +248,7 @@ class ResourceMixin:
             except BaseException as e:
                 a.diagnostic.notes.append(Note(f"abandonment-safe release of {prov.name} failed: {e}"))
             raise
-        exit_class = {"ok": "Normal", "threw": "Failed", "cancelled": "Cancelled"}[outcome[0]]
+        exit_class = {"ok": "Normal", "transfer": "Normal", "threw": "Failed", "cancelled": "Cancelled"}[outcome[0]]
         release_error = None
         if outcome[0] == "cancelled":
             task.mask += 1
@@ -265,8 +269,8 @@ class ResourceMixin:
         if release_error is None:
             if kind == "ok":
                 return payload
-            raise payload
-        if kind == "ok":
+            raise payload  # Thrown, Cancelled, or the resumed return/break/continue
+        if kind in ("ok", "transfer"):
             raise release_error
         if kind == "threw":
             raise self.aggregate_thrown([("body", payload), ("release", release_error)], node.span)

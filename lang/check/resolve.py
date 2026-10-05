@@ -166,6 +166,7 @@ class Resolver:
         self.module_scopes: dict[str, Scope] = {}
         self.module_exports: dict[str, dict[str, A.Decl]] = {}
         self.module_decls: dict[str, dict[str, A.Decl]] = {}
+        self.capture_sites: list = []  # (Lambda/Spawn node, captured bindings), finalised in run()
 
     # ------------------------------------------------------------------ diagnostics
     def err(self, stable: str, msg: str, span: Span, label: str = "", help: Optional[str] = None,
@@ -220,6 +221,10 @@ class Resolver:
         for name, ms in self.program.modules.items():
             if ms.ast is not None:
                 self.resolve_module(name, ms)
+        # A capture's "reassigned" flag is final only once the whole enclosing scope has
+        # been resolved: a later `x = ...` in the parent also makes the capture live (BUG-0018).
+        for node, caps in self.capture_sites:
+            node.ann["captures"] = [(n, b.assigned) for n, b in caps.items()]
         return self.diags
 
     def resolve_module(self, mname: str, ms) -> None:
@@ -874,6 +879,7 @@ class Resolver:
                 self.block(e.block, s, da, new_scope=False)
             self.with_ctx(inner, run)
             e.ann["captures"] = [(n, b.assigned) for n, b in inner.captures.items()]
+            self.capture_sites.append((e, dict(inner.captures)))
             for n, b in inner.captures.items():
                 self.note_capture(n, b)
             return da
@@ -936,6 +942,7 @@ class Resolver:
             self.marked_restore(saved)
         e.ann["captures"] = [(n, b.assigned) for n, b in inner.captures.items()]
         e.ann["capture_bindings"] = list(inner.captures.values())
+        self.capture_sites.append((e, dict(inner.captures)))
         for n, b in inner.captures.items():
             self.note_capture(n, b)
 

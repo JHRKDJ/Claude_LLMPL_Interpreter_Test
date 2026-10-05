@@ -10,7 +10,8 @@ from ..equality import type_name
 from ..frozen import is_frozen
 from ..isolation import Transfer
 from ..scheduler import Coro
-from ..signals import Abandoned, Cancelled, Fault, HardTermination, Thrown
+from ..signals import (Abandoned, BreakSignal, Cancelled, ContinueSignal, Fault, HardTermination, ReturnSignal,
+                       Thrown)
 from ..tasks import CancelScope, Outcome, Task, TaskGroup, Wait, cancel_scope
 from ..values import UNIT, Closure, Duration, FrozenList, FrozenRecord, Instant, VariantValue
 from .core import Env, Frame
@@ -147,11 +148,16 @@ class ConcMixin:
         task.groups.append(group)
         frame.groups.append(group)
         body_exc = None
+        transfer = None
         value = UNIT
         try:
             value = self.exec_block(node.body, env)
         except (Thrown, Cancelled, Abandoned) as e:
             body_exc = e
+        except (ReturnSignal, BreakSignal, ContinueSignal) as sig:
+            # `return`/`break`/`continue` end the body normally; the group still quiesces
+            # and settles its outcome before control leaves (V3 5.12.2; BUG-0016)
+            transfer = sig
         finally:
             frame.groups.pop()
         if body_exc is not None:
@@ -162,7 +168,10 @@ class ConcMixin:
         task.scopes.remove(group.scope)
         task.groups.remove(group)
         group.closed = True
-        return self.group_outcome(group, value, body_exc, node, env)
+        result = self.group_outcome(group, value, body_exc, node, env)
+        if transfer is not None:
+            raise transfer
+        return result
 
     def wait_quiescence(self, group: TaskGroup) -> None:
         while group.live > 0:
