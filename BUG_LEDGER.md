@@ -627,7 +627,7 @@ Regression test failed before fix: yes (1 of 2)
 Fix: category bindings have a member-less category type; field access is
   S.TYPE.UNKNOWN_FIELD with a hint to catch the concrete type or narrow
   (lang/check/callcheck.py, expr.py).
-Commit: PENDING
+Commit: dd38667
 Status: fixed
 
 BUG-0044
@@ -645,5 +645,5 @@ Fix: text masking of known credential shapes; sensitive/credential-named field v
   quadratically on long inputs (the suite slowed past 2 minutes); they were bounded and
   a performance guard added (lang/runtime/capture.py, interp/calls.py, interp/core.py,
   lang/diagnostics/model.py, renderers).
-Commit: PENDING
+Commit: dd38667
 Status: fixed
