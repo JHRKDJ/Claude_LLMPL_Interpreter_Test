@@ -252,7 +252,7 @@ Regression test failed before fix: yes (all 3)
 Fix: a control transfer ends the body normally; the group quiesces and settles its
   outcome (a child failure still becomes the outward AggregateException), then the
   transfer resumes (lang/runtime/interp/conc.py).
-Commit: PENDING
+Commit: 4825290
 Status: fixed
 
 BUG-0017
@@ -266,7 +266,7 @@ Regression test failed before fix: yes (all 4)
 Fix: the scope body captures control transfers as a "transfer" outcome; release
   runs with ScopeExit.Normal; a release failure replaces the transfer as on normal
   exit; otherwise the transfer resumes (lang/runtime/interp/res.py).
-Commit: PENDING
+Commit: 4825290
 Status: fixed
 
 BUG-0018
@@ -279,5 +279,5 @@ Minimal reproduction: tests/regressions/test_bug_0018_capture_reassigned_later.p
 Regression test failed before fix: yes (2 of 3)
 Fix: capture "reassigned" flags are finalised after the whole program is resolved
   (lang/check/resolve.py).
-Commit: PENDING
+Commit: 4825290
 Status: fixed
