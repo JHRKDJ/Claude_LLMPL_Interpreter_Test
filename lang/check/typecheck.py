@@ -99,6 +99,7 @@ class Checker(WalkMixin, CallMixin, SelectCheckMixin, ExprMixin):
         self.types: dict[str, TypeInfo] = core_type_infos()
         self.modules: dict[str, dict] = {}  # module -> name -> entity
         self.exports: dict[str, set] = {}
+        self.import_links: list[tuple[str, str, str]] = []  # (importer, name, source module)
         self.fn_sigs: list[FnSig] = []
         self.eff_stack: list[Collector] = []
         self.fn_stack: list[FnState] = []
@@ -156,6 +157,10 @@ class Checker(WalkMixin, CallMixin, SelectCheckMixin, ExprMixin):
             self.bind_imports(name, ms.ast)
         for name, ms in mods:
             self.fill_types(name, ms.ast)
+        # names imported with `import m.{f}` were bound to placeholder entries before
+        # fill_types created their signatures; rebind them to the filled entries (BUG-0015)
+        for mname, n, full in self.import_links:
+            self.modules[mname][n] = self.modules[full][n]
         self.check_declarations(mods)
         # effect inference fixpoint for unannotated functions (no reporting)
         for _ in range(6):
@@ -224,8 +229,9 @@ class Checker(WalkMixin, CallMixin, SelectCheckMixin, ExprMixin):
                 continue
             if imp.names is not None:
                 for n, _ in imp.names:
-                    if n in self.modules[full]:
-                        ents.setdefault(n, self.modules[full][n])
+                    if n in self.modules[full] and n not in ents:
+                        ents[n] = self.modules[full][n]
+                        self.import_links.append((mname, n, full))
             else:
                 ents.setdefault(imp.alias or imp.path[-1], ("module", full))
 
